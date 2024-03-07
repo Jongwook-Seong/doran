@@ -1,6 +1,6 @@
 package com.sjw.doran.memberservice.controller;
 
-import com.sjw.doran.memberservice.entity.MemberEntity;
+import com.sjw.doran.memberservice.entity.Member;
 import com.sjw.doran.memberservice.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -27,10 +27,10 @@ public class MemberController {
     @ApiResponses(
             @ApiResponse(responseCode = "200", description = "Success",
                     content = {
-                        @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = MemberEntity.class)))
+                        @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = Member.class)))
                     })
     )
-    public List<MemberEntity> members() {
+    public List<Member> members() {
         return memberService.findMembers();
     }
 
@@ -38,10 +38,10 @@ public class MemberController {
     @Operation(summary = "신규 멤버 저장", description = "새로운 멤버를 저장합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Success",
-                    content = {@Content(schema = @Schema(implementation = MemberEntity.class))}),
+                    content = {@Content(schema = @Schema(implementation = Member.class))}),
             @ApiResponse(responseCode = "500", description = "Fail")
     })
-    public void saveMember(@RequestBody MemberEntity member) {
+    public void saveMember(@RequestBody Member member) {
         memberService.saveMember(member);
     }
 }

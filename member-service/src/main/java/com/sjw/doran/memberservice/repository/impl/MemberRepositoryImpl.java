@@ -1,14 +1,14 @@
 package com.sjw.doran.memberservice.repository.impl;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.sjw.doran.memberservice.entity.MemberEntity;
-import com.sjw.doran.memberservice.entity.QMemberEntity;
+import com.sjw.doran.memberservice.entity.Member;
+import com.sjw.doran.memberservice.entity.QMember;
 import com.sjw.doran.memberservice.repository.MemberRepositoryCustom;
 import jakarta.persistence.EntityManager;
 
 import java.util.Optional;
 
-import static com.sjw.doran.memberservice.entity.QMemberEntity.memberEntity;
+import static com.sjw.doran.memberservice.entity.QMember.member;
 
 public class MemberRepositoryImpl implements MemberRepositoryCustom {
 
@@ -19,13 +19,13 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
     }
 
     @Override
-    public Optional<MemberEntity> findByMemberUuid(String memberUuid) {
+    public Optional<Member> findByMemberUuid(String memberUuid) {
 
-        MemberEntity member = queryFactory
-                .selectFrom(memberEntity)
-                .where(memberEntity.memberUuid.eq(memberUuid))
+        Member findMember = queryFactory
+                .selectFrom(member)
+                .where(member.memberUuid.eq(memberUuid))
                 .fetchOne();
 
-        return Optional.of(member);
+        return Optional.of(findMember);
     }
 }
