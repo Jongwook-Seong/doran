@@ -17,7 +17,15 @@ public class Member extends BaseTimeEntity {
     private String nickname;
     private String profileImageUrl;
 
-//    private List<String> orderUuidList;
+    @Embedded
+    private Address address;
+
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "order_uuid_list", joinColumns = @JoinColumn(name = "member_id"))
+    private List<String> orderUuid;
+
+    @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Basket basket;
 
     public Member(String memberUuid, String nickname, String profileImageUrl) {
         this.memberUuid = memberUuid;
