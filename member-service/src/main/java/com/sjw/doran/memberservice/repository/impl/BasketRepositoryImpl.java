@@ -3,7 +3,6 @@ package com.sjw.doran.memberservice.repository.impl;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sjw.doran.memberservice.entity.Basket;
 import com.sjw.doran.memberservice.entity.Member;
-import com.sjw.doran.memberservice.entity.QBasket;
 import com.sjw.doran.memberservice.repository.BasketRepositoryCustom;
 import jakarta.persistence.EntityManager;
 
@@ -13,8 +12,8 @@ public class BasketRepositoryImpl implements BasketRepositoryCustom {
 
     private JPAQueryFactory queryFactory;
 
-    public BasketRepositoryImpl(EntityManager em) {
-        queryFactory = new JPAQueryFactory(em);
+    public BasketRepositoryImpl(EntityManager entityManager) {
+        queryFactory = new JPAQueryFactory(entityManager);
     }
 
     @Override

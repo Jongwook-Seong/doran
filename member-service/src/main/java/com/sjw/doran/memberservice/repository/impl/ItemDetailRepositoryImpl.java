@@ -3,7 +3,6 @@ package com.sjw.doran.memberservice.repository.impl;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sjw.doran.memberservice.entity.Basket;
 import com.sjw.doran.memberservice.entity.ItemDetail;
-import com.sjw.doran.memberservice.entity.QItemDetail;
 import com.sjw.doran.memberservice.repository.ItemDetailRepositoryCustom;
 import jakarta.persistence.EntityManager;
 import org.springframework.transaction.annotation.Transactional;
