@@ -15,6 +15,7 @@ public class Basket {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "basket_id")
     private Long id;
+
     @OneToOne
     @JoinColumn(name = "member_id")
     private Member member;
@@ -22,4 +23,8 @@ public class Basket {
     @OneToMany
     @JoinColumn(name = "basket_id")
     private List<ItemDetail> itemDetails;
+
+    public Basket(Member member) {
+        this.member = member;
+    }
 }
