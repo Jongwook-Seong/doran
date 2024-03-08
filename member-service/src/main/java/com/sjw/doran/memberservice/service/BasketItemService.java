@@ -1,4 +1,4 @@
 package com.sjw.doran.memberservice.service;
 
-public interface ItemDetailService {
+public interface BasketItemService {
 }

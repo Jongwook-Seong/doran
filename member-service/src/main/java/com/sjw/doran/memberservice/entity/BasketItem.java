@@ -6,7 +6,7 @@ import lombok.*;
 @Entity
 @Getter @Setter
 @NoArgsConstructor
-public class ItemDetail {
+public class BasketItem {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "item_detail_id")
@@ -19,7 +19,7 @@ public class ItemDetail {
     private String itemUuid;
     private int count;
 
-    public ItemDetail(Basket basket, String itemUuid, int count) {
+    public BasketItem(Basket basket, String itemUuid, int count) {
         this.basket = basket;
         this.itemUuid = itemUuid;
         this.count = count;

@@ -1,10 +1,10 @@
 package com.sjw.doran.memberservice.repository.impl;
 
 import com.sjw.doran.memberservice.entity.Basket;
-import com.sjw.doran.memberservice.entity.ItemDetail;
+import com.sjw.doran.memberservice.entity.BasketItem;
 import com.sjw.doran.memberservice.entity.Member;
 import com.sjw.doran.memberservice.repository.BasketRepository;
-import com.sjw.doran.memberservice.repository.ItemDetailRepository;
+import com.sjw.doran.memberservice.repository.BasketBasketItemRepository;
 import com.sjw.doran.memberservice.repository.MemberRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -19,14 +19,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Slf4j
 @SpringBootTest
 @Transactional
-class ItemDetailRepositoryImplTest {
+class BasketItemRepositoryImplTest {
 
     @Autowired
     MemberRepository memberRepository;
     @Autowired
     BasketRepository basketRepository;
     @Autowired
-    ItemDetailRepository itemDetailRepository;
+    BasketBasketItemRepository basketItemRepository;
 
     @Test
     void findAllByBasket() {
@@ -38,18 +38,18 @@ class ItemDetailRepositoryImplTest {
         basketRepository.save(basket);
         Basket findBasket = basketRepository.findByMember(member);
 
-        ItemDetail itemDetail1 = new ItemDetail(findBasket, "123", 2);
-        ItemDetail itemDetail2 = new ItemDetail(findBasket, "456", 4);
-        itemDetailRepository.save(itemDetail1);
-        itemDetailRepository.save(itemDetail2);
+        BasketItem basketItem1 = new BasketItem(findBasket, "123", 2);
+        BasketItem basketItem2 = new BasketItem(findBasket, "456", 4);
+        basketItemRepository.save(basketItem1);
+        basketItemRepository.save(basketItem2);
 
-        List<ItemDetail> findItemDetails = itemDetailRepository.findAllByBasket(findBasket);
+        List<BasketItem> findBasketItems = basketItemRepository.findAllByBasket(findBasket);
 
-        log.info("itemDetail1 = " + itemDetail1);
-        log.info("itemDetail2 = " + itemDetail2);
-        log.info("findItemDetails = " + findItemDetails);
+        log.info("itemDetail1 = " + basketItem1);
+        log.info("itemDetail2 = " + basketItem2);
+        log.info("findItemDetails = " + findBasketItems);
 
-        assertThat(findItemDetails).contains(itemDetail1);
-        assertThat(findItemDetails).contains(itemDetail2);
+        assertThat(findBasketItems).contains(basketItem1);
+        assertThat(findBasketItems).contains(basketItem2);
     }
 }

@@ -22,7 +22,7 @@ public class Basket {
 
     @OneToMany
     @JoinColumn(name = "basket_id")
-    private List<ItemDetail> itemDetails;
+    private List<BasketItem> basketItems;
 
     public Basket(Member member) {
         this.member = member;
