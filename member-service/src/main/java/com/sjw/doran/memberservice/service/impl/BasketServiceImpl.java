@@ -19,4 +19,10 @@ public class BasketServiceImpl implements BasketService {
     public void setBasket(Member member) {
         basketRepository.save(new Basket(member));
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Basket findBasket(Member member) {
+        return basketRepository.findByMember(member);
+    }
 }

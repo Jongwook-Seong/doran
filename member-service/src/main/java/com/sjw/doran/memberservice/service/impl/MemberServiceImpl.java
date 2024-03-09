@@ -7,12 +7,19 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
+
+    @Override
+    public Member findMember(String memberUuid) {
+        Optional<Member> member = memberRepository.findByMemberUuid(memberUuid);
+        return member.get();
+    }
 
     @Override
     public List<Member> findMembers() {

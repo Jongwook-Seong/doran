@@ -4,7 +4,7 @@ import com.sjw.doran.memberservice.entity.Basket;
 import com.sjw.doran.memberservice.entity.BasketItem;
 import com.sjw.doran.memberservice.entity.Member;
 import com.sjw.doran.memberservice.repository.BasketRepository;
-import com.sjw.doran.memberservice.repository.BasketBasketItemRepository;
+import com.sjw.doran.memberservice.repository.BasketItemRepository;
 import com.sjw.doran.memberservice.repository.MemberRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -26,7 +26,7 @@ class BasketItemRepositoryImplTest {
     @Autowired
     BasketRepository basketRepository;
     @Autowired
-    BasketBasketItemRepository basketItemRepository;
+    BasketItemRepository basketItemRepository;
 
     @Test
     void findAllByBasket() {

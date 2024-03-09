@@ -1,6 +1,7 @@
 package com.sjw.doran.memberservice.controller;
 
 import com.sjw.doran.memberservice.entity.Member;
+import com.sjw.doran.memberservice.service.BasketService;
 import com.sjw.doran.memberservice.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -21,6 +22,7 @@ import java.util.List;
 public class MemberController {
 
     private final MemberService memberService;
+    private final BasketService basketService;
 
     @GetMapping("/members")
     @Operation(summary = "멤버 리스트 조회", description = "전체 멤버 목록을 조회합니다.")
@@ -34,14 +36,15 @@ public class MemberController {
         return memberService.findMembers();
     }
 
-    @PostMapping("/save")
-    @Operation(summary = "신규 멤버 저장", description = "새로운 멤버를 저장합니다.")
+    @PostMapping("/join")
+    @Operation(summary = "신규 회원 저장", description = "새로 가입한 멤버(회원)를 저장합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Success",
                     content = {@Content(schema = @Schema(implementation = Member.class))}),
             @ApiResponse(responseCode = "500", description = "Fail")
     })
-    public void saveMember(@RequestBody Member member) {
+    public void joinMember(@RequestBody Member member) {
         memberService.saveMember(member);
+        basketService.setBasket(member);
     }
 }
