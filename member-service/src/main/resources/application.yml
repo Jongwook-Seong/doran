@@ -1,0 +1,32 @@
+spring:
+  application:
+    name: member-service
+  config:
+    activate:
+      on-profile: default
+  datasource:
+    url: jdbc:h2:tcp://localhost/~/member-database
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
+
+logging:
+  level:
+    org.hibernate.SQL: debug
+
+springdoc:
+  packages-to-scan: com.sjw.doran.memberservice.controller
+  default-consumes-media-type: application/json;charset=UTF-8
+  default-produces-media-type: application/json;charset=UTF-8
+  swagger-ui:
+    path: /api/member/swagger-ui.html
+    disable-swagger-default-url: true
+    display-request-duration: true
+    operations-sorter: alpha
