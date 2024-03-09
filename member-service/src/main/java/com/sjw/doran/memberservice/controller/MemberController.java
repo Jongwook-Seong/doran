@@ -43,7 +43,7 @@ public class MemberController {
                     content = {@Content(schema = @Schema(implementation = Member.class))}),
             @ApiResponse(responseCode = "500", description = "Fail")
     })
-    public void joinMember(@RequestBody Member member) {
+    public void joinMember(@RequestHeader("userUuid") String userUuid) {
         memberService.saveMember(member);
         basketService.setBasket(member);
     }
