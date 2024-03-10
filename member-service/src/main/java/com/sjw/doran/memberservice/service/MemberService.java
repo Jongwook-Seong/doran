@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface MemberService {
 
-    Member findMember(String memberUuid);
+    Member findMember(String userUuid);
     List<Member> findMembers();
     void saveMember(Member member);
 }

@@ -19,11 +19,11 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
     }
 
     @Override
-    public Optional<Member> findByMemberUuid(String memberUuid) {
+    public Optional<Member> findByUserUuid(String userUuid) {
 
         Member findMember = queryFactory
                 .selectFrom(member)
-                .where(member.memberUuid.eq(memberUuid))
+                .where(member.userUuid.eq(userUuid))
                 .fetchOne();
 
         return Optional.of(findMember);

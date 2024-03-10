@@ -9,7 +9,7 @@ import lombok.*;
 public class BasketItem {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "item_detail_id")
+    @Column(name = "basket_item_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.EAGER)

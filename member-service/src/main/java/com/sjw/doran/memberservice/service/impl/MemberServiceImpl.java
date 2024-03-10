@@ -16,8 +16,8 @@ public class MemberServiceImpl implements MemberService {
     private final MemberRepository memberRepository;
 
     @Override
-    public Member findMember(String memberUuid) {
-        Optional<Member> member = memberRepository.findByMemberUuid(memberUuid);
+    public Member findMember(String userUuid) {
+        Optional<Member> member = memberRepository.findByUserUuid(userUuid);
         return member.get();
     }
 

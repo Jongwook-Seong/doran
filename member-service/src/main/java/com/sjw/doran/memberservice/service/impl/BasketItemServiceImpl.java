@@ -1,9 +1,12 @@
 package com.sjw.doran.memberservice.service.impl;
 
+import com.sjw.doran.memberservice.dto.BasketItemDto;
 import com.sjw.doran.memberservice.entity.Basket;
 import com.sjw.doran.memberservice.entity.BasketItem;
 import com.sjw.doran.memberservice.repository.BasketItemRepository;
 import com.sjw.doran.memberservice.service.BasketItemService;
+import com.sjw.doran.memberservice.util.ModelMapperUtil;
+import com.sjw.doran.memberservice.vo.request.BasketItemCreateRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,6 +19,7 @@ import java.util.List;
 public class BasketItemServiceImpl implements BasketItemService {
 
     private final BasketItemRepository basketItemRepository;
+    private final ModelMapperUtil modelMapperUtil;
 
     @Override
     @Transactional(readOnly = true)
@@ -24,7 +28,9 @@ public class BasketItemServiceImpl implements BasketItemService {
     }
 
     @Override
-    public void addBasketItem(Basket basket, String itemUuid) {
-//        basketItemRepository.saveBasketItem()
+    public void addBasketItem(Basket basket, BasketItemCreateRequest basketItemCreateRequest) {
+        BasketItemDto basketItemDto = BasketItemDto.getInstanceForCreate(basketItemCreateRequest);
+        BasketItem basketItem = modelMapperUtil.BasketItemDtoConvertToEntity(basketItemDto);
+        basketItem.setBasket(basket);
     }
 }

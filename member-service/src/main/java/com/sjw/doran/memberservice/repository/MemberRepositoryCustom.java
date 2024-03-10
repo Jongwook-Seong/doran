@@ -6,5 +6,5 @@ import java.util.Optional;
 
 public interface MemberRepositoryCustom {
 
-    Optional<Member> findByMemberUuid(String memberUuid);
+    Optional<Member> findByUserUuid(String userUuid);
 }

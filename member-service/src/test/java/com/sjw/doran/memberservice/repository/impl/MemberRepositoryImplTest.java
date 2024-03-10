@@ -24,7 +24,7 @@ class MemberRepositoryImplTest {
         Member member = new Member("111", "nick", "url");
         memberRepository.save(member);
 
-        Optional<Member> findMemberUuid = memberRepository.findByMemberUuid("111");
+        Optional<Member> findMemberUuid = memberRepository.findByUserUuid("111");
 
         Assertions.assertThat(findMemberUuid.get()).isEqualTo(member);
         log.info("member : " + member);

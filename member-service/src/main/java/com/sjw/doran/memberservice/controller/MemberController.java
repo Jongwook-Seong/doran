@@ -44,6 +44,7 @@ public class MemberController {
             @ApiResponse(responseCode = "500", description = "Fail")
     })
     public void joinMember(@RequestHeader("userUuid") String userUuid) {
+        Member member = new Member(userUuid);
         memberService.saveMember(member);
         basketService.setBasket(member);
     }
