@@ -8,4 +8,6 @@ import java.util.List;
 public interface BasketItemRepositoryCustom {
 
     List<BasketItem> findAllByBasket(Basket basket);
+
+    void deleteByBasketAndItemUuid(Basket basket, String itemUuid);
 }

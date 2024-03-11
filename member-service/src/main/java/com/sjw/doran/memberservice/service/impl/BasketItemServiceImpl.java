@@ -35,4 +35,10 @@ public class BasketItemServiceImpl implements BasketItemService {
         basketItem.setBasket(basket);
         basketItemRepository.save(basketItem);
     }
+
+    @Override
+    @Transactional
+    public void deleteBasketItem(Basket basket, String itemUuid) {
+        basketItemRepository.deleteByBasketAndItemUuid(basket, itemUuid);
+    }
 }

@@ -15,4 +15,7 @@ public interface BasketService {
 
     @Transactional
     void addBasketItem(String userUuid, BasketItemCreateRequest basketItemCreateRequest);
+
+    @Transactional
+    void deleteBasketItem(String userUuid, String itemUuid);
 }

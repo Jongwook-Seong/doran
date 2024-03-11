@@ -43,4 +43,15 @@ public class BasketServiceImpl implements BasketService {
         Basket basket = basketRepository.findByMember(member.get());
         basketItemService.addBasketItem(basket, basketItemCreateRequest);
     }
+
+    @Override
+    @Transactional
+    public void deleteBasketItem(String userUuid, String itemUuid) {
+        Optional<Member> member = memberRepository.findByUserUuid(userUuid);
+        if (member.isEmpty()) {
+            return;
+        }
+        Basket basket = basketRepository.findByMember(member.get());
+        basketItemService.deleteBasketItem(basket, itemUuid);
+    }
 }
