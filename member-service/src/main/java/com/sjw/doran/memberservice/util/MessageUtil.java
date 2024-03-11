@@ -10,8 +10,24 @@ public class MessageUtil {
 
     private final MessageSource messageSource;
 
+    public String getMemberCreateMessage() {
+        return getMessage("response.member.create");
+    }
+
+    public String getMemberUpdateMessage() {
+        return getMessage("response.member.update");
+    }
+
+    public String getMemberDeleteMessage() {
+        return getMessage("response.member.delete");
+    }
+
     public String getBasketItemCreateMessage() {
         return getMessage("response.basketItem.create");
+    }
+
+    public String getBasketItemDeleteMessage() {
+        return getMessage("response.basketItem.delete");
     }
 
     public String getBasketItemCreateAlreadyMessage() {

@@ -1,8 +1,10 @@
 package com.sjw.doran.memberservice.service.impl;
 
+import com.sjw.doran.memberservice.dto.MemberDto;
 import com.sjw.doran.memberservice.entity.Member;
 import com.sjw.doran.memberservice.repository.MemberRepository;
 import com.sjw.doran.memberservice.service.MemberService;
+import com.sjw.doran.memberservice.util.ModelMapperUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,16 +16,20 @@ import java.util.Optional;
 public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
+    private final ModelMapperUtil modelMapperUtil;
 
     @Override
-    public Member findMember(String userUuid) {
+    public MemberDto findMember(String userUuid) {
         Optional<Member> member = memberRepository.findByUserUuid(userUuid);
-        return member.get();
+        MemberDto memberDto = modelMapperUtil.convertToMemberDto(member.get());
+        return memberDto;
     }
 
     @Override
-    public List<Member> findMembers() {
-        return memberRepository.findAll();
+    public List<MemberDto> findMembers() {
+        List<Member> members = memberRepository.findAll();
+        List<MemberDto> memberDtos = modelMapperUtil.mapMemberEntityListToDtoList(members);
+        return memberDtos;
     }
 
     @Override
