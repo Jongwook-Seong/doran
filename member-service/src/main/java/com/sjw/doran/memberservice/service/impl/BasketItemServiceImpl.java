@@ -32,5 +32,6 @@ public class BasketItemServiceImpl implements BasketItemService {
         BasketItemDto basketItemDto = BasketItemDto.getInstanceForCreate(basketItemCreateRequest);
         BasketItem basketItem = modelMapperUtil.BasketItemDtoConvertToEntity(basketItemDto);
         basketItem.setBasket(basket);
+        basketItemRepository.save(basketItem);
     }
 }
