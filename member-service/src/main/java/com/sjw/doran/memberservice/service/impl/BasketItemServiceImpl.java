@@ -28,6 +28,7 @@ public class BasketItemServiceImpl implements BasketItemService {
     }
 
     @Override
+    @Transactional
     public void addBasketItem(Basket basket, BasketItemCreateRequest basketItemCreateRequest) {
         BasketItemDto basketItemDto = BasketItemDto.getInstanceForCreate(basketItemCreateRequest);
         BasketItem basketItem = modelMapperUtil.BasketItemDtoConvertToEntity(basketItemDto);

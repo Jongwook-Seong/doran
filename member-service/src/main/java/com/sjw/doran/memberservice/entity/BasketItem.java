@@ -16,6 +16,7 @@ public class BasketItem {
     @JoinColumn(name = "basket_id")
     private Basket basket;
 
+    @Column(unique = true)
     private String itemUuid;
     private int count;
 
