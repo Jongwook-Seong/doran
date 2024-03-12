@@ -34,6 +34,18 @@ public class MessageUtil {
         return getMessage("request.already.basketItem.create");
     }
 
+    public String getMemberCreateErrorMessage() {
+        return getMessage("runtime.error.member.create");
+    }
+
+    public String getBasketCreateErrorMessage() {
+        return getMessage("runtime.error.basket.create");
+    }
+
+    public String getMemberDeleteErrorMessage() {
+        return getMessage("runtime.error.member.delete");
+    }
+
     private String getMessage(String messageCode) {
         return messageSource.getMessage(messageCode, new String[]{}, Locale.KOREA);
     }

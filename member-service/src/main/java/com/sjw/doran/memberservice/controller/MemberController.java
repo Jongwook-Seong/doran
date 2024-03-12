@@ -5,7 +5,7 @@ import com.sjw.doran.memberservice.entity.Member;
 import com.sjw.doran.memberservice.service.BasketService;
 import com.sjw.doran.memberservice.service.MemberService;
 import com.sjw.doran.memberservice.util.MessageUtil;
-import com.sjw.doran.memberservice.vo.response.MemberJoinResponse;
+import com.sjw.doran.memberservice.vo.response.MemberResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -53,7 +53,18 @@ public class MemberController {
     public ResponseEntity joinMember(@RequestHeader("userUuid") String userUuid) {
         Member member = new Member(userUuid);
         memberService.saveMember(member);
-        basketService.setBasket(member);
-        return ResponseEntity.ok(MemberJoinResponse.getInstance(userUuid, messageUtil.getMemberCreateMessage()));
+        return ResponseEntity.ok(MemberResponse.getInstance(userUuid, messageUtil.getMemberCreateMessage()));
+    }
+
+    @DeleteMapping("/delete")
+    @Operation(summary = "회원 탈퇴", description = "탈퇴할 멤버(회원)의 데이터를 삭제합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Success",
+                    content = {@Content(schema = @Schema(implementation = ResponseEntity.class))}),
+            @ApiResponse(responseCode = "500", description = "Fail")
+    })
+    public ResponseEntity deleteMember(@RequestHeader("userUuid") String userUuid) {
+        memberService.deleteMember(userUuid);
+        return ResponseEntity.ok(MemberResponse.getInstance(userUuid, messageUtil.getMemberDeleteMessage()));
     }
 }

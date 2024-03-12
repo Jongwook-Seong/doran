@@ -5,13 +5,13 @@ import lombok.Getter;
 
 @Builder
 @Getter
-public class MemberJoinResponse {
+public class MemberResponse {
 
     private String userUuid;
     private String message;
 
-    public static MemberJoinResponse getInstance(String userUuid, String message) {
-        return MemberJoinResponse.builder()
+    public static MemberResponse getInstance(String userUuid, String message) {
+        return MemberResponse.builder()
                 .userUuid(userUuid)
                 .message(message)
                 .build();

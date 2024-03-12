@@ -35,6 +35,12 @@ public class BasketServiceImpl implements BasketService {
 
     @Override
     @Transactional
+    public void deleteBasket(Member member) {
+        basketRepository.deleteByMember(member);
+    }
+
+    @Override
+    @Transactional
     public void addBasketItem(String userUuid, BasketItemCreateRequest basketItemCreateRequest) {
         Optional<Member> member = memberRepository.findByUserUuid(userUuid);
         if (member.isEmpty()) {
