@@ -28,4 +28,15 @@ public class BasketItemRepositoryImpl implements BasketItemRepositoryCustom {
                 .where(basketItem.basket.eq(basket))
                 .fetch();
     }
+
+    @Override
+    @Transactional
+    public void deleteByBasketAndItemUuid(Basket basket, String itemUuid) {
+        queryFactory
+                .delete(basketItem)
+                .where(
+                        basketItem.basket.eq(basket),
+                        basketItem.itemUuid.eq(itemUuid))
+                .execute();
+    }
 }

@@ -27,6 +27,10 @@ public class Member extends BaseTimeEntity {
     @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private Basket basket;
 
+    public Member(String userUuid) {
+        this.userUuid = userUuid;
+    }
+
     public Member(String userUuid, String nickname, String profileImageUrl) {
         this.userUuid = userUuid;
         this.nickname = nickname;

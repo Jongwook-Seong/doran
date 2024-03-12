@@ -8,4 +8,7 @@ public interface BasketRepositoryCustom {
 
     @Transactional(readOnly = true)
     Basket findByMember(Member member);
+
+    @Transactional
+    void deleteByMember(Member member);
 }

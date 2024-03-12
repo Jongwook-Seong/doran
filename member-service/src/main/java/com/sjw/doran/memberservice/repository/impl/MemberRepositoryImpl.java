@@ -5,6 +5,7 @@ import com.sjw.doran.memberservice.entity.Member;
 import com.sjw.doran.memberservice.entity.QMember;
 import com.sjw.doran.memberservice.repository.MemberRepositoryCustom;
 import jakarta.persistence.EntityManager;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -19,11 +20,12 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
     }
 
     @Override
-    public Optional<Member> findByMemberUuid(String memberUuid) {
+    @Transactional(readOnly = true)
+    public Optional<Member> findByUserUuid(String userUuid) {
 
         Member findMember = queryFactory
                 .selectFrom(member)
-                .where(member.memberUuid.eq(memberUuid))
+                .where(member.userUuid.eq(userUuid))
                 .fetchOne();
 
         return Optional.of(findMember);

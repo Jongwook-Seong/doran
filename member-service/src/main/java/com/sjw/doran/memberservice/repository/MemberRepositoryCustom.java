@@ -1,10 +1,12 @@
 package com.sjw.doran.memberservice.repository;
 
 import com.sjw.doran.memberservice.entity.Member;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
 public interface MemberRepositoryCustom {
 
-    Optional<Member> findByMemberUuid(String memberUuid);
+    @Transactional(readOnly = true)
+    Optional<Member> findByUserUuid(String userUuid);
 }
