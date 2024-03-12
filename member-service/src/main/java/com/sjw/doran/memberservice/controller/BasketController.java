@@ -14,9 +14,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("/api/member/basket")
@@ -34,7 +37,10 @@ public class BasketController {
                     content = {@Content(schema = @Schema(implementation = ResponseEntity.class))}),
             @ApiResponse(responseCode = "500", description = "Fail")
     })
-    public ResponseEntity setBasketItem(@RequestHeader String userUuid, @RequestBody BasketItemCreateRequest basketItemCreateRequest) {
+    public ResponseEntity setBasketItem(@RequestHeader String userUuid, @Valid @RequestBody BasketItemCreateRequest basketItemCreateRequest) {
+        if (userUuid.isEmpty()) {
+            throw new NoSuchElementException(messageUtil.getUserUuidEmptyMessage());
+        }
         basketService.addBasketItem(userUuid, basketItemCreateRequest);
         return ResponseEntity.ok(BasketItemResponse.getInstance(basketItemCreateRequest.getItemUuid(), messageUtil.getBasketItemCreateMessage()));
     }

@@ -30,6 +30,10 @@ public class MessageUtil {
         return getMessage("response.basketItem.delete");
     }
 
+    public String getUserUuidEmptyMessage() {
+        return getMessage("request.empty.userUuid");
+    }
+
     public String getBasketItemCreateAlreadyMessage() {
         return getMessage("request.already.basketItem.create");
     }
