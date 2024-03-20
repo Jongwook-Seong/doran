@@ -4,6 +4,7 @@ import com.sjw.doran.authservice.dto.UserDto;
 import com.sjw.doran.authservice.service.UserService;
 import com.sjw.doran.authservice.util.ModelMapperUtil;
 import com.sjw.doran.authservice.vo.request.UserJoinRequest;
+import com.sjw.doran.authservice.vo.request.UserLoginRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,9 +23,15 @@ public class UserController {
 
     @PostMapping("/join")
     public ResponseEntity<Void> join(@RequestBody UserJoinRequest request) {
-        System.out.println(request);
         UserDto userDto = modelMapperUtil.convertToUserDto(request);
         userService.join(userDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<Void> login(@RequestBody UserLoginRequest request) {
+//        UserDto userDto = modelMapperUtil.convertToUserDto(request);
+
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }
