@@ -41,11 +41,9 @@ public class User extends AuditingFields {
     private String username;
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-    @NotBlank
     private LocalDate birthDate;
 
     @Enumerated(EnumType.STRING)
-    @NotBlank
     private Gender gender;
 
     @Enumerated(EnumType.STRING)
