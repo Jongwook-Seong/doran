@@ -16,7 +16,7 @@ public class AuthServiceApplication {
 	}
 
 	@Bean
-	public PasswordEncoder passwordEncoder() {
+	public BCryptPasswordEncoder bCryptPasswordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
 }

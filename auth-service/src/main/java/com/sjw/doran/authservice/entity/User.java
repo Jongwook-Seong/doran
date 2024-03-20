@@ -4,16 +4,15 @@ import com.sjw.doran.authservice.entity.constant.Gender;
 import com.sjw.doran.authservice.entity.constant.UserRole;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 
 @Entity
 @Data
+@Builder
 @EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
 @AllArgsConstructor
@@ -41,11 +40,14 @@ public class User extends AuditingFields {
     private String username;
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    @NotNull
     private LocalDate birthDate;
 
     @Enumerated(EnumType.STRING)
+    @NotNull
     private Gender gender;
 
     @Enumerated(EnumType.STRING)
+    @NotNull
     private UserRole role;
 }
