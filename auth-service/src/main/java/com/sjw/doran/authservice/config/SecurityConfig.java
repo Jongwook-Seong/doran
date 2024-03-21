@@ -1,5 +1,8 @@
 package com.sjw.doran.authservice.config;
 
+import com.sjw.doran.authservice.jwt.JwtAuthenticationFilter;
+import com.sjw.doran.authservice.jwt.JwtAuthorizationFilter;
+import com.sjw.doran.authservice.repository.UserRepository;
 import com.sjw.doran.authservice.service.PrincipalDetailsService;
 import com.sjw.doran.authservice.service.PrincipalOAuth2UserService;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +22,8 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     private final PrincipalDetailsService principalDetailsService;
+    private final CorsConfig corsConfig;
+    private final UserRepository userRepository;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -32,6 +37,9 @@ public class SecurityConfig {
 
         http.sessionManagement(sessionManagement -> sessionManagement
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        http.addFilter(corsConfig.corsFilter());
+        http.addFilter(new JwtAuthenticationFilter(authenticationManager));
+        http.addFilter(new JwtAuthorizationFilter(authenticationManager, userRepository));
 
         http.authorizeHttpRequests(authorize -> authorize
                 .requestMatchers("/api/user/**").authenticated()

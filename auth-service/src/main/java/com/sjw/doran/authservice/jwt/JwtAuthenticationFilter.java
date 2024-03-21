@@ -48,13 +48,20 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         PrincipalDetails principalDetails = (PrincipalDetails) authResult.getPrincipal();
 
-        String jwtToken = JWT.create()
+        String jwtAccessToken = JWT.create()
                 .withSubject("token")
-                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.EXPIRATION_TIME))
+                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.ACCESS_TOKEN_EXPIRATION_TIME))
                 .withClaim("id", principalDetails.getUser().getId())
                 .withClaim("identity", principalDetails.getUser().getIdentity())
                 .sign(Algorithm.HMAC512(JwtProperties.SECRET));
 
-        response.addHeader(JwtProperties.HEADER_STRING, JwtProperties.TOKEN_PREFIX + jwtToken);
+        String jwtRefreshToken = JWT.create()
+                .withSubject("token")
+                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.REFRESH_TOKEN_EXPIRATION_TIME))
+                .withClaim("id", principalDetails.getUser().getId())
+                .withClaim("identity", principalDetails.getUser().getIdentity())
+                .sign(Algorithm.HMAC512(JwtProperties.SECRET));
+
+        response.addHeader(JwtProperties.HEADER_STRING, JwtProperties.TOKEN_PREFIX + jwtAccessToken);
     }
 }
