@@ -13,6 +13,11 @@ public class ModelMapperUtil {
 
     private final ModelMapper mapper;
 
+    public UserDto convertToUserDto(User user) {
+        mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        return mapper.map(user, UserDto.class);
+    }
+
     public UserDto convertToUserDto(UserJoinRequest request) {
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         return mapper.map(request, UserDto.class);

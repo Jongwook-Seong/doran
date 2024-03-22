@@ -35,4 +35,11 @@ public class UserServiceImpl implements UserService {
                 .build();
         userRepository.save(user);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public UserDto getUserByIdentity(String identity) {
+        User user = userRepository.findByIdentity(identity).get();
+        return modelMapperUtil.convertToUserDto(user);
+    }
 }

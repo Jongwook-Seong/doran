@@ -7,4 +7,7 @@ public interface UserService {
 
     @Transactional
     void join(UserDto userDto);
+
+    @Transactional(readOnly = true)
+    UserDto getUserByIdentity(String identity);
 }

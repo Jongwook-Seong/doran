@@ -49,14 +49,14 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         PrincipalDetails principalDetails = (PrincipalDetails) authResult.getPrincipal();
 
         String jwtAccessToken = JWT.create()
-                .withSubject("token")
+                .withSubject(principalDetails.getUser().getEmail())
                 .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.ACCESS_TOKEN_EXPIRATION_TIME))
                 .withClaim("id", principalDetails.getUser().getId())
                 .withClaim("identity", principalDetails.getUser().getIdentity())
                 .sign(Algorithm.HMAC512(JwtProperties.SECRET));
 
         String jwtRefreshToken = JWT.create()
-                .withSubject("token")
+                .withSubject(principalDetails.getUser().getEmail())
                 .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.REFRESH_TOKEN_EXPIRATION_TIME))
                 .withClaim("id", principalDetails.getUser().getId())
                 .withClaim("identity", principalDetails.getUser().getIdentity())

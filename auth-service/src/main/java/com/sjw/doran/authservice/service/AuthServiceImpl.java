@@ -1,6 +1,7 @@
 package com.sjw.doran.authservice.service;
 
 import com.sjw.doran.authservice.dto.TokenDto;
+import com.sjw.doran.authservice.jwt.TokenProvider;
 import com.sjw.doran.authservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
+    private final TokenProvider tokenProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final UserRepository userRepository;
 
@@ -27,7 +29,7 @@ public class AuthServiceImpl implements AuthService {
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String authorities = getAuthorities(authentication);
 
-        return null;
+        return tokenProvider.createToken(authentication.getName(), authorities);
     }
 
     public String getAuthorities(Authentication authentication) {
