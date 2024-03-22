@@ -26,6 +26,18 @@ spring:
       port: 6379
       host: 127.0.0.1
 
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id:
+            client-secret:
+            redirect-uri:
+            scope:
+              - email
+              - profile
+
 logging:
   level:
     org.hibernate.SQL: debug
