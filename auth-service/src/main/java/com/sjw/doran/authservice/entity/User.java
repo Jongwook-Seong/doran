@@ -50,4 +50,12 @@ public class User extends AuditingFields {
     @Enumerated(EnumType.STRING)
     @NotNull
     private UserRole role;
+
+    public void modifyUserInfo(String email, String password) {
+        if (email != null)
+            this.email = email;
+
+        if (password != null)
+            this.password = password;
+    }
 }

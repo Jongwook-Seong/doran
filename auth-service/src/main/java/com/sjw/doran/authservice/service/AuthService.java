@@ -7,4 +7,10 @@ public interface AuthService {
 
     @Transactional(readOnly = true)
     TokenDto authorize(String identity, String password);
+
+    TokenDto reissue(String accessToken, String refreshToken);
+
+    void logout(String accessToken, String refreshToken);
+
+    boolean validateCheck(String identity, String userUuid);
 }

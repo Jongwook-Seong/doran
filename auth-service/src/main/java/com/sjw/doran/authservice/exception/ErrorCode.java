@@ -13,6 +13,7 @@ public enum ErrorCode {
     INVALID_USER_UUID(HttpStatus.UNAUTHORIZED, "User UUID is invalid"),
     INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, "Password is invalid"),
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"),
+    USER_DELETE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "User Delete Error"),
     INVALID_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "Access Token is invalid"),
     INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "Refresh Token is invalid"),
     INVALID_PERMISSION(HttpStatus.UNAUTHORIZED, "Permission is invalid");
