@@ -59,8 +59,7 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     public List<UserDto> getUsers() {
         List<User> users = userRepository.findAll();
-
-        return null;
+        return modelMapperUtil.mapToUserDtoList(users);
     }
 
     @Override
