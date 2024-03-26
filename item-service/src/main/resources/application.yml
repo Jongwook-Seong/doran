@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: item-service
+  config:
+    activate:
+      on-profile: default
+#  messages:
+#    basename: errors, messages
+  datasource:
+    url: jdbc:h2:tcp://localhost/~/item-database
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
+
+logging:
+  level:
+    org.hibernate.SQL: debug
