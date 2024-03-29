@@ -1,15 +1,15 @@
 package com.sjw.doran.itemservice.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter @Setter
-@NoArgsConstructor
-@Inheritance(strategy = InheritanceType.JOINED)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "dtype")
 public abstract class Item extends AuditingFields {
 
@@ -21,6 +21,9 @@ public abstract class Item extends AuditingFields {
     private int price;
     private int stockQuantity;
     private String itemImageUrl;
+
+    @ManyToMany(mappedBy = "items", cascade = CascadeType.ALL)
+    private List<Category> categories = new ArrayList<>();
 
     public void addStock(int quantity) {
         this.stockQuantity += quantity;
