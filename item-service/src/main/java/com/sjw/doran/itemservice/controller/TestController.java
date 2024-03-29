@@ -8,8 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -34,14 +32,8 @@ public class TestController {
         book.setPrice(price);
         book.setStockQuantity(quantity);
         book.setItemImageUrl(itemImageUrl);
+        book.setCategory(Category.BOOK);
 
-        Category category = new Category("Book");
-        category.addChildCategory(category);
-        ArrayList<Category> categories = new ArrayList<>();
-        categories.add(category);
-
-        book.setCategories(categories);
-        System.out.println("book.getCategories().get(0).getName() = " + book.getCategories().get(0).getName());
         return book;
     }
 }

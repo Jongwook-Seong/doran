@@ -1,9 +1,6 @@
 package com.sjw.doran.itemservice.repository.impl;
 
-import com.sjw.doran.itemservice.entity.Artwork;
-import com.sjw.doran.itemservice.entity.Book;
-import com.sjw.doran.itemservice.entity.Category;
-import com.sjw.doran.itemservice.entity.Item;
+import com.sjw.doran.itemservice.entity.*;
 import com.sjw.doran.itemservice.repository.ItemRepository;
 import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
@@ -59,14 +56,8 @@ class ItemRepositoryImplTest {
         Item findItem2 = itemRepository.findByItemUuid(item2.getItemUuid()).orElseThrow(RuntimeException::new);
         Item findItem3 = itemRepository.findByItemUuid(item3.getItemUuid()).orElseThrow(RuntimeException::new);
 
-        Category category = new Category();
-        category.setName("Book");
-        em.persist(category);
-        System.out.println("category.getItems() = " + category.getItems()); //null
-        System.out.println("category.getName() = " + category.getName());
-        List<Item> findItems = itemRepository.findByCategory(category);
+        List<Item> findItems = itemRepository.findByCategory(Category.BOOK);
 
-        System.out.println("findItems = " + findItems);
         assertThat(findItems).contains(findItem1);
         assertThat(findItems).contains(findItem2);
         assertThat(findItems).doesNotContain(findItem3);
@@ -79,14 +70,8 @@ class ItemRepositoryImplTest {
         book.setPrice(price);
         book.setStockQuantity(quantity);
         book.setItemImageUrl(itemImageUrl);
+        book.setCategory(Category.BOOK);
 
-        Category category = new Category();
-        category.setName("Book");
-        category.addChildCategory(category);
-        ArrayList<Category> categories = new ArrayList<>();
-        categories.add(category);
-
-        book.setCategories(categories);
         return book;
     }
 
@@ -97,14 +82,8 @@ class ItemRepositoryImplTest {
         artwork.setPrice(price);
         artwork.setStockQuantity(quantity);
         artwork.setItemImageUrl(itemImageUrl);
+        artwork.setCategory(Category.ARTWORK);
 
-        Category category = new Category();
-        category.setName("Artwork");
-        category.addChildCategory(category);
-        ArrayList<Category> categories = new ArrayList<>();
-        categories.add(category);
-
-        artwork.setCategories(categories);
         return artwork;
     }
 }

@@ -1,12 +1,12 @@
 package com.sjw.doran.itemservice.repository.impl;
 
-import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sjw.doran.itemservice.entity.Category;
 import com.sjw.doran.itemservice.entity.Item;
 import com.sjw.doran.itemservice.entity.QItem;
 import com.sjw.doran.itemservice.repository.ItemRepositoryCustom;
 import jakarta.persistence.EntityManager;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -39,13 +39,9 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
 
         List<Item> findItems = queryFactory
                 .selectFrom(item)
-                .where(item.categories.contains(category))
+                .where(item.category.eq(category))
                 .fetch();
 
         return findItems;
     }
-
-//    private BooleanBuilder matchCategory(Category category) {
-//
-//    }
 }

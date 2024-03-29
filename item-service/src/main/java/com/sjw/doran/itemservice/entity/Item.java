@@ -22,8 +22,8 @@ public abstract class Item extends AuditingFields {
     private int stockQuantity;
     private String itemImageUrl;
 
-    @ManyToMany(mappedBy = "items", cascade = CascadeType.ALL)
-    private List<Category> categories = new ArrayList<>();
+    @Enumerated(EnumType.STRING)
+    private Category category;
 
     public void addStock(int quantity) {
         this.stockQuantity += quantity;

@@ -26,7 +26,7 @@ public class QBook extends EntityPathBase<Book> {
     public final StringPath bookReview = createString("bookReview");
 
     //inherited
-    public final ListPath<Category, QCategory> categories = _super.categories;
+    public final EnumPath<Category> category = _super.category;
 
     public final StringPath contentsTable = createString("contentsTable");
 

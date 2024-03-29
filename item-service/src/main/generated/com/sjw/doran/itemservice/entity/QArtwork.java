@@ -24,7 +24,7 @@ public class QArtwork extends EntityPathBase<Artwork> {
     public final StringPath artist = createString("artist");
 
     //inherited
-    public final ListPath<Category, QCategory> categories = _super.categories;
+    public final EnumPath<Category> category = _super.category;
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
