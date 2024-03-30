@@ -26,6 +26,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
     @Transactional(readOnly = true)
     public Optional<Item> findByItemUuid(String itemUuid) {
 
+        System.out.println("itemUuid = " + itemUuid);
         Item findItem = queryFactory
                 .selectFrom(QItem.item)
                 .where(QItem.item.itemUuid.eq(itemUuid))

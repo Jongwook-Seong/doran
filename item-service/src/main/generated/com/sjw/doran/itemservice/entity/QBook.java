@@ -55,7 +55,7 @@ public class QBook extends EntityPathBase<Book> {
     //inherited
     public final NumberPath<Integer> price = _super.price;
 
-    public final DatePath<java.time.LocalDate> publicationDate = createDate("publicationDate", java.time.LocalDate.class);
+    public final DateTimePath<java.util.Date> publicationDate = createDateTime("publicationDate", java.util.Date.class);
 
     //inherited
     public final NumberPath<Integer> stockQuantity = _super.stockQuantity;

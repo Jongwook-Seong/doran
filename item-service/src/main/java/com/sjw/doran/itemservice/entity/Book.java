@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDate;
+import java.util.Date;
 
 @Entity
 @Getter @Setter
@@ -19,7 +19,7 @@ public class Book extends Item {
     private String author;
     private String isbn;
     private int pages;
-    private LocalDate publicationDate;
+    private Date publicationDate;
     private String contentsTable;
     private String bookReview;
 }
