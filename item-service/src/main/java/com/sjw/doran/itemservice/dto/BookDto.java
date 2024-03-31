@@ -20,6 +20,7 @@ public class BookDto {
     private String itemName;
     private int price;
     private int stockQuantity;
+    private String itemImageUrl;
     private Category category;
 
     private String author;

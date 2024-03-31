@@ -1,9 +1,7 @@
 package com.sjw.doran.itemservice.repository.impl;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.sjw.doran.itemservice.entity.Category;
-import com.sjw.doran.itemservice.entity.Item;
-import com.sjw.doran.itemservice.entity.QItem;
+import com.sjw.doran.itemservice.entity.*;
 import com.sjw.doran.itemservice.repository.ItemRepositoryCustom;
 import jakarta.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
+import static com.sjw.doran.itemservice.entity.QBook.book;
 import static com.sjw.doran.itemservice.entity.QItem.item;
 
 public class ItemRepositoryImpl implements ItemRepositoryCustom {
@@ -36,6 +35,19 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<Book> findBookByKeyword(String keyword) {
+
+        List<Book> findBooks = queryFactory.selectFrom(book)
+                .where(book.itemName.contains(keyword))
+                .distinct()
+                .fetch();
+
+        return findBooks;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<Item> findByCategory(Category category) {
 
         List<Item> findItems = queryFactory
@@ -44,5 +56,14 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
                 .fetch();
 
         return findItems;
+    }
+
+    @Override
+    public void deleteByItemUuid(String itemUuid) {
+
+        queryFactory
+                .delete(item)
+                .where(item.itemUuid.eq(itemUuid))
+                .execute();
     }
 }

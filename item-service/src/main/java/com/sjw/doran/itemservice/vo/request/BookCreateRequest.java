@@ -1,6 +1,5 @@
 package com.sjw.doran.itemservice.vo.request;
 
-import com.sjw.doran.itemservice.entity.Category;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
