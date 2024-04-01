@@ -8,7 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.sjw.doran.itemservice.entity.QBook.book;
 import static com.sjw.doran.itemservice.entity.QItem.item;
@@ -25,13 +27,24 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
     @Transactional(readOnly = true)
     public Optional<Item> findByItemUuid(String itemUuid) {
 
-        System.out.println("itemUuid = " + itemUuid);
         Item findItem = queryFactory
                 .selectFrom(QItem.item)
                 .where(QItem.item.itemUuid.eq(itemUuid))
                 .fetchOne();
 
         return Optional.of(findItem);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Item> findByItemUuidList(List<String> itemUuidList) {
+        List<Item> itemList = queryFactory
+                .selectFrom(item)
+                .where(item.itemUuid.in(itemUuidList))
+                .fetch();
+
+        Map<String, Item> itemMap = itemList.stream().collect(Collectors.toMap(Item::getItemUuid, i -> i));
+        return itemUuidList.stream().map(itemMap::get).collect(Collectors.toList());
     }
 
     @Override

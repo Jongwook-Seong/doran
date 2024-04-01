@@ -9,15 +9,13 @@ import java.util.List;
 
 public interface ItemService {
 
-    @Transactional
     void saveBook(BookDto bookDto);
 
-    @Transactional
     void deleteItem(String itemUuid);
 
-    @Transactional(readOnly = true)
     Item getItemDetail(String itemUuid);
 
-    @Transactional(readOnly = true)
+    List<ItemSimpleResponse> getItemSimpleList(List<String> itemUuidList);
+
     List<ItemSimpleResponse> getBooksByKeyword(String keyword);
 }
