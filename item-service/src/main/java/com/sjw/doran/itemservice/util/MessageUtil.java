@@ -34,6 +34,18 @@ public class MessageUtil {
         return getMessage("request.content.image");
     }
 
+    public String getItemCreateErrorMessage() {
+        return getMessage("runtime.error.item.create");
+    }
+
+    public String getItemUpdateErrorMessage() {
+        return getMessage("runtime.error.item.update");
+    }
+
+    public String getItemDeleteErrorMessage() {
+        return getMessage("runtime.error.item.delete");
+    }
+
     private String getMessage(String messageCode) {
         return messageSource.getMessage(messageCode, new String[]{}, Locale.KOREA);
     }
