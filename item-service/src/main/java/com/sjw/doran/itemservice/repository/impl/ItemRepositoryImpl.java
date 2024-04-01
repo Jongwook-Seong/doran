@@ -5,6 +5,9 @@ import com.sjw.doran.itemservice.entity.*;
 import com.sjw.doran.itemservice.repository.ItemRepositoryCustom;
 import jakarta.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -37,14 +40,25 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Item> findByItemUuidList(List<String> itemUuidList) {
+    public Page<Item> findByItemUuidList(List<String> itemUuidList, Pageable pageable) {
         List<Item> itemList = queryFactory
                 .selectFrom(item)
                 .where(item.itemUuid.in(itemUuidList))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
                 .fetch();
 
         Map<String, Item> itemMap = itemList.stream().collect(Collectors.toMap(Item::getItemUuid, i -> i));
-        return itemUuidList.stream().map(itemMap::get).collect(Collectors.toList());
+        List<Item> orderedItemList = itemUuidList.stream().map(itemMap::get).collect(Collectors.toList());
+        System.out.println("orderedItemList = " + orderedItemList);
+
+        Long total = queryFactory
+                .select(item.count())
+                .from(item)
+                .where(item.itemUuid.in(itemUuidList))
+                .fetchOne();
+
+        return new PageImpl<>(orderedItemList, pageable, total);
     }
 
     @Override

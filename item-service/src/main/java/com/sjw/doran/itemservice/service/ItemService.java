@@ -3,7 +3,8 @@ package com.sjw.doran.itemservice.service;
 import com.sjw.doran.itemservice.dto.BookDto;
 import com.sjw.doran.itemservice.entity.Item;
 import com.sjw.doran.itemservice.vo.response.ItemSimpleResponse;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 
 import java.util.List;
 
@@ -15,7 +16,7 @@ public interface ItemService {
 
     Item getItemDetail(String itemUuid);
 
-    List<ItemSimpleResponse> getItemSimpleList(List<String> itemUuidList);
+    Slice<ItemSimpleResponse> getItemSimpleSlice(List<String> itemUuidList, Pageable pageable);
 
     List<ItemSimpleResponse> getBooksByKeyword(String keyword);
 }

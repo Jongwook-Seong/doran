@@ -15,9 +15,9 @@ public class BookCreateRequest {
 
     @NotBlank(message = "{request.required}")
     private String itemName;
-    @NotBlank(message = "{request.required}")
+//    @NotBlank(message = "{request.required}")
     private int price;
-    @NotBlank(message = "{request.required}")
+//    @NotBlank(message = "{request.required}")
     private int stockQuantity;
 
     @NotBlank(message = "{request.required}")

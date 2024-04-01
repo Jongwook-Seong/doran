@@ -10,12 +10,17 @@ import com.sjw.doran.itemservice.util.MessageUtil;
 import com.sjw.doran.itemservice.vo.response.ItemSimpleResponse;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -53,14 +58,12 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemSimpleResponse> getItemSimpleList(List<String> itemUuidList) {
-        List<Item> items = itemRepository.findByItemUuidList(itemUuidList);
-        List<ItemSimpleResponse> itemSimpleResponseList = new ArrayList<>();
-        for (Item item : items) {
-            ItemDto itemDto = modelMapper.map(item, ItemDto.class);
-            itemSimpleResponseList.add(ItemSimpleResponse.getInstanceAsItem(itemDto));
-        }
-        return itemSimpleResponseList;
+    public Slice<ItemSimpleResponse> getItemSimpleSlice(List<String> itemUuidList, Pageable pageable) {
+//        Slice<ItemSimpleResponse> itemSimpleSlice = itemRepository.findByItemUuidList(itemUuidList, pageable)
+//                .map(item -> modelMapper.map(item, ItemSimpleResponse.class));
+        Slice<ItemSimpleResponse> itemSimpleSlice = itemRepository.findByItemUuidList(itemUuidList, pageable)
+                .map(item -> item != null ? modelMapper.map(item, ItemSimpleResponse.class) : null);
+        return itemSimpleSlice;
     }
 
     @Override
