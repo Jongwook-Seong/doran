@@ -8,6 +8,7 @@ import com.sjw.doran.itemservice.repository.ItemRepository;
 import com.sjw.doran.itemservice.service.ItemService;
 import com.sjw.doran.itemservice.util.MessageUtil;
 import com.sjw.doran.itemservice.vo.response.ItemSimpleResponse;
+import com.sjw.doran.itemservice.vo.response.ItemSimpleWithQuantityResponse;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -67,6 +68,18 @@ public class ItemServiceImpl implements ItemService {
             itemSimpleResponseList.add(itemSimpleResponse);
         }
         return itemSimpleResponseList;
+    }
+
+    @Override
+    public List<ItemSimpleWithQuantityResponse> getItemSimpleWithQuantityList(List<String> itemUuidList) {
+        List<Item> itemList = itemRepository.findByItemUuidList(itemUuidList);
+        ArrayList<ItemSimpleWithQuantityResponse> itemSimpleWQResponseList = new ArrayList<>();
+        for (Item item : itemList) {
+            if (item == null) continue;
+            ItemSimpleWithQuantityResponse itemSimpleWQResponse = modelMapper.map(item, ItemSimpleWithQuantityResponse.class);
+            itemSimpleWQResponseList.add(itemSimpleWQResponse);
+        }
+        return itemSimpleWQResponseList;
     }
 
     @Override

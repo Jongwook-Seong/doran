@@ -8,6 +8,7 @@ import com.sjw.doran.itemservice.util.MessageUtil;
 import com.sjw.doran.itemservice.vo.request.BookCreateRequest;
 import com.sjw.doran.itemservice.vo.request.ItemListRequest;
 import com.sjw.doran.itemservice.vo.response.ItemSimpleResponse;
+import com.sjw.doran.itemservice.vo.response.ItemSimpleWithQuantityResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -38,11 +39,19 @@ public class ItemController {
         return new ResponseEntity<>(itemDetail, HttpStatus.OK);
     }
 
-    /** 아이템 장바구니 목록 조회하기 **/
+    /** 책 장바구니 목록 조회하기 **/
     @GetMapping("/book/basket")
     public ResponseEntity<List<ItemSimpleResponse>> getBookBasket(@Valid @RequestBody ItemListRequest itemListRequest) {
         List<ItemSimpleResponse> itemSimpleResponseList = itemService.getItemSimpleList(itemListRequest.getItemUuidList());
         return new ResponseEntity<>(itemSimpleResponseList, HttpStatus.OK);
+    }
+
+    /** 아이템 주문 목록 조회하기 **/
+    @GetMapping("/orderitems")
+    public ResponseEntity<List<ItemSimpleWithQuantityResponse>> getOrderItems(@Valid @RequestBody ItemListRequest itemListRequest) {
+        List<ItemSimpleWithQuantityResponse> itemSimpleWQResponseList =
+                itemService.getItemSimpleWithQuantityList(itemListRequest.getItemUuidList());
+        return new ResponseEntity<>(itemSimpleWQResponseList, HttpStatus.OK);
     }
 
     // 임시
