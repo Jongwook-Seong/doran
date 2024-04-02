@@ -19,15 +19,15 @@ public class MessageUtil {
     }
 
     public String getTypeMismatchErrorMessage() {
-        return getMessage("request.typemismatch");
+        return getMessage("request.type-mismatch");
     }
 
     public String getNoSuchElementItemUuidErrorMessage(String itemUuid) {
-        return getMessages("request.nosuchelement.itemUuid", new String[]{itemUuid});
+        return getMessages("request.no-such-element.itemUuid", new String[]{itemUuid});
     }
 
-    public String getImageTypeErrorMessage() {
-        return getMessage("request.type.image");
+    public String getUnsupportedFileTypeErrorMessage() {
+        return getMessage("request.error.file-type.unsupported");
     }
 
     public String getContentImageErrorMessage() {

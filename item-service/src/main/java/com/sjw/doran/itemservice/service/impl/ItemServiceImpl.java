@@ -5,8 +5,10 @@ import com.sjw.doran.itemservice.dto.ItemDto;
 import com.sjw.doran.itemservice.entity.Book;
 import com.sjw.doran.itemservice.entity.Item;
 import com.sjw.doran.itemservice.repository.ItemRepository;
+import com.sjw.doran.itemservice.service.AwsS3UploadService;
 import com.sjw.doran.itemservice.service.ItemService;
 import com.sjw.doran.itemservice.util.MessageUtil;
+import com.sjw.doran.itemservice.vo.request.BookCreateRequest;
 import com.sjw.doran.itemservice.vo.response.ItemSimpleResponse;
 import com.sjw.doran.itemservice.vo.response.ItemSimpleWithQuantityResponse;
 import lombok.RequiredArgsConstructor;
@@ -30,17 +32,7 @@ public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
     private final ModelMapper modelMapper;
     private final MessageUtil messageUtil;
-
-    @Override
-    @Transactional
-    public void saveBook(BookDto bookDto) {
-        Item item = modelMapper.map(bookDto, Book.class);
-        try {
-            itemRepository.save(item);
-        } catch (Exception e) {
-            throw new RuntimeException(messageUtil.getItemCreateErrorMessage());
-        }
-    }
+    private final AwsS3UploadService awsS3UploadService;
 
     @Override
     @Transactional
@@ -49,6 +41,20 @@ public class ItemServiceImpl implements ItemService {
             itemRepository.deleteByItemUuid(itemUuid);
         } catch (Exception e) {
             throw new RuntimeException(messageUtil.getItemDeleteErrorMessage());
+        }
+    }
+
+    @Override
+    @Transactional
+    public void saveBook(BookCreateRequest request) {
+        BookDto bookDto = BookDto.getInstanceForCreate(request);
+        Item item = modelMapper.map(bookDto, Book.class);
+        String itemImageUrl = awsS3UploadService.saveFile(request.getFileData(), item.getItemUuid());
+        item.setItemImageUrl(itemImageUrl);
+        try {
+            itemRepository.save(item);
+        } catch (Exception e) {
+            throw new RuntimeException(messageUtil.getItemCreateErrorMessage());
         }
     }
 
