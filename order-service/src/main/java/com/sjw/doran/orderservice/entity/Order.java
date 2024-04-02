@@ -1,9 +1,7 @@
 package com.sjw.doran.orderservice.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
@@ -11,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Getter @Setter
 @Table(name = "orders")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
@@ -20,9 +19,10 @@ public class Order extends AuditingFields {
     @Column(name = "order_id")
     private Long id;
 
+    private String orderUuid;
     private String userUuid;
 
-    @OneToMany(mappedBy = "order")
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderItem> orderItems = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
