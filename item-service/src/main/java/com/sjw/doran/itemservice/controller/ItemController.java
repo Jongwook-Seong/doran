@@ -18,8 +18,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static java.util.Collections.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -43,11 +45,13 @@ public class ItemController {
 
     /** 아이템 장바구니 목록 조회하기 **/
     @GetMapping("/book/basket")
-    public ResponseEntity<Slice<ItemSimpleResponse>> getBookBasket(
+    public ResponseEntity<List<ItemSimpleResponse>> getBookBasket(
             @Valid @RequestBody ItemListRequest itemListRequest,
             @PageableDefault(page = 0, size = 2) Pageable pageable) {
         Slice<ItemSimpleResponse> itemSimpleSlice = itemService.getItemSimpleSlice(itemListRequest.getItemUuidList(), pageable);
-        return new ResponseEntity<>(itemSimpleSlice, HttpStatus.OK);
+        List<ItemSimpleResponse> itemList = itemSimpleSlice.getContent();
+        itemList = itemList.stream().filter(Objects::nonNull).collect(Collectors.toList());
+        return new ResponseEntity<>(itemList, HttpStatus.OK);
     }
 
     // 임시
