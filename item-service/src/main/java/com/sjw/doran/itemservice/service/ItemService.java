@@ -2,6 +2,7 @@ package com.sjw.doran.itemservice.service;
 
 import com.sjw.doran.itemservice.dto.BookDto;
 import com.sjw.doran.itemservice.entity.Item;
+import com.sjw.doran.itemservice.vo.request.BookCreateRequest;
 import com.sjw.doran.itemservice.vo.response.ItemSimpleResponse;
 import com.sjw.doran.itemservice.vo.response.ItemSimpleWithQuantityResponse;
 
@@ -9,7 +10,7 @@ import java.util.List;
 
 public interface ItemService {
 
-    void saveBook(BookDto bookDto);
+    void saveBook(BookCreateRequest request);
 
     void deleteItem(String itemUuid);
 

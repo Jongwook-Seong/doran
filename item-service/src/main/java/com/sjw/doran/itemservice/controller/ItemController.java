@@ -64,8 +64,7 @@ public class ItemController {
     /** 책 등록하기 **/
     @PostMapping("/book/register")
     public ResponseEntity<Void> registerBook(@Valid @RequestBody BookCreateRequest bookCreateRequest) {
-        BookDto bookDto = BookDto.getInstanceForCreate(bookCreateRequest);
-        itemService.saveBook(bookDto);
+        itemService.saveBook(bookCreateRequest);
         return ResponseEntity.accepted().build();
     }
 
