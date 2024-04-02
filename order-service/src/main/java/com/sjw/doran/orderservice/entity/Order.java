@@ -1,5 +1,6 @@
 package com.sjw.doran.orderservice.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -28,6 +29,7 @@ public class Order extends AuditingFields {
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
 
+    @JsonIgnore
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "delivery_id")
     private Delivery delivery;

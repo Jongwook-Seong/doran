@@ -1,14 +1,13 @@
 package com.sjw.doran.orderservice.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Getter @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class Delivery {
@@ -23,6 +22,6 @@ public class Delivery {
     @Enumerated(EnumType.STRING)
     private DeliveryStatus deliveryStatus;
 
-    @OneToMany(mappedBy = "delivery", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "delivery", cascade = CascadeType.ALL)
     private List<DeliveryTracking> deliveryTrackings = new ArrayList<>();
 }

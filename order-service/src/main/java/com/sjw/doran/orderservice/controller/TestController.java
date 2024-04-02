@@ -1,10 +1,15 @@
 package com.sjw.doran.orderservice.controller;
 
+import com.sjw.doran.orderservice.dto.DeliveryDto;
+import com.sjw.doran.orderservice.dto.DeliveryTrackingDto;
 import com.sjw.doran.orderservice.dto.OrderDto;
 import com.sjw.doran.orderservice.dto.OrderItemDto;
+import com.sjw.doran.orderservice.entity.Delivery;
+import com.sjw.doran.orderservice.entity.DeliveryTracking;
 import com.sjw.doran.orderservice.entity.Order;
 import com.sjw.doran.orderservice.entity.OrderItem;
 import com.sjw.doran.orderservice.repository.DeliveryRepository;
+import com.sjw.doran.orderservice.repository.DeliveryTrackingRepository;
 import com.sjw.doran.orderservice.repository.OrderItemRepository;
 import com.sjw.doran.orderservice.repository.OrderRepository;
 import com.sjw.doran.orderservice.vo.ItemSimpleInfo;
@@ -24,6 +29,7 @@ public class TestController {
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
     private final DeliveryRepository deliveryRepository;
+    private final DeliveryTrackingRepository deliveryTrackingRepository;
     private final ModelMapper modelMapper;
 
     @PostMapping("/new-order")
@@ -47,14 +53,31 @@ public class TestController {
             orderItem.setOrder(order);
         }
 
+        DeliveryDto deliveryDto = DeliveryDto.getInstanceForCreate();
+        Delivery delivery = modelMapper.map(deliveryDto, Delivery.class);
+        delivery.setOrder(order);
+        order.setDelivery(delivery);
+
+        DeliveryTrackingDto deliveryTrackingDto =
+                DeliveryTrackingDto.getInstanceForCreate("kim", "010-xxxx-xxxx", "seoul");
+        DeliveryTracking deliveryTracking = modelMapper.map(deliveryTrackingDto, DeliveryTracking.class);
+        deliveryTracking.setDelivery(delivery);
+
         orderRepository.save(order);
         orderItemRepository.saveAll(orderItemList);
+        deliveryRepository.save(delivery);
+        deliveryTrackingRepository.save(deliveryTracking);
     }
 
-    @GetMapping("/get")
+    @GetMapping("/get-order")
     public Order getOrder(@RequestParam("orderUuid") String orderUuid) {
         Order order = orderRepository.findByOrderUuid(orderUuid).orElseThrow(() -> {
             throw new RuntimeException("Invalid orderUuid"); });
         return order;
     }
+
+//    @GetMapping("/get-delivery")
+//    public Delivery getDelivery(@RequestParam("orderUuid") String orderUuid) {
+//
+//    }
 }
