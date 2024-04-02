@@ -5,6 +5,7 @@ import com.sjw.doran.orderservice.dto.OrderItemDto;
 import com.sjw.doran.orderservice.entity.Order;
 import com.sjw.doran.orderservice.entity.OrderItem;
 import com.sjw.doran.orderservice.repository.DeliveryRepository;
+import com.sjw.doran.orderservice.repository.OrderItemRepository;
 import com.sjw.doran.orderservice.repository.OrderRepository;
 import com.sjw.doran.orderservice.vo.ItemSimpleInfo;
 import com.sjw.doran.orderservice.vo.request.OrderCreateRequest;
@@ -21,6 +22,7 @@ import java.util.List;
 public class TestController {
 
     private final OrderRepository orderRepository;
+    private final OrderItemRepository orderItemRepository;
     private final DeliveryRepository deliveryRepository;
     private final ModelMapper modelMapper;
 
@@ -41,24 +43,18 @@ public class TestController {
         for (OrderItemDto orderItemDto : orderItemDtoList) {
             orderItemList.add(modelMapper.map(orderItemDto, OrderItem.class));
         }
-        System.out.println("TestController.newOrder");
-        System.out.println("orderItemList = " + orderItemList);
         for (OrderItem orderItem : orderItemList) {
-            System.out.println("orderItem = " + orderItem);
+            orderItem.setOrder(order);
         }
-        order.setOrderItems(orderItemList);
-        System.out.println("order = " + order);
-        System.out.println("order.getOrderItems() = " + order.getOrderItems());
+
         orderRepository.save(order);
+        orderItemRepository.saveAll(orderItemList);
     }
 
     @GetMapping("/get")
     public Order getOrder(@RequestParam("orderUuid") String orderUuid) {
         Order order = orderRepository.findByOrderUuid(orderUuid).orElseThrow(() -> {
-            throw new RuntimeException("Invalid orderUuid");
-        });
-        List<OrderItem> orderItems = order.getOrderItems();
-        System.out.println("orderItems = " + orderItems);
+            throw new RuntimeException("Invalid orderUuid"); });
         return order;
     }
 }
