@@ -11,17 +11,12 @@ import com.sjw.doran.itemservice.vo.response.ItemSimpleResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static java.util.Collections.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -45,13 +40,9 @@ public class ItemController {
 
     /** 아이템 장바구니 목록 조회하기 **/
     @GetMapping("/book/basket")
-    public ResponseEntity<List<ItemSimpleResponse>> getBookBasket(
-            @Valid @RequestBody ItemListRequest itemListRequest,
-            @PageableDefault(page = 0, size = 2) Pageable pageable) {
-        Slice<ItemSimpleResponse> itemSimpleSlice = itemService.getItemSimpleSlice(itemListRequest.getItemUuidList(), pageable);
-        List<ItemSimpleResponse> itemList = itemSimpleSlice.getContent();
-        itemList = itemList.stream().filter(Objects::nonNull).collect(Collectors.toList());
-        return new ResponseEntity<>(itemList, HttpStatus.OK);
+    public ResponseEntity<List<ItemSimpleResponse>> getBookBasket(@Valid @RequestBody ItemListRequest itemListRequest) {
+        List<ItemSimpleResponse> itemSimpleResponseList = itemService.getItemSimpleList(itemListRequest.getItemUuidList());
+        return new ResponseEntity<>(itemSimpleResponseList, HttpStatus.OK);
     }
 
     // 임시

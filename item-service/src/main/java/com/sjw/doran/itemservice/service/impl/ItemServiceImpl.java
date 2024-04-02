@@ -58,12 +58,15 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public Slice<ItemSimpleResponse> getItemSimpleSlice(List<String> itemUuidList, Pageable pageable) {
-//        Slice<ItemSimpleResponse> itemSimpleSlice = itemRepository.findByItemUuidList(itemUuidList, pageable)
-//                .map(item -> modelMapper.map(item, ItemSimpleResponse.class));
-        Slice<ItemSimpleResponse> itemSimpleSlice = itemRepository.findByItemUuidList(itemUuidList, pageable)
-                .map(item -> item != null ? modelMapper.map(item, ItemSimpleResponse.class) : null);
-        return itemSimpleSlice;
+    public List<ItemSimpleResponse> getItemSimpleList(List<String> itemUuidList) {
+        List<Item> itemList = itemRepository.findByItemUuidList(itemUuidList);
+        List<ItemSimpleResponse> itemSimpleResponseList = new ArrayList<>();
+        for (Item item : itemList) {
+            if (item == null) continue;
+            ItemSimpleResponse itemSimpleResponse = modelMapper.map(item, ItemSimpleResponse.class);
+            itemSimpleResponseList.add(itemSimpleResponse);
+        }
+        return itemSimpleResponseList;
     }
 
     @Override

@@ -16,7 +16,7 @@ public interface ItemRepositoryCustom {
     Optional<Item> findByItemUuid(String itemUuid);
 
     @Transactional(readOnly = true)
-    Page<Item> findByItemUuidList(List<String> itemUuidList, Pageable pageable);
+    List<Item> findByItemUuidList(List<String> itemUuidList);
 
     @Transactional(readOnly = true)
     List<Book> findBookByKeyword(String keyword);

@@ -40,25 +40,15 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<Item> findByItemUuidList(List<String> itemUuidList, Pageable pageable) {
+    public List<Item> findByItemUuidList(List<String> itemUuidList) {
         List<Item> itemList = queryFactory
                 .selectFrom(item)
                 .where(item.itemUuid.in(itemUuidList))
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
                 .fetch();
 
         Map<String, Item> itemMap = itemList.stream().collect(Collectors.toMap(Item::getItemUuid, i -> i));
         List<Item> orderedItemList = itemUuidList.stream().map(itemMap::get).collect(Collectors.toList());
-        System.out.println("orderedItemList = " + orderedItemList);
-
-        Long total = queryFactory
-                .select(item.count())
-                .from(item)
-                .where(item.itemUuid.in(itemUuidList))
-                .fetchOne();
-
-        return new PageImpl<>(orderedItemList, pageable, total);
+        return orderedItemList;
     }
 
     @Override
