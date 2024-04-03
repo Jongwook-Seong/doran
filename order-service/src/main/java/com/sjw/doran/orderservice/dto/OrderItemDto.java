@@ -20,7 +20,7 @@ public class OrderItemDto {
         return OrderItemDto.builder()
                 .itemUuid(itemSimpleInfo.getItemUuid())
                 .orderPrice(itemSimpleInfo.getPrice() * itemSimpleInfo.getCount())
-                .count(itemSimpleInfo.getPrice())
+                .count(itemSimpleInfo.getCount())
                 .build();
     }
 }

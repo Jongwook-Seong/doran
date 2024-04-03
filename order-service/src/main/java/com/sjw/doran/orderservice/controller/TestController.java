@@ -55,7 +55,7 @@ public class TestController {
 
         DeliveryDto deliveryDto = DeliveryDto.getInstanceForCreate();
         Delivery delivery = modelMapper.map(deliveryDto, Delivery.class);
-        delivery.setOrder(order);
+
         order.setDelivery(delivery);
 
         DeliveryTrackingDto deliveryTrackingDto =
