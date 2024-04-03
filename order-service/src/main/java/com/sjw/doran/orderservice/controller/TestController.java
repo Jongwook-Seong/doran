@@ -77,8 +77,14 @@ public class TestController {
         return order;
     }
 
-//    @GetMapping("/get-delivery")
-//    public Delivery getDelivery(@RequestParam("orderUuid") String orderUuid) {
-//
-//    }
+    @GetMapping("/get-delivery")
+    public Delivery getDelivery(@RequestParam("orderUuid") String orderUuid) {
+        Order order = orderRepository.findByOrderUuid(orderUuid).orElseThrow(() -> {
+            throw new RuntimeException("Invalid orderUuid"); });
+        Delivery delivery = order.getDelivery();
+
+//        Delivery delivery = deliveryRepository.findByOrder(order);
+
+        return delivery;
+    }
 }

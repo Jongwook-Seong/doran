@@ -19,6 +19,10 @@ spring:
         format_sql: true
         show_sql: true
 
+  jackson:
+    serialization:
+      fail-on-empty-beans: false
+
 logging:
   level:
     org.hibernate.SQL: debug
