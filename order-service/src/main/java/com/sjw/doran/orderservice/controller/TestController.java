@@ -50,8 +50,6 @@ public class TestController {
             orderItem.setOrder(order);
         }
 
-//        TransceiverInfo transceiverInfo = new TransceiverInfo("kim", "lee", "010-1234-5678");
-//        Address address = new Address("incheon", "jangjaero 995 beongil 44", "7-507", "21021");
         TransceiverInfo transceiverInfo = request.getTransceiverInfo();
         Address address = request.getAddress();
         DeliveryDto deliveryDto = DeliveryDto.getInstanceForCreate(transceiverInfo, address);

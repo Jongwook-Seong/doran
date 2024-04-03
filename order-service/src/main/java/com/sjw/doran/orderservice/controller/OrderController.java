@@ -14,11 +14,14 @@ public class OrderController {
     private final OrderService orderService;
 
     /** 주문 생성하기 **/
+    @PostMapping("/orders")
     public ResponseEntity<Void> createOrder(@RequestHeader("userUuid") String userUuid, @RequestBody OrderCreateRequest request) {
+        orderService.createOrder(userUuid, request);
         return ResponseEntity.accepted().build();
     }
 
     /** 주문 취소하기 **/
+    @PutMapping("/cancel")
     public ResponseEntity<Void> createOrder(@RequestHeader("userUuid") String userUuid, @RequestParam("orderUuid") String orderUuid) {
         return ResponseEntity.accepted().build();
     }

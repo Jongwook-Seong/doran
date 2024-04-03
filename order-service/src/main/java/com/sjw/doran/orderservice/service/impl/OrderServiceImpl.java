@@ -1,13 +1,81 @@
 package com.sjw.doran.orderservice.service.impl;
 
+import com.sjw.doran.orderservice.dto.DeliveryDto;
+import com.sjw.doran.orderservice.dto.DeliveryTrackingDto;
+import com.sjw.doran.orderservice.dto.OrderDto;
+import com.sjw.doran.orderservice.dto.OrderItemDto;
+import com.sjw.doran.orderservice.entity.*;
+import com.sjw.doran.orderservice.repository.DeliveryRepository;
+import com.sjw.doran.orderservice.repository.DeliveryTrackingRepository;
+import com.sjw.doran.orderservice.repository.OrderItemRepository;
 import com.sjw.doran.orderservice.repository.OrderRepository;
 import com.sjw.doran.orderservice.service.OrderService;
+import com.sjw.doran.orderservice.vo.ItemSimpleInfo;
+import com.sjw.doran.orderservice.vo.request.OrderCreateRequest;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
+    private final OrderItemRepository orderItemRepository;
+    private final DeliveryRepository deliveryRepository;
+    private final DeliveryTrackingRepository deliveryTrackingRepository;
+    private final ModelMapper modelMapper;
+
+    @Override
+    @Transactional
+    public void createOrder(String userUuid, OrderCreateRequest request) {
+        List<ItemSimpleInfo> itemSimpleInfoList = request.getItemSimpleInfoList();
+        TransceiverInfo transceiverInfo = request.getTransceiverInfo();
+        Address address = request.getAddress();
+
+        List<OrderItem> orderItemList = getOrderItemList(itemSimpleInfoList);
+        Order order = getOrder(userUuid, orderItemList);
+        Delivery delivery = getDelivery(transceiverInfo, address);
+        order.setDelivery(delivery);
+
+        DeliveryTracking deliveryTracking = createDefaultDeliveryTracking();
+        deliveryTracking.setDelivery(delivery);
+
+        orderRepository.save(order);
+        orderItemRepository.saveAll(orderItemList);
+        deliveryTrackingRepository.save(deliveryTracking);
+    }
+
+    private List<OrderItem> getOrderItemList(List<ItemSimpleInfo> itemSimpleInfoList) {
+        List<OrderItemDto> orderItemDtoList = new ArrayList<>();
+        itemSimpleInfoList.forEach(info ->
+                orderItemDtoList.add(OrderItemDto.getInstanceForCreate(info)));
+
+        List<OrderItem> orderItemList = new ArrayList<>();
+        orderItemDtoList.forEach(oiDto ->
+                orderItemList.add(modelMapper.map(oiDto, OrderItem.class)));
+        return orderItemList;
+    }
+
+    private Order getOrder(String userUuid, List<OrderItem> orderItemList) {
+        OrderDto orderDto = OrderDto.getInstanceForCreate(userUuid);
+        Order order = modelMapper.map(orderDto, Order.class);
+        orderItemList.forEach(orderItem -> orderItem.setOrder(order));
+        return order;
+    }
+
+    private Delivery getDelivery(TransceiverInfo transceiverInfo, Address address) {
+        DeliveryDto deliveryDto = DeliveryDto.getInstanceForCreate(transceiverInfo, address);
+        return modelMapper.map(deliveryDto, Delivery.class);
+    }
+
+    private DeliveryTracking createDefaultDeliveryTracking() {
+        DeliveryTrackingDto deliveryTrackingDto =
+                DeliveryTrackingDto.getInstanceForCreate("kim", "010-xxxx-xxxx", "seoul");
+        return modelMapper.map(deliveryTrackingDto, DeliveryTracking.class);
+    }
 }
