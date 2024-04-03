@@ -37,9 +37,9 @@ public class OrderServiceImpl implements OrderService {
         TransceiverInfo transceiverInfo = request.getTransceiverInfo();
         Address address = request.getAddress();
 
-        List<OrderItem> orderItemList = getOrderItemList(itemSimpleInfoList);
-        Order order = getOrder(userUuid, orderItemList);
-        Delivery delivery = getDelivery(transceiverInfo, address);
+        List<OrderItem> orderItemList = createOrderItemList(itemSimpleInfoList);
+        Order order = createOrder(userUuid, orderItemList);
+        Delivery delivery = createDelivery(transceiverInfo, address);
         order.setDelivery(delivery);
 
         DeliveryTracking deliveryTracking = createDefaultDeliveryTracking();
@@ -50,7 +50,12 @@ public class OrderServiceImpl implements OrderService {
         deliveryTrackingRepository.save(deliveryTracking);
     }
 
-    private List<OrderItem> getOrderItemList(List<ItemSimpleInfo> itemSimpleInfoList) {
+    @Override
+    public void cancelOrder(String userUuid, String orderUuid) {
+        orderRepository.updateOrderStatusAsCancel(userUuid, orderUuid);
+    }
+
+    private List<OrderItem> createOrderItemList(List<ItemSimpleInfo> itemSimpleInfoList) {
         List<OrderItemDto> orderItemDtoList = new ArrayList<>();
         itemSimpleInfoList.forEach(info ->
                 orderItemDtoList.add(OrderItemDto.getInstanceForCreate(info)));
@@ -61,14 +66,14 @@ public class OrderServiceImpl implements OrderService {
         return orderItemList;
     }
 
-    private Order getOrder(String userUuid, List<OrderItem> orderItemList) {
+    private Order createOrder(String userUuid, List<OrderItem> orderItemList) {
         OrderDto orderDto = OrderDto.getInstanceForCreate(userUuid);
         Order order = modelMapper.map(orderDto, Order.class);
         orderItemList.forEach(orderItem -> orderItem.setOrder(order));
         return order;
     }
 
-    private Delivery getDelivery(TransceiverInfo transceiverInfo, Address address) {
+    private Delivery createDelivery(TransceiverInfo transceiverInfo, Address address) {
         DeliveryDto deliveryDto = DeliveryDto.getInstanceForCreate(transceiverInfo, address);
         return modelMapper.map(deliveryDto, Delivery.class);
     }

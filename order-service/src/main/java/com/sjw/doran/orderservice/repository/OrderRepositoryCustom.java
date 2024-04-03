@@ -7,4 +7,6 @@ import java.util.Optional;
 public interface OrderRepositoryCustom {
 
     Optional<Order> findByOrderUuid(String orderUuid);
+
+    void updateOrderStatusAsCancel(String userUuid, String orderUuid);
 }

@@ -22,7 +22,8 @@ public class OrderController {
 
     /** 주문 취소하기 **/
     @PutMapping("/cancel")
-    public ResponseEntity<Void> createOrder(@RequestHeader("userUuid") String userUuid, @RequestParam("orderUuid") String orderUuid) {
+    public ResponseEntity<Void> cancelOrder(@RequestHeader("userUuid") String userUuid, @RequestParam("orderUuid") String orderUuid) {
+        orderService.cancelOrder(userUuid, orderUuid);
         return ResponseEntity.accepted().build();
     }
 

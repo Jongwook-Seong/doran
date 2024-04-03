@@ -7,4 +7,6 @@ import java.util.List;
 public interface OrderService {
 
     void createOrder(String userUuid, OrderCreateRequest request);
+
+    void cancelOrder(String userUuid, String orderUuid);
 }
