@@ -24,6 +24,12 @@ public class Delivery {
     @Enumerated(EnumType.STRING)
     private DeliveryStatus deliveryStatus;
 
+    @Embedded
+    private TransceiverInfo transceiverInfo;
+
+    @Embedded
+    private Address address;
+
     @OneToMany(mappedBy = "delivery", cascade = CascadeType.ALL)
     private List<DeliveryTracking> deliveryTrackings = new ArrayList<>();
 }

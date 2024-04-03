@@ -17,6 +17,7 @@ public class OrderDto {
 
     private String orderUuid;
     private String userUuid;
+    private String orderNumber;
     private OrderStatus orderStatus;
     private LocalDateTime orderDate;
 

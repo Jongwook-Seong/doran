@@ -22,6 +22,8 @@ public class QDelivery extends EntityPathBase<Delivery> {
 
     public static final QDelivery delivery = new QDelivery("delivery");
 
+    public final QAddress address;
+
     public final EnumPath<DeliveryStatus> deliveryStatus = createEnum("deliveryStatus", DeliveryStatus.class);
 
     public final ListPath<DeliveryTracking, QDeliveryTracking> deliveryTrackings = this.<DeliveryTracking, QDeliveryTracking>createList("deliveryTrackings", DeliveryTracking.class, QDeliveryTracking.class, PathInits.DIRECT2);
@@ -29,6 +31,8 @@ public class QDelivery extends EntityPathBase<Delivery> {
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
     public final QOrder order;
+
+    public final QTransceiverInfo transceiverInfo;
 
     public QDelivery(String variable) {
         this(Delivery.class, forVariable(variable), INITS);
@@ -48,7 +52,9 @@ public class QDelivery extends EntityPathBase<Delivery> {
 
     public QDelivery(Class<? extends Delivery> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
+        this.address = inits.isInitialized("address") ? new QAddress(forProperty("address")) : null;
         this.order = inits.isInitialized("order") ? new QOrder(forProperty("order"), inits.get("order")) : null;
+        this.transceiverInfo = inits.isInitialized("transceiverInfo") ? new QTransceiverInfo(forProperty("transceiverInfo")) : null;
     }
 
 }
