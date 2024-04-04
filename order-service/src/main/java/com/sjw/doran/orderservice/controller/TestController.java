@@ -5,7 +5,6 @@ import com.sjw.doran.orderservice.dto.DeliveryTrackingDto;
 import com.sjw.doran.orderservice.dto.OrderDto;
 import com.sjw.doran.orderservice.dto.OrderItemDto;
 import com.sjw.doran.orderservice.entity.*;
-import com.sjw.doran.orderservice.repository.DeliveryRepository;
 import com.sjw.doran.orderservice.repository.DeliveryTrackingRepository;
 import com.sjw.doran.orderservice.repository.OrderItemRepository;
 import com.sjw.doran.orderservice.repository.OrderRepository;
@@ -25,7 +24,6 @@ public class TestController {
 
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
-    private final DeliveryRepository deliveryRepository;
     private final DeliveryTrackingRepository deliveryTrackingRepository;
     private final ModelMapper modelMapper;
 
@@ -50,8 +48,6 @@ public class TestController {
             orderItem.setOrder(order);
         }
 
-//        TransceiverInfo transceiverInfo = new TransceiverInfo("kim", "lee", "010-1234-5678");
-//        Address address = new Address("incheon", "jangjaero 995 beongil 44", "7-507", "21021");
         TransceiverInfo transceiverInfo = request.getTransceiverInfo();
         Address address = request.getAddress();
         DeliveryDto deliveryDto = DeliveryDto.getInstanceForCreate(transceiverInfo, address);
@@ -66,7 +62,6 @@ public class TestController {
 
         orderRepository.save(order);
         orderItemRepository.saveAll(orderItemList);
-        deliveryRepository.save(delivery);
         deliveryTrackingRepository.save(deliveryTracking);
     }
 
