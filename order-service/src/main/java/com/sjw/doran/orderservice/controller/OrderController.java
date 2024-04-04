@@ -7,10 +7,13 @@ import com.sjw.doran.orderservice.vo.request.OrderCreateRequest;
 import com.sjw.doran.orderservice.vo.response.DeliveryTrackingResponse;
 import com.sjw.doran.orderservice.vo.response.OrderDetailResponse;
 import com.sjw.doran.orderservice.vo.response.OrderListResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("/api/order")
@@ -22,9 +25,9 @@ public class OrderController {
 
     /** 주문 생성하기 **/
     @PostMapping("/orders")
-    public ResponseEntity<Void> createOrder(@RequestHeader("userUuid") String userUuid, @RequestBody OrderCreateRequest request) {
+    public ResponseEntity<Void> createOrder(@RequestHeader("userUuid") String userUuid, @Valid @RequestBody OrderCreateRequest request) {
         if (userUuid.isEmpty()) {
-            throw new RuntimeException(messageUtil.getUserUuidEmptyErrorMessage());
+            throw new NoSuchElementException(messageUtil.getUserUuidEmptyErrorMessage());
         }
         orderService.createOrder(userUuid, request);
         return ResponseEntity.ok().build();
@@ -34,9 +37,9 @@ public class OrderController {
     @PutMapping("/cancel")
     public ResponseEntity<Void> cancelOrder(@RequestHeader("userUuid") String userUuid, @RequestParam("orderUuid") String orderUuid) {
         if (userUuid.isEmpty()) {
-            throw new RuntimeException(messageUtil.getUserUuidEmptyErrorMessage());
+            throw new NoSuchElementException(messageUtil.getUserUuidEmptyErrorMessage());
         } else if (orderUuid.isEmpty()) {
-            throw new RuntimeException(messageUtil.getOrderUuidEmptyErrorMessage());
+            throw new NoSuchElementException(messageUtil.getOrderUuidEmptyErrorMessage());
         }
         orderService.cancelOrder(userUuid, orderUuid);
         return ResponseEntity.ok().build();
@@ -46,7 +49,7 @@ public class OrderController {
     @GetMapping("/list")
     public ResponseEntity<OrderListResponse> inquireOrderList(@RequestHeader("userUuid") String userUuid) {
         if (userUuid.isEmpty()) {
-            throw new RuntimeException(messageUtil.getUserUuidEmptyErrorMessage());
+            throw new NoSuchElementException(messageUtil.getUserUuidEmptyErrorMessage());
         }
         OrderListResponse orderListResponse = orderService.getOrderList(userUuid);
         return new ResponseEntity<>(orderListResponse, HttpStatus.OK);
@@ -58,9 +61,9 @@ public class OrderController {
     @GetMapping("/detail")
     public ResponseEntity<OrderDetailResponse> inquireOrderDetail(@RequestHeader("userUuid") String userUuid, @RequestParam("orderUuid") String orderUuid) {
         if (userUuid.isEmpty()) {
-            throw new RuntimeException(messageUtil.getUserUuidEmptyErrorMessage());
+            throw new NoSuchElementException(messageUtil.getUserUuidEmptyErrorMessage());
         } else if (orderUuid.isEmpty()) {
-            throw new RuntimeException(messageUtil.getOrderUuidEmptyErrorMessage());
+            throw new NoSuchElementException(messageUtil.getOrderUuidEmptyErrorMessage());
         }
         OrderDetailResponse orderDetailResponse = orderService.getOrderDetail(userUuid, orderUuid);
         return new ResponseEntity<>(orderDetailResponse, HttpStatus.OK);
@@ -70,9 +73,9 @@ public class OrderController {
     @GetMapping("/delivery/tracking")
     public ResponseEntity<DeliveryTrackingResponse> inquireDeliveryTracking(@RequestHeader("userUuid") String userUuid, @RequestParam("orderUuid") String orderUuid) {
         if (userUuid.isEmpty()) {
-            throw new RuntimeException(messageUtil.getUserUuidEmptyErrorMessage());
+            throw new NoSuchElementException(messageUtil.getUserUuidEmptyErrorMessage());
         } else if (orderUuid.isEmpty()) {
-            throw new RuntimeException(messageUtil.getOrderUuidEmptyErrorMessage());
+            throw new NoSuchElementException(messageUtil.getOrderUuidEmptyErrorMessage());
         }
         DeliveryTrackingResponse deliveryTrackingInfo = orderService.getDeliveryTrackingInfo(userUuid, orderUuid);
         return new ResponseEntity<>(deliveryTrackingInfo, HttpStatus.OK);
@@ -80,9 +83,9 @@ public class OrderController {
 
     /** 배송 상태 갱신하기 **/
     @PostMapping("/delivery/status")
-    public ResponseEntity<Void> updateDeliveryInfo(@RequestParam("orderUuid") String orderUuid, @RequestBody DeliveryStatusPostRequest request) {
+    public ResponseEntity<Void> updateDeliveryInfo(@RequestParam("orderUuid") String orderUuid, @Valid @RequestBody DeliveryStatusPostRequest request) {
         if (orderUuid.isEmpty()) {
-            throw new RuntimeException(messageUtil.getOrderUuidEmptyErrorMessage());
+            throw new NoSuchElementException(messageUtil.getOrderUuidEmptyErrorMessage());
         }
         orderService.updateDeliveryInfo(orderUuid, request);
         return ResponseEntity.ok().build();
