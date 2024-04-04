@@ -2,6 +2,7 @@ package com.sjw.doran.orderservice.controller;
 
 import com.sjw.doran.orderservice.service.OrderService;
 import com.sjw.doran.orderservice.vo.request.OrderCreateRequest;
+import com.sjw.doran.orderservice.vo.response.OrderDetailResponse;
 import com.sjw.doran.orderservice.vo.response.OrderListResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -32,11 +33,18 @@ public class OrderController {
     /** 주문 목록 조회하기 **/
     @GetMapping("/list")
     public ResponseEntity<OrderListResponse> inquireOrderList(@RequestHeader("userUuid") String userUuid) {
-        OrderListResponse orderList = orderService.getOrderList(userUuid);
-        return new ResponseEntity<>(orderList, HttpStatus.OK);
+        OrderListResponse orderListResponse = orderService.getOrderList(userUuid);
+        return new ResponseEntity<>(orderListResponse, HttpStatus.OK);
     }
 
+    /** 최근 주문 목록 간략 조회하기 **/
+
     /** 주문 상세 조회하기 **/
+    @GetMapping("/detail")
+    public ResponseEntity<OrderDetailResponse> inquireOrderDetail(@RequestHeader("userUuid") String userUuid, @RequestParam("orderUuid") String orderUuid) {
+        OrderDetailResponse orderDetailResponse = orderService.getOrderDetail(userUuid, orderUuid);
+        return new ResponseEntity<>(orderDetailResponse, HttpStatus.OK);
+    }
 
     /** 배송 조회하기 **/
 

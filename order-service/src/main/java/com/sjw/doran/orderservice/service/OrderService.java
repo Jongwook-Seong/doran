@@ -1,6 +1,7 @@
 package com.sjw.doran.orderservice.service;
 
 import com.sjw.doran.orderservice.vo.request.OrderCreateRequest;
+import com.sjw.doran.orderservice.vo.response.OrderDetailResponse;
 import com.sjw.doran.orderservice.vo.response.OrderListResponse;
 
 import java.util.List;
@@ -12,4 +13,6 @@ public interface OrderService {
     void cancelOrder(String userUuid, String orderUuid);
 
     OrderListResponse getOrderList(String userUuid);
+
+    OrderDetailResponse getOrderDetail(String userUuid, String orderUuid);
 }

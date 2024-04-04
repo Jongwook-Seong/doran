@@ -14,12 +14,14 @@ import com.sjw.doran.orderservice.vo.ItemSimpleInfo;
 import com.sjw.doran.orderservice.vo.OrderItemSimple;
 import com.sjw.doran.orderservice.vo.OrderSimple;
 import com.sjw.doran.orderservice.vo.request.OrderCreateRequest;
+import com.sjw.doran.orderservice.vo.response.OrderDetailResponse;
 import com.sjw.doran.orderservice.vo.response.OrderListResponse;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,6 +73,22 @@ public class OrderServiceImpl implements OrderService {
             orderSimpleList.add(OrderSimple.getInstance(oisList, order.getDelivery().getDeliveryStatus(), order.getOrderDate()));
         }
         return OrderListResponse.getInstance(orderSimpleList);
+    }
+
+    @Override
+    public OrderDetailResponse getOrderDetail(String userUuid, String orderUuid) {
+        Order order = orderRepository.findByUserUuidAndOrderUuid(userUuid, orderUuid).orElseThrow(() -> {
+            throw new RuntimeException("Invalid Order"); });
+
+        List<OrderItemSimple> orderItemSimpleList = new ArrayList<>();
+        List<OrderItem> orderItems = order.getOrderItems();
+        for (OrderItem orderItem : orderItems) {
+            orderItemSimpleList.add(OrderItemSimple.getInstance(orderItem.getCount(), orderItem.getOrderPrice()));
+        }
+        Delivery delivery = order.getDelivery();
+
+        return OrderDetailResponse.getInstance(orderItemSimpleList, order.getOrderDate(),
+                delivery.getDeliveryStatus(), delivery.getTransceiverInfo(), delivery.getAddress());
     }
 
     private List<OrderItem> createOrderItemList(List<ItemSimpleInfo> itemSimpleInfoList) {

@@ -9,6 +9,8 @@ public interface OrderRepositoryCustom {
 
     Optional<Order> findByOrderUuid(String orderUuid);
 
+    Optional<Order> findByUserUuidAndOrderUuid(String userUuid, String orderUuid);
+
     List<Order> findAllByUserUuid(String userUuid);
 
     void updateOrderStatusAsCancel(String userUuid, String orderUuid);

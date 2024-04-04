@@ -32,6 +32,16 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
     }
 
     @Override
+    public Optional<Order> findByUserUuidAndOrderUuid(String userUuid, String orderUuid) {
+        Order findOrder = queryFactory
+                .selectFrom(order)
+                .where(order.userUuid.eq(userUuid),
+                        order.orderUuid.eq(orderUuid))
+                .fetchOne();
+        return Optional.ofNullable(findOrder);
+    }
+
+    @Override
     public List<Order> findAllByUserUuid(String userUuid) {
         List<Order> orderList = queryFactory
                 .selectFrom(order)
