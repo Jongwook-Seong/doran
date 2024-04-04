@@ -10,10 +10,12 @@ import com.sjw.doran.orderservice.repository.DeliveryTrackingRepository;
 import com.sjw.doran.orderservice.repository.OrderItemRepository;
 import com.sjw.doran.orderservice.repository.OrderRepository;
 import com.sjw.doran.orderservice.service.OrderService;
+import com.sjw.doran.orderservice.vo.DeliveryTrackingInfo;
 import com.sjw.doran.orderservice.vo.ItemSimpleInfo;
 import com.sjw.doran.orderservice.vo.OrderItemSimple;
 import com.sjw.doran.orderservice.vo.OrderSimple;
 import com.sjw.doran.orderservice.vo.request.OrderCreateRequest;
+import com.sjw.doran.orderservice.vo.response.DeliveryTrackingResponse;
 import com.sjw.doran.orderservice.vo.response.OrderDetailResponse;
 import com.sjw.doran.orderservice.vo.response.OrderListResponse;
 import lombok.RequiredArgsConstructor;
@@ -89,6 +91,22 @@ public class OrderServiceImpl implements OrderService {
 
         return OrderDetailResponse.getInstance(orderItemSimpleList, order.getOrderDate(),
                 delivery.getDeliveryStatus(), delivery.getTransceiverInfo(), delivery.getAddress());
+    }
+
+    @Override
+    public DeliveryTrackingResponse getDeliveryTrackingInfo(String userUuid, String orderUuid) {
+        Order order = orderRepository.findByUserUuidAndOrderUuid(userUuid, orderUuid).orElseThrow(() -> {
+            throw new RuntimeException("Invalid Order"); });
+
+        Delivery delivery = order.getDelivery();
+        List<DeliveryTrackingInfo> deliveryTrackingInfoList = new ArrayList<>();
+        List<DeliveryTracking> deliveryTrackings = delivery.getDeliveryTrackings();
+        for (DeliveryTracking tracking : deliveryTrackings) {
+            deliveryTrackingInfoList.add(DeliveryTrackingInfo
+                    .getInstance(tracking.getCourier(), tracking.getContactNumber(), tracking.getPostLocation(), tracking.getPostDateTime()));
+        }
+
+        return DeliveryTrackingResponse.getInstance(deliveryTrackingInfoList, delivery.getDeliveryStatus());
     }
 
     private List<OrderItem> createOrderItemList(List<ItemSimpleInfo> itemSimpleInfoList) {

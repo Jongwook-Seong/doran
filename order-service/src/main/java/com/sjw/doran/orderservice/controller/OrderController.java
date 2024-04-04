@@ -2,6 +2,7 @@ package com.sjw.doran.orderservice.controller;
 
 import com.sjw.doran.orderservice.service.OrderService;
 import com.sjw.doran.orderservice.vo.request.OrderCreateRequest;
+import com.sjw.doran.orderservice.vo.response.DeliveryTrackingResponse;
 import com.sjw.doran.orderservice.vo.response.OrderDetailResponse;
 import com.sjw.doran.orderservice.vo.response.OrderListResponse;
 import lombok.RequiredArgsConstructor;
@@ -46,7 +47,14 @@ public class OrderController {
         return new ResponseEntity<>(orderDetailResponse, HttpStatus.OK);
     }
 
-    /** 배송 조회하기 **/
+    /**
+     * 배송 추적 조회하기
+     **/
+    @GetMapping("/delivery/tracking")
+    public ResponseEntity<DeliveryTrackingResponse> inquireDeliveryTracking(@RequestHeader("userUuid") String userUuid, @RequestParam("orderUuid") String orderUuid) {
+        DeliveryTrackingResponse deliveryTrackingInfo = orderService.getDeliveryTrackingInfo(userUuid, orderUuid);
+        return new ResponseEntity<>(deliveryTrackingInfo, HttpStatus.OK);
+    }
 
     /** 배송 상태 갱신하기 **/
 }
