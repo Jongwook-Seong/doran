@@ -11,7 +11,10 @@ import com.sjw.doran.orderservice.repository.OrderItemRepository;
 import com.sjw.doran.orderservice.repository.OrderRepository;
 import com.sjw.doran.orderservice.service.OrderService;
 import com.sjw.doran.orderservice.vo.ItemSimpleInfo;
+import com.sjw.doran.orderservice.vo.OrderItemSimple;
+import com.sjw.doran.orderservice.vo.OrderSimple;
 import com.sjw.doran.orderservice.vo.request.OrderCreateRequest;
+import com.sjw.doran.orderservice.vo.response.OrderListResponse;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -53,6 +56,21 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public void cancelOrder(String userUuid, String orderUuid) {
         orderRepository.updateOrderStatusAsCancel(userUuid, orderUuid);
+    }
+
+    @Override
+    public OrderListResponse getOrderList(String userUuid) {
+        List<Order> orderList = orderRepository.findAllByUserUuid(userUuid);
+        List<OrderSimple> orderSimpleList = new ArrayList<>();
+        for (Order order : orderList) {
+            List<OrderItemSimple> oisList = new ArrayList<>();
+            List<OrderItem> orderItems = order.getOrderItems();
+            for (OrderItem orderItem : orderItems) {
+                oisList.add(OrderItemSimple.getInstance(orderItem.getCount(), orderItem.getOrderPrice()));
+            }
+            orderSimpleList.add(OrderSimple.getInstance(oisList, order.getDelivery().getDeliveryStatus(), order.getOrderDate()));
+        }
+        return OrderListResponse.getInstance(orderSimpleList);
     }
 
     private List<OrderItem> createOrderItemList(List<ItemSimpleInfo> itemSimpleInfoList) {
