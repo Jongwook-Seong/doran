@@ -1,6 +1,7 @@
 package com.sjw.doran.orderservice.repository.impl;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.sjw.doran.orderservice.entity.Delivery;
 import com.sjw.doran.orderservice.entity.DeliveryStatus;
 import com.sjw.doran.orderservice.entity.Order;
 import com.sjw.doran.orderservice.entity.OrderStatus;
@@ -63,6 +64,20 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
 
         if (toCancelOrder.getDelivery().getDeliveryStatus() != DeliveryStatus.READY) return;
         toCancelOrder.setOrderStatus(OrderStatus.CANCEL);
+    }
+
+    @Override
+    @Transactional
+    public Delivery updateDeliveryStatus(String orderUuid, DeliveryStatus deliveryStatus) {
+        Order toUpdateStatusOrder = queryFactory
+                .selectFrom(order)
+                .where(order.orderUuid.eq(orderUuid))
+                .fetchOne();
+
+        Delivery delivery = toUpdateStatusOrder.getDelivery();
+        if (delivery.getDeliveryStatus() != deliveryStatus)
+            delivery.setDeliveryStatus(deliveryStatus);
+        return delivery;
     }
 
     private LocalDateTime getThreeMonthsAgo() {

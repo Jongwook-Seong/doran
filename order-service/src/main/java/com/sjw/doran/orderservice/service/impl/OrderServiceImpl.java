@@ -14,6 +14,7 @@ import com.sjw.doran.orderservice.vo.DeliveryTrackingInfo;
 import com.sjw.doran.orderservice.vo.ItemSimpleInfo;
 import com.sjw.doran.orderservice.vo.OrderItemSimple;
 import com.sjw.doran.orderservice.vo.OrderSimple;
+import com.sjw.doran.orderservice.vo.request.DeliveryStatusPostRequest;
 import com.sjw.doran.orderservice.vo.request.OrderCreateRequest;
 import com.sjw.doran.orderservice.vo.response.DeliveryTrackingResponse;
 import com.sjw.doran.orderservice.vo.response.OrderDetailResponse;
@@ -99,14 +100,27 @@ public class OrderServiceImpl implements OrderService {
             throw new RuntimeException("Invalid Order"); });
 
         Delivery delivery = order.getDelivery();
+        List<DeliveryTracking> deliveryTrackings = deliveryTrackingRepository.findAllByDelivery(delivery);
+
         List<DeliveryTrackingInfo> deliveryTrackingInfoList = new ArrayList<>();
-        List<DeliveryTracking> deliveryTrackings = delivery.getDeliveryTrackings();
         for (DeliveryTracking tracking : deliveryTrackings) {
             deliveryTrackingInfoList.add(DeliveryTrackingInfo
                     .getInstance(tracking.getCourier(), tracking.getContactNumber(), tracking.getPostLocation(), tracking.getPostDateTime()));
         }
 
         return DeliveryTrackingResponse.getInstance(deliveryTrackingInfoList, delivery.getDeliveryStatus());
+    }
+
+    @Override
+    @Transactional
+    public void updateDeliveryInfo(String orderUuid, DeliveryStatusPostRequest request) {
+        Delivery delivery = orderRepository.updateDeliveryStatus(orderUuid, request.getDeliveryStatus());
+
+        DeliveryTrackingDto deliveryTrackingDto = DeliveryTrackingDto.getInstanceForCreate(request.getCourier(), request.getContactNumber(), request.getPostLocation());
+        DeliveryTracking deliveryTracking = modelMapper.map(deliveryTrackingDto, DeliveryTracking.class);
+        deliveryTracking.setDelivery(delivery);
+
+        deliveryTrackingRepository.save(deliveryTracking);
     }
 
     private List<OrderItem> createOrderItemList(List<ItemSimpleInfo> itemSimpleInfoList) {

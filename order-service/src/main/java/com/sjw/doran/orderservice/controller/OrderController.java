@@ -1,6 +1,7 @@
 package com.sjw.doran.orderservice.controller;
 
 import com.sjw.doran.orderservice.service.OrderService;
+import com.sjw.doran.orderservice.vo.request.DeliveryStatusPostRequest;
 import com.sjw.doran.orderservice.vo.request.OrderCreateRequest;
 import com.sjw.doran.orderservice.vo.response.DeliveryTrackingResponse;
 import com.sjw.doran.orderservice.vo.response.OrderDetailResponse;
@@ -21,14 +22,14 @@ public class OrderController {
     @PostMapping("/orders")
     public ResponseEntity<Void> createOrder(@RequestHeader("userUuid") String userUuid, @RequestBody OrderCreateRequest request) {
         orderService.createOrder(userUuid, request);
-        return ResponseEntity.accepted().build();
+        return ResponseEntity.ok().build();
     }
 
     /** 주문 취소하기 **/
     @PutMapping("/cancel")
     public ResponseEntity<Void> cancelOrder(@RequestHeader("userUuid") String userUuid, @RequestParam("orderUuid") String orderUuid) {
         orderService.cancelOrder(userUuid, orderUuid);
-        return ResponseEntity.accepted().build();
+        return ResponseEntity.ok().build();
     }
 
     /** 주문 목록 조회하기 **/
@@ -47,9 +48,7 @@ public class OrderController {
         return new ResponseEntity<>(orderDetailResponse, HttpStatus.OK);
     }
 
-    /**
-     * 배송 추적 조회하기
-     **/
+    /** 배송 추적 조회하기 **/
     @GetMapping("/delivery/tracking")
     public ResponseEntity<DeliveryTrackingResponse> inquireDeliveryTracking(@RequestHeader("userUuid") String userUuid, @RequestParam("orderUuid") String orderUuid) {
         DeliveryTrackingResponse deliveryTrackingInfo = orderService.getDeliveryTrackingInfo(userUuid, orderUuid);
@@ -57,4 +56,9 @@ public class OrderController {
     }
 
     /** 배송 상태 갱신하기 **/
+    @PostMapping("/delivery/status")
+    public ResponseEntity<Void> updateDeliveryInfo(@RequestParam("orderUuid") String orderUuid, @RequestBody DeliveryStatusPostRequest request) {
+        orderService.updateDeliveryInfo(orderUuid, request);
+        return ResponseEntity.ok().build();
+    }
 }

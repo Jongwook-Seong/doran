@@ -1,5 +1,6 @@
 package com.sjw.doran.orderservice.service;
 
+import com.sjw.doran.orderservice.vo.request.DeliveryStatusPostRequest;
 import com.sjw.doran.orderservice.vo.request.OrderCreateRequest;
 import com.sjw.doran.orderservice.vo.response.DeliveryTrackingResponse;
 import com.sjw.doran.orderservice.vo.response.OrderDetailResponse;
@@ -18,4 +19,6 @@ public interface OrderService {
     OrderDetailResponse getOrderDetail(String userUuid, String orderUuid);
 
     DeliveryTrackingResponse getDeliveryTrackingInfo(String userUuid, String orderUuid);
+
+    void updateDeliveryInfo(String orderUuid, DeliveryStatusPostRequest request);
 }
