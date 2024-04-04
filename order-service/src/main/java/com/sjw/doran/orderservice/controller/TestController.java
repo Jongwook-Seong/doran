@@ -5,7 +5,6 @@ import com.sjw.doran.orderservice.dto.DeliveryTrackingDto;
 import com.sjw.doran.orderservice.dto.OrderDto;
 import com.sjw.doran.orderservice.dto.OrderItemDto;
 import com.sjw.doran.orderservice.entity.*;
-import com.sjw.doran.orderservice.repository.DeliveryRepository;
 import com.sjw.doran.orderservice.repository.DeliveryTrackingRepository;
 import com.sjw.doran.orderservice.repository.OrderItemRepository;
 import com.sjw.doran.orderservice.repository.OrderRepository;
@@ -25,7 +24,6 @@ public class TestController {
 
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
-    private final DeliveryRepository deliveryRepository;
     private final DeliveryTrackingRepository deliveryTrackingRepository;
     private final ModelMapper modelMapper;
 
@@ -64,7 +62,6 @@ public class TestController {
 
         orderRepository.save(order);
         orderItemRepository.saveAll(orderItemList);
-        deliveryRepository.save(delivery);
         deliveryTrackingRepository.save(deliveryTracking);
     }
 
