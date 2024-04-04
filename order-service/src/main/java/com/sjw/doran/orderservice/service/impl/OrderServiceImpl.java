@@ -9,6 +9,7 @@ import com.sjw.doran.orderservice.repository.DeliveryTrackingRepository;
 import com.sjw.doran.orderservice.repository.OrderItemRepository;
 import com.sjw.doran.orderservice.repository.OrderRepository;
 import com.sjw.doran.orderservice.service.OrderService;
+import com.sjw.doran.orderservice.util.MessageUtil;
 import com.sjw.doran.orderservice.vo.DeliveryTrackingInfo;
 import com.sjw.doran.orderservice.vo.ItemSimpleInfo;
 import com.sjw.doran.orderservice.vo.OrderItemSimple;
@@ -25,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +36,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderItemRepository orderItemRepository;
     private final DeliveryTrackingRepository deliveryTrackingRepository;
     private final ModelMapper modelMapper;
+    private final MessageUtil messageUtil;
 
     @Override
     @Transactional
@@ -50,35 +53,47 @@ public class OrderServiceImpl implements OrderService {
         DeliveryTracking deliveryTracking = createDefaultDeliveryTracking();
         deliveryTracking.setDelivery(delivery);
 
-        orderRepository.save(order);
-        orderItemRepository.saveAll(orderItemList);
-        deliveryTrackingRepository.save(deliveryTracking);
+        try {
+            orderRepository.save(order);
+            orderItemRepository.saveAll(orderItemList);
+            deliveryTrackingRepository.save(deliveryTracking);
+        } catch (Exception e) {
+            throw new RuntimeException(messageUtil.getOrderCreateErrorMessage());
+        }
     }
 
     @Override
     public void cancelOrder(String userUuid, String orderUuid) {
-        orderRepository.updateOrderStatusAsCancel(userUuid, orderUuid);
+        try {
+            orderRepository.updateOrderStatusAsCancel(userUuid, orderUuid);
+        } catch (Exception e) {
+            throw new RuntimeException(messageUtil.getOrderCancelErrorMessage());
+        }
     }
 
     @Override
     public OrderListResponse getOrderList(String userUuid) {
-        List<Order> orderList = orderRepository.findAllByUserUuid(userUuid);
-        List<OrderSimple> orderSimpleList = new ArrayList<>();
-        for (Order order : orderList) {
-            List<OrderItemSimple> oisList = new ArrayList<>();
-            List<OrderItem> orderItems = order.getOrderItems();
-            for (OrderItem orderItem : orderItems) {
-                oisList.add(OrderItemSimple.getInstance(orderItem.getCount(), orderItem.getOrderPrice()));
+        try {
+            List<Order> orderList = orderRepository.findAllByUserUuid(userUuid);
+            List<OrderSimple> orderSimpleList = new ArrayList<>();
+            for (Order order : orderList) {
+                List<OrderItemSimple> oisList = new ArrayList<>();
+                List<OrderItem> orderItems = order.getOrderItems();
+                for (OrderItem orderItem : orderItems) {
+                    oisList.add(OrderItemSimple.getInstance(orderItem.getCount(), orderItem.getOrderPrice()));
+                }
+                orderSimpleList.add(OrderSimple.getInstance(oisList, order.getDelivery().getDeliveryStatus(), order.getOrderDate()));
             }
-            orderSimpleList.add(OrderSimple.getInstance(oisList, order.getDelivery().getDeliveryStatus(), order.getOrderDate()));
+            return OrderListResponse.getInstance(orderSimpleList);
+        } catch (Exception e) {
+            throw new NoSuchElementException(messageUtil.getNoSuchUserUuidErrorMessage(userUuid));
         }
-        return OrderListResponse.getInstance(orderSimpleList);
     }
 
     @Override
     public OrderDetailResponse getOrderDetail(String userUuid, String orderUuid) {
         Order order = orderRepository.findByUserUuidAndOrderUuid(userUuid, orderUuid).orElseThrow(() -> {
-            throw new RuntimeException("Invalid Order"); });
+            throw new NoSuchElementException("Invalid Order"); });
 
         List<OrderItemSimple> orderItemSimpleList = new ArrayList<>();
         List<OrderItem> orderItems = order.getOrderItems();
@@ -94,7 +109,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public DeliveryTrackingResponse getDeliveryTrackingInfo(String userUuid, String orderUuid) {
         Order order = orderRepository.findByUserUuidAndOrderUuid(userUuid, orderUuid).orElseThrow(() -> {
-            throw new RuntimeException("Invalid Order"); });
+            throw new NoSuchElementException("Invalid Order"); });
 
         Delivery delivery = order.getDelivery();
         List<DeliveryTracking> deliveryTrackings = deliveryTrackingRepository.findAllByDelivery(delivery);
@@ -111,13 +126,17 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public void updateDeliveryInfo(String orderUuid, DeliveryStatusPostRequest request) {
-        Delivery delivery = orderRepository.updateDeliveryStatus(orderUuid, request.getDeliveryStatus());
+        try {
+            Delivery delivery = orderRepository.updateDeliveryStatus(orderUuid, request.getDeliveryStatus());
 
-        DeliveryTrackingDto deliveryTrackingDto = DeliveryTrackingDto.getInstanceForCreate(request.getCourier(), request.getContactNumber(), request.getPostLocation());
-        DeliveryTracking deliveryTracking = modelMapper.map(deliveryTrackingDto, DeliveryTracking.class);
-        deliveryTracking.setDelivery(delivery);
+            DeliveryTrackingDto deliveryTrackingDto = DeliveryTrackingDto.getInstanceForCreate(request.getCourier(), request.getContactNumber(), request.getPostLocation());
+            DeliveryTracking deliveryTracking = modelMapper.map(deliveryTrackingDto, DeliveryTracking.class);
+            deliveryTracking.setDelivery(delivery);
 
-        deliveryTrackingRepository.save(deliveryTracking);
+            deliveryTrackingRepository.save(deliveryTracking);
+        } catch (Exception e) {
+            throw new RuntimeException(messageUtil.getDeliveryUpdateErrorMessage());
+        }
     }
 
     private List<OrderItem> createOrderItemList(List<ItemSimpleInfo> itemSimpleInfoList) {
