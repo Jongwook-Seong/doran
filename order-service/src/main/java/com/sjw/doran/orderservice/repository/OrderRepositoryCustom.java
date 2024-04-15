@@ -13,9 +13,13 @@ public interface OrderRepositoryCustom {
 
     Optional<Order> findByUserUuidAndOrderUuid(String userUuid, String orderUuid);
 
+    Optional<Order> findOrderWithItemsAndDeliveryByUserUuidAndOrderUuid(String userUuid, String orderUuid);
+
+    Optional<Order> findOrderWithDeliveryByUserUuidAndOrderUuid(String userUuid, String orderUuid);
+
 //    Optional<Order> findByUserUuidAndOrderUuidOrderByDeliveryTracking(String userUuid, String orderUuid);
 
-    List<Order> findAllByUserUuid(String userUuid);
+    List<Order> findOrdersWithItemsAndDeliveryByUserUuid(String userUuid);
 
     void updateOrderStatusAsCancel(String userUuid, String orderUuid);
 
