@@ -74,7 +74,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderListResponse getOrderList(String userUuid) {
         try {
-            List<Order> orderList = orderRepository.findAllByUserUuid(userUuid);
+            List<Order> orderList = orderRepository.findOrdersWithItemsAndDeliveryByUserUuid(userUuid);
             List<OrderSimple> orderSimpleList = new ArrayList<>();
             for (Order order : orderList) {
                 List<OrderItemSimple> oisList = new ArrayList<>();
@@ -92,7 +92,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderDetailResponse getOrderDetail(String userUuid, String orderUuid) {
-        Order order = orderRepository.findByUserUuidAndOrderUuid(userUuid, orderUuid).orElseThrow(() -> {
+        Order order = orderRepository.findOrderWithItemsAndDeliveryByUserUuidAndOrderUuid(userUuid, orderUuid).orElseThrow(() -> {
             throw new NoSuchElementException("Invalid Order"); });
 
         List<OrderItemSimple> orderItemSimpleList = new ArrayList<>();
@@ -108,7 +108,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public DeliveryTrackingResponse getDeliveryTrackingInfo(String userUuid, String orderUuid) {
-        Order order = orderRepository.findByUserUuidAndOrderUuid(userUuid, orderUuid).orElseThrow(() -> {
+        Order order = orderRepository.findOrderWithDeliveryByUserUuidAndOrderUuid(userUuid, orderUuid).orElseThrow(() -> {
             throw new NoSuchElementException("Invalid Order"); });
 
         Delivery delivery = order.getDelivery();
