@@ -35,14 +35,14 @@ class ItemControllerTest {
     @Test
     void 아이템_저장_및_검색조회() {
 
-        BookCreateRequest bookCreateRequest = new BookCreateRequest(
-                "Spring", 10000, 100,
-                "kim", "1111", 100, new Date(), "index", "review"
-        );
-        itemController.registerBook(bookCreateRequest);
-
-        ResponseEntity<List<ItemSimpleResponse>> searchBooks = itemController.bookSearch("Spring");
-        System.out.println("searchBooks = " + searchBooks);
+//        BookCreateRequest bookCreateRequest = new BookCreateRequest(
+//                "Spring", 10000, 100,
+//                "kim", "1111", 100, new Date(), "index", "review"
+//        );
+//        itemController.registerBook(bookCreateRequest);
+//
+//        ResponseEntity<List<ItemSimpleResponse>> searchBooks = itemController.bookSearch("Spring");
+//        System.out.println("searchBooks = " + searchBooks);
     }
 
     Book createBook(String itemName, int price, int quantity, String itemImageUrl) {

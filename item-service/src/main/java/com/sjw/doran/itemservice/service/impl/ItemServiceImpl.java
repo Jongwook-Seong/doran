@@ -32,7 +32,7 @@ public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
     private final ModelMapper modelMapper;
     private final MessageUtil messageUtil;
-    private final AwsS3UploadService awsS3UploadService;
+//    private final AwsS3UploadService awsS3UploadService;
 
     @Override
     @Transactional
@@ -49,8 +49,8 @@ public class ItemServiceImpl implements ItemService {
     public void saveBook(BookCreateRequest request) {
         BookDto bookDto = BookDto.getInstanceForCreate(request);
         Item item = modelMapper.map(bookDto, Book.class);
-        String itemImageUrl = awsS3UploadService.saveFile(request.getFileData(), item.getItemUuid());
-        item.setItemImageUrl(itemImageUrl);
+//        String itemImageUrl = awsS3UploadService.saveFile(request.getFileData(), item.getItemUuid());
+//        item.setItemImageUrl(itemImageUrl);
         try {
             itemRepository.save(item);
         } catch (Exception e) {
