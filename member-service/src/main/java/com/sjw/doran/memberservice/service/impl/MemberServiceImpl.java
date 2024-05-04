@@ -27,7 +27,14 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional(readOnly = true)
-    public MemberDto findMember(String userUuid) {
+    public Member findMember(String userUuid) {
+        Optional<Member> member = memberRepository.findByUserUuid(userUuid);
+        return member.get();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public MemberDto findMemberDto(String userUuid) {
         Optional<Member> member = memberRepository.findByUserUuid(userUuid);
         MemberDto memberDto = modelMapperUtil.convertToMemberDto(member.get());
         return memberDto;

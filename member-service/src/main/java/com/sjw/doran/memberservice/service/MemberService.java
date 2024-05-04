@@ -9,7 +9,9 @@ import java.util.List;
 public interface MemberService {
 
     @Transactional(readOnly = true)
-    MemberDto findMember(String userUuid);
+    Member findMember(String userUuid);
+    @Transactional(readOnly = true)
+    MemberDto findMemberDto(String userUuid);
     @Transactional(readOnly = true)
     List<MemberDto> findMembers();
     @Transactional

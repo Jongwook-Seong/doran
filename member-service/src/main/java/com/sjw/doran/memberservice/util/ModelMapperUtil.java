@@ -22,6 +22,12 @@ public class ModelMapperUtil {
         return memberDto;
     }
 
+    public Member convertToMember(MemberDto memberDto) {
+        mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        Member member = mapper.map(memberDto, Member.class);
+        return member;
+    }
+
     public List<MemberDto> mapMemberEntityListToDtoList(List<Member> members) {
         List<MemberDto> memberDtos = members.stream()
                 .map(this::convertToMemberDto)

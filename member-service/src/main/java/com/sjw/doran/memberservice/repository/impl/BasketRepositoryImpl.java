@@ -21,6 +21,20 @@ public class BasketRepositoryImpl implements BasketRepositoryCustom {
     @Transactional(readOnly = true)
     public Basket findByMember(Member member) {
 
+//        return queryFactory
+//                .selectFrom(basket)
+//                .where(basket.member.eq(member))
+//                .fetchOne();
+
+        Basket basket1 = queryFactory
+                .selectFrom(basket)
+                .where(basket.member.eq(member))
+                .fetchOne();
+
+        System.out.println("basket1 = " + basket1);
+        System.out.println("basket1.getMember() = " + basket1.getMember());
+        System.out.println("basket1.getBasketItems() = " + basket1.getBasketItems());
+
         return queryFactory
                 .selectFrom(basket)
                 .where(basket.member.eq(member))
