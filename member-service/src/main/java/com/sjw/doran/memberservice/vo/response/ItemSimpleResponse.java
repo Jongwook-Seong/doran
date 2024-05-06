@@ -7,6 +7,6 @@ public class ItemSimpleResponse {
 
     private String itemUuid;
     private String itemName;
-    private int price;
     private String itemImageUrl;
+    private int price;
 }

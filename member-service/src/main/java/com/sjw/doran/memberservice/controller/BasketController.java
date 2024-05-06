@@ -1,8 +1,6 @@
 package com.sjw.doran.memberservice.controller;
 
-import com.sjw.doran.memberservice.dto.MemberDto;
 import com.sjw.doran.memberservice.entity.Basket;
-import com.sjw.doran.memberservice.entity.BasketItem;
 import com.sjw.doran.memberservice.entity.Member;
 import com.sjw.doran.memberservice.service.BasketItemService;
 import com.sjw.doran.memberservice.service.BasketService;
@@ -11,7 +9,7 @@ import com.sjw.doran.memberservice.util.MessageUtil;
 import com.sjw.doran.memberservice.util.ModelMapperUtil;
 import com.sjw.doran.memberservice.vo.request.BasketItemCreateRequest;
 import com.sjw.doran.memberservice.vo.response.BasketItemResponse;
-import com.sjw.doran.memberservice.vo.response.ItemSimpleResponse;
+import com.sjw.doran.memberservice.vo.response.ItemSimpleWithCountResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -28,7 +26,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 @RestController
-@RequestMapping("/api/member/basket")
+@RequestMapping("/basket")
 @RequiredArgsConstructor
 @Tag(name = "Member Service", description = "Basket in Member Service Swagger API")
 public class BasketController {
@@ -73,13 +71,13 @@ public class BasketController {
                 content = {@Content(schema = @Schema(implementation = ResponseEntity.class))}),
             @ApiResponse(responseCode = "500", description = "Fail")
     })
-    public ResponseEntity<List<ItemSimpleResponse>> getBasketItemList(@RequestHeader String userUuid) {
+    public ResponseEntity<List<ItemSimpleWithCountResponse>> getBasketItemList(@RequestHeader String userUuid) {
         if (userUuid.isEmpty()) {
             throw new NoSuchElementException(messageUtil.getUserUuidEmptyMessage());
         }
         Member member = memberService.findMember(userUuid);
         Basket basket = basketService.findBasket(member);
-        List<ItemSimpleResponse> basketItemSimpleResponseList = basketItemService.findAllByBasket(basket);
-        return ResponseEntity.status(HttpStatus.OK).body(basketItemSimpleResponseList);
+        List<ItemSimpleWithCountResponse> basketItemSimpleWithCountResponseList = basketItemService.findAllByBasket(basket);
+        return ResponseEntity.status(HttpStatus.OK).body(basketItemSimpleWithCountResponseList);
     }
 }
