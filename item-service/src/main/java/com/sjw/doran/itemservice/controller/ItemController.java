@@ -47,9 +47,8 @@ public class ItemController {
 
     /** 아이템 주문 목록 조회하기 **/
     @GetMapping("/orderitems")
-    public ResponseEntity<List<ItemSimpleWithQuantityResponse>> getOrderItems(@Valid @RequestBody ItemListRequest itemListRequest) {
-        List<ItemSimpleWithQuantityResponse> itemSimpleWQResponseList =
-                itemService.getItemSimpleWithQuantityList(itemListRequest.getItemUuidList());
+    public ResponseEntity<List<ItemSimpleWithQuantityResponse>> getOrderItems(@RequestParam("itemUuidList") List<String> itemUuidList) {
+        List<ItemSimpleWithQuantityResponse> itemSimpleWQResponseList = itemService.getItemSimpleWithQuantityList(itemUuidList);
         return new ResponseEntity<>(itemSimpleWQResponseList, HttpStatus.OK);
     }
 

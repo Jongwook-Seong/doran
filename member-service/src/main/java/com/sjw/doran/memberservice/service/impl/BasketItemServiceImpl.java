@@ -3,7 +3,7 @@ package com.sjw.doran.memberservice.service.impl;
 import com.sjw.doran.memberservice.dto.BasketItemDto;
 import com.sjw.doran.memberservice.entity.Basket;
 import com.sjw.doran.memberservice.entity.BasketItem;
-import com.sjw.doran.memberservice.feign.ItemServiceClient;
+import com.sjw.doran.memberservice.client.ItemServiceClient;
 import com.sjw.doran.memberservice.repository.BasketItemRepository;
 import com.sjw.doran.memberservice.service.BasketItemService;
 import com.sjw.doran.memberservice.util.ModelMapperUtil;
