@@ -41,8 +41,8 @@ public class ItemController {
 
     /** 책 장바구니 목록 조회하기 **/
     @GetMapping("/book/basket")
-    public ResponseEntity<List<ItemSimpleResponse>> getBookBasket(@Valid @RequestBody ItemListRequest itemListRequest) {
-        List<ItemSimpleResponse> itemSimpleResponseList = itemService.getItemSimpleList(itemListRequest.getItemUuidList());
+    public ResponseEntity<List<ItemSimpleResponse>> getBookBasket(@RequestParam("itemUuidList") List<String> itemUuidList) {
+        List<ItemSimpleResponse> itemSimpleResponseList = itemService.getItemSimpleList(itemUuidList);
         return new ResponseEntity<>(itemSimpleResponseList, HttpStatus.OK);
     }
 

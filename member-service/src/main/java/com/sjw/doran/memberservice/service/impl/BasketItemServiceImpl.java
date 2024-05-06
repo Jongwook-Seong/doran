@@ -8,10 +8,8 @@ import com.sjw.doran.memberservice.repository.BasketItemRepository;
 import com.sjw.doran.memberservice.service.BasketItemService;
 import com.sjw.doran.memberservice.util.ModelMapperUtil;
 import com.sjw.doran.memberservice.vo.request.BasketItemCreateRequest;
-import com.sjw.doran.memberservice.vo.request.ItemListRequest;
 import com.sjw.doran.memberservice.vo.response.ItemSimpleResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,8 +30,7 @@ public class BasketItemServiceImpl implements BasketItemService {
         List<String> itemUuidList = new ArrayList<>();
         List<BasketItem> basketItemList = basketItemRepository.findAllByBasket(basket);
         basketItemList.forEach(basketItem -> itemUuidList.add(basketItem.getItemUuid()));
-        ItemListRequest itemListRequest = new ItemListRequest(itemUuidList);
-        List<ItemSimpleResponse> bookBasket = itemServiceClient.getBookBasket(itemListRequest);
+        List<ItemSimpleResponse> bookBasket = itemServiceClient.getBookBasket(itemUuidList);
         return bookBasket;
     }
 

@@ -25,17 +25,7 @@ spring:
           uri: lb://ITEM-SERVICE
           predicates:
             - Path=/item-service/**
-#        - id: item-service
-#          uri: lb://ITEM-SERVICE
-#          predicates:
-#            - Path=/item-service/**
-#            - Method=GET,POST
-#          filters:
-#            - RewritePath=/item-service/(?<segment>/*), /$\{segment}
         - id: order-service
           uri: lb://ORDER-SERVICE
           predicates:
             - Path=/order-service/**
-            - Method=GET,POST
-          filters:
-            - RewritePath=/order-service/(?<segment>/*), /$\{segment}
