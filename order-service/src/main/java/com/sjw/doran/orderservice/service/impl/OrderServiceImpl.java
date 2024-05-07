@@ -1,6 +1,5 @@
 package com.sjw.doran.orderservice.service.impl;
 
-import com.sjw.doran.orderservice.client.ItemServiceClient;
 import com.sjw.doran.orderservice.dto.DeliveryDto;
 import com.sjw.doran.orderservice.dto.DeliveryTrackingDto;
 import com.sjw.doran.orderservice.dto.OrderDto;
@@ -36,7 +35,6 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
     private final DeliveryTrackingRepository deliveryTrackingRepository;
-    private final ItemServiceClient itemServiceClient;
     private final ModelMapper modelMapper;
     private final MessageUtil messageUtil;
 
@@ -55,18 +53,10 @@ public class OrderServiceImpl implements OrderService {
         DeliveryTracking deliveryTracking = createDefaultDeliveryTracking();
         deliveryTracking.setDelivery(delivery);
 
-        List<String> orderItemUuidList = new ArrayList<>();
-        List<Integer> orderItemCountList = new ArrayList<>();
-        for (OrderItem orderItem : orderItemList) {
-            orderItemUuidList.add(orderItem.getItemUuid());
-            orderItemCountList.add(orderItem.getCount());
-        }
-
         try {
             orderRepository.save(order);
             orderItemRepository.saveAll(orderItemList);
             deliveryTrackingRepository.save(deliveryTracking);
-            itemServiceClient.orderItems(orderItemUuidList, orderItemCountList);
         } catch (Exception e) {
             throw new RuntimeException(messageUtil.getOrderCreateErrorMessage());
         }

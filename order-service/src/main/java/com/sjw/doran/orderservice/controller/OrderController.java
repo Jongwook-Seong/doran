@@ -1,7 +1,9 @@
 package com.sjw.doran.orderservice.controller;
 
+import com.sjw.doran.orderservice.client.ItemServiceClient;
 import com.sjw.doran.orderservice.service.OrderService;
 import com.sjw.doran.orderservice.util.MessageUtil;
+import com.sjw.doran.orderservice.vo.ItemSimpleInfo;
 import com.sjw.doran.orderservice.vo.request.DeliveryStatusPostRequest;
 import com.sjw.doran.orderservice.vo.request.OrderCreateRequest;
 import com.sjw.doran.orderservice.vo.response.DeliveryTrackingResponse;
@@ -13,6 +15,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 @RestController
@@ -21,6 +25,7 @@ import java.util.NoSuchElementException;
 public class OrderController {
 
     private final OrderService orderService;
+    private final ItemServiceClient itemServiceClient;
     private final MessageUtil messageUtil;
 
     /** 주문 생성하기 **/
@@ -29,7 +34,17 @@ public class OrderController {
         if (userUuid.isEmpty()) {
             throw new NoSuchElementException(messageUtil.getUserUuidEmptyErrorMessage());
         }
+
+        List<ItemSimpleInfo> itemSimpleInfoList = request.getItemSimpleInfoList();
+        List<String> itemUuidList = new ArrayList<>();
+        List<Integer> itemCountList = new ArrayList<>();
+        for (ItemSimpleInfo itemSimpleInfo : itemSimpleInfoList) {
+            itemUuidList.add(itemSimpleInfo.getItemUuid());
+            itemCountList.add(itemSimpleInfo.getCount());
+        }
+
         orderService.createOrder(userUuid, request);
+        itemServiceClient.orderItems(itemUuidList, itemCountList);
         return ResponseEntity.ok().build();
     }
 
