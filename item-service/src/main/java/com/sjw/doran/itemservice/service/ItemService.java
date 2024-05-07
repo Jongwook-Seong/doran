@@ -1,6 +1,5 @@
 package com.sjw.doran.itemservice.service;
 
-import com.sjw.doran.itemservice.dto.BookDto;
 import com.sjw.doran.itemservice.entity.Item;
 import com.sjw.doran.itemservice.vo.request.BookCreateRequest;
 import com.sjw.doran.itemservice.vo.response.ItemSimpleResponse;
@@ -21,4 +20,6 @@ public interface ItemService {
     List<ItemSimpleWithQuantityResponse> getItemSimpleWithQuantityList(List<String> itemUuidList);
 
     List<ItemSimpleResponse> getBooksByKeyword(String keyword);
+
+    void subtractItems(List<String> itemUuidList, List<Integer> countList);
 }

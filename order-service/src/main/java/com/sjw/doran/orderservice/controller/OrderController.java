@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.NoSuchElementException;
 
 @RestController
-@RequestMapping("/api/order")
+@RequestMapping("/order-service")
 @RequiredArgsConstructor
 public class OrderController {
 

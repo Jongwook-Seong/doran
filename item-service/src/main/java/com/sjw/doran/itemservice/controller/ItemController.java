@@ -52,6 +52,13 @@ public class ItemController {
         return new ResponseEntity<>(itemSimpleWQResponseList, HttpStatus.OK);
     }
 
+    /** 아이템 구매하기 **/
+    @PutMapping("/orderitems")
+    public ResponseEntity<Void> orderItems(@RequestParam("itemUuidList") List<String> itemUuidList, @RequestParam("countList") List<Integer> countList) {
+        itemService.subtractItems(itemUuidList, countList);
+        return ResponseEntity.accepted().build();
+    }
+
     // 임시
     @GetMapping("/book/search")
     public ResponseEntity<List<ItemSimpleResponse>> bookSearch(@RequestParam String keywords) {

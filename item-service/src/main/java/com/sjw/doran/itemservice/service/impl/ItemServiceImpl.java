@@ -99,4 +99,10 @@ public class ItemServiceImpl implements ItemService {
         }
         return itemSimpleResponseList;
     }
+
+    @Override
+    @Transactional
+    public void subtractItems(List<String> itemUuidList, List<Integer> countList) {
+        itemRepository.updateStockQuantity(itemUuidList, countList);
+    }
 }
