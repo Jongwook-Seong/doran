@@ -63,9 +63,14 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public void cancelOrder(String userUuid, String orderUuid) {
+    public List<ItemSimpleInfo> cancelOrder(String userUuid, String orderUuid) {
         try {
             orderRepository.updateOrderStatusAsCancel(userUuid, orderUuid);
+            Order order = orderRepository.findByOrderUuid(orderUuid).get();
+            List<OrderItem> orderItems = order.getOrderItems();
+            List<ItemSimpleInfo> itemSimpleInfoList = new ArrayList<>();
+            orderItems.forEach(orderItem -> itemSimpleInfoList.add(ItemSimpleInfo.getInstance(orderItem)));
+            return itemSimpleInfoList;
         } catch (Exception e) {
             throw new RuntimeException(messageUtil.getOrderCancelErrorMessage());
         }

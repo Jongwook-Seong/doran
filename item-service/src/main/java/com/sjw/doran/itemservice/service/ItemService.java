@@ -22,4 +22,6 @@ public interface ItemService {
     List<ItemSimpleResponse> getBooksByKeyword(String keyword);
 
     void subtractItems(List<String> itemUuidList, List<Integer> countList);
+
+    void restoreItems(List<String> itemUuidList, List<Integer> countList);
 }

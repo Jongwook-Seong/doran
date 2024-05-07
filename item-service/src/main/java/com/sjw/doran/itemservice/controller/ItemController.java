@@ -59,6 +59,13 @@ public class ItemController {
         return ResponseEntity.accepted().build();
     }
 
+    /** 아이템 구매 취소하기 **/
+    @PutMapping("/orderitems/cancel")
+    public ResponseEntity<Void> cancelOrderItems(@RequestParam("itemUuidList") List<String> itemUuidList, @RequestParam("countList") List<Integer> countList) {
+        itemService.restoreItems(itemUuidList, countList);
+        return ResponseEntity.accepted().build();
+    }
+
     // 임시
     @GetMapping("/book/search")
     public ResponseEntity<List<ItemSimpleResponse>> bookSearch(@RequestParam String keywords) {

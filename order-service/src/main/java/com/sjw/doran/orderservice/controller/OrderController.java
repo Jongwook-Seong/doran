@@ -56,7 +56,14 @@ public class OrderController {
         } else if (orderUuid.isEmpty()) {
             throw new NoSuchElementException(messageUtil.getOrderUuidEmptyErrorMessage());
         }
-        orderService.cancelOrder(userUuid, orderUuid);
+        List<ItemSimpleInfo> itemSimpleInfoList = orderService.cancelOrder(userUuid, orderUuid);
+        List<String> itemUuidList = new ArrayList<>();
+        List<Integer> itemCountList = new ArrayList<>();
+        for (ItemSimpleInfo itemSimpleInfo : itemSimpleInfoList) {
+            itemUuidList.add(itemSimpleInfo.getItemUuid());
+            itemCountList.add(itemSimpleInfo.getCount());
+        }
+        itemServiceClient.cancelOrderItems(itemUuidList, itemCountList);
         return ResponseEntity.ok().build();
     }
 

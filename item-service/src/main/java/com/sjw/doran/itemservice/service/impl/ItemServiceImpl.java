@@ -105,4 +105,11 @@ public class ItemServiceImpl implements ItemService {
     public void subtractItems(List<String> itemUuidList, List<Integer> countList) {
         itemRepository.updateStockQuantity(itemUuidList, countList);
     }
+
+    @Override
+    @Transactional
+    public void restoreItems(List<String> itemUuidList, List<Integer> countList) {
+        countList.replaceAll(count -> -count);
+        itemRepository.updateStockQuantity(itemUuidList, countList);
+    }
 }

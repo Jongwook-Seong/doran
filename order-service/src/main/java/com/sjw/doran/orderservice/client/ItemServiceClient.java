@@ -16,4 +16,7 @@ public interface ItemServiceClient {
 
     @PutMapping("/item-service/orderitems")
     void orderItems(@RequestParam("itemUuidList") List<String> itemUuidList, @RequestParam("countList") List<Integer> countList);
+
+    @PutMapping("/item-service/orderitems/cancel")
+    void cancelOrderItems(@RequestParam("itemUuidList") List<String> itemUuidList, @RequestParam("countList") List<Integer> countList);
 }
