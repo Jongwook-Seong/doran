@@ -9,6 +9,7 @@ import com.sjw.doran.itemservice.vo.request.BookCreateRequest;
 import com.sjw.doran.itemservice.vo.request.ItemListRequest;
 import com.sjw.doran.itemservice.vo.response.ItemSimpleResponse;
 import com.sjw.doran.itemservice.vo.response.ItemSimpleWithQuantityResponse;
+import com.sjw.doran.itemservice.vo.response.ItemSimpleWithoutPriceResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -88,5 +89,15 @@ public class ItemController {
         }
         itemService.deleteItem(itemUuid);
         return ResponseEntity.accepted().build();
+    }
+
+    /** 아이템 단순정보(itemUuid, itemName, itemImageUrl) 조회(서비스간 통신 호출) **/
+    @GetMapping("/items/simple")
+    public ResponseEntity<List<ItemSimpleWithoutPriceResponse>> getItemSimpleWithoutPrice(@RequestParam("itemUuidList") List<String> itemUuidList) {
+        if (itemUuidList.isEmpty()) {
+            throw new NoSuchElementException(messageUtil.getItemUuidEmptyErrorMessage());
+        }
+        List<ItemSimpleWithoutPriceResponse> itemSimpleWithoutPriceList = itemService.getItemSimpleWithoutPriceList(itemUuidList);
+        return new ResponseEntity<>(itemSimpleWithoutPriceList, HttpStatus.OK);
     }
 }

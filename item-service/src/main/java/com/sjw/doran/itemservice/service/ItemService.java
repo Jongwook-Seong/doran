@@ -4,6 +4,7 @@ import com.sjw.doran.itemservice.entity.Item;
 import com.sjw.doran.itemservice.vo.request.BookCreateRequest;
 import com.sjw.doran.itemservice.vo.response.ItemSimpleResponse;
 import com.sjw.doran.itemservice.vo.response.ItemSimpleWithQuantityResponse;
+import com.sjw.doran.itemservice.vo.response.ItemSimpleWithoutPriceResponse;
 
 import java.util.List;
 
@@ -18,6 +19,8 @@ public interface ItemService {
     List<ItemSimpleResponse> getItemSimpleList(List<String> itemUuidList);
 
     List<ItemSimpleWithQuantityResponse> getItemSimpleWithQuantityList(List<String> itemUuidList);
+
+    List<ItemSimpleWithoutPriceResponse> getItemSimpleWithoutPriceList(List<String> itemUuidList);
 
     List<ItemSimpleResponse> getBooksByKeyword(String keyword);
 

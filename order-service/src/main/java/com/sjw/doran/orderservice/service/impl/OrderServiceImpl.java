@@ -85,7 +85,7 @@ public class OrderServiceImpl implements OrderService {
                 List<OrderItemSimple> oisList = new ArrayList<>();
                 List<OrderItem> orderItems = order.getOrderItems();
                 for (OrderItem orderItem : orderItems) {
-                    oisList.add(OrderItemSimple.getInstance(orderItem.getCount(), orderItem.getOrderPrice()));
+                    oisList.add(OrderItemSimple.getInstance(orderItem.getItemUuid(), orderItem.getCount(), orderItem.getOrderPrice()));
                 }
                 orderSimpleList.add(OrderSimple.getInstance(oisList, order.getDelivery().getDeliveryStatus(), order.getOrderDate()));
             }
@@ -103,7 +103,7 @@ public class OrderServiceImpl implements OrderService {
         List<OrderItemSimple> orderItemSimpleList = new ArrayList<>();
         List<OrderItem> orderItems = order.getOrderItems();
         for (OrderItem orderItem : orderItems) {
-            orderItemSimpleList.add(OrderItemSimple.getInstance(orderItem.getCount(), orderItem.getOrderPrice()));
+            orderItemSimpleList.add(OrderItemSimple.getInstance(orderItem.getItemUuid(), orderItem.getCount(), orderItem.getOrderPrice()));
         }
         Delivery delivery = order.getDelivery();
 

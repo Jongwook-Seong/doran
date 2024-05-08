@@ -11,6 +11,7 @@ import com.sjw.doran.itemservice.util.MessageUtil;
 import com.sjw.doran.itemservice.vo.request.BookCreateRequest;
 import com.sjw.doran.itemservice.vo.response.ItemSimpleResponse;
 import com.sjw.doran.itemservice.vo.response.ItemSimpleWithQuantityResponse;
+import com.sjw.doran.itemservice.vo.response.ItemSimpleWithoutPriceResponse;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -86,6 +87,17 @@ public class ItemServiceImpl implements ItemService {
             itemSimpleWQResponseList.add(itemSimpleWQResponse);
         }
         return itemSimpleWQResponseList;
+    }
+
+    @Override
+    public List<ItemSimpleWithoutPriceResponse> getItemSimpleWithoutPriceList(List<String> itemUuidList) {
+        List<Item> itemList = itemRepository.findByItemUuidList(itemUuidList);
+        List<ItemSimpleWithoutPriceResponse> itemSimpleWxPResponseList = new ArrayList<>();
+        for (Item item : itemList) {
+            if (item == null) continue;
+            itemSimpleWxPResponseList.add(modelMapper.map(item, ItemSimpleWithoutPriceResponse.class));
+        }
+        return itemSimpleWxPResponseList;
     }
 
     @Override
