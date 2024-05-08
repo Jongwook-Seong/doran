@@ -9,11 +9,16 @@ spring:
       on-profile: default
   messages:
     basename: errors
+#  datasource:
+#    url: jdbc:h2:tcp://localhost/~/order-database
+#    username: sa
+#    password:
+#    driver-class-name: org.h2.Driver
   datasource:
-    url: jdbc:h2:tcp://localhost/~/order-database
-    username: sa
-    password:
-    driver-class-name: org.h2.Driver
+    url: jdbc:mysql://localhost:3306/orders
+    username: root
+    password: mysql
+    driver-class-name: com.mysql.cj.jdbc.Driver
   h2:
     console:
       enabled: true
