@@ -22,7 +22,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/member")
+@RequestMapping("/")
 @Tag(name = "Member Service", description = "Member Service Swagger API")
 public class MemberController {
 

@@ -10,6 +10,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -82,5 +83,29 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
                 .delete(item)
                 .where(item.itemUuid.eq(itemUuid))
                 .execute();
+    }
+
+    @Override
+    @Transactional
+    public void updateStockQuantity(List<String> itemUuidList, List<Integer> countList) {
+
+        Map<String, Integer> itemUuidCountMap = new HashMap<>();
+        for (int i = 0; i < itemUuidList.size(); i++) {
+            String itemUuid = itemUuidList.get(i);
+            Integer count = countList.get(i);
+            itemUuidCountMap.put(itemUuid, count);
+        }
+
+        List<Item> items = queryFactory
+                .selectFrom(item)
+                .where(item.itemUuid.in(itemUuidList))
+                .fetch();
+
+        for (Item item : items) {
+            Integer count = itemUuidCountMap.get(item.getItemUuid());
+            if (count != null) {
+                item.setStockQuantity(item.getStockQuantity() - count);
+            }
+        }
     }
 }

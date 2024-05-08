@@ -20,7 +20,6 @@ public class BasketRepositoryImpl implements BasketRepositoryCustom {
     @Override
     @Transactional(readOnly = true)
     public Basket findByMember(Member member) {
-
         return queryFactory
                 .selectFrom(basket)
                 .where(basket.member.eq(member))

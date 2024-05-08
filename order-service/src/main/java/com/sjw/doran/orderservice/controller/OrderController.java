@@ -1,26 +1,27 @@
 package com.sjw.doran.orderservice.controller;
 
+import com.sjw.doran.orderservice.client.ItemServiceClient;
 import com.sjw.doran.orderservice.service.OrderService;
 import com.sjw.doran.orderservice.util.MessageUtil;
+import com.sjw.doran.orderservice.vo.ItemSimpleInfo;
 import com.sjw.doran.orderservice.vo.request.DeliveryStatusPostRequest;
 import com.sjw.doran.orderservice.vo.request.OrderCreateRequest;
-import com.sjw.doran.orderservice.vo.response.DeliveryTrackingResponse;
-import com.sjw.doran.orderservice.vo.response.OrderDetailResponse;
-import com.sjw.doran.orderservice.vo.response.OrderListResponse;
+import com.sjw.doran.orderservice.vo.response.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.NoSuchElementException;
+import java.util.*;
 
 @RestController
-@RequestMapping("/api/order")
+@RequestMapping("/order-service")
 @RequiredArgsConstructor
 public class OrderController {
 
     private final OrderService orderService;
+    private final ItemServiceClient itemServiceClient;
     private final MessageUtil messageUtil;
 
     /** 주문 생성하기 **/
@@ -29,7 +30,18 @@ public class OrderController {
         if (userUuid.isEmpty()) {
             throw new NoSuchElementException(messageUtil.getUserUuidEmptyErrorMessage());
         }
+
+        // itemServiceClient.orderItems() 파라미터 추출
+        List<ItemSimpleInfo> itemSimpleInfoList = request.getItemSimpleInfoList();
+        List<String> itemUuidList = new ArrayList<>();
+        List<Integer> itemCountList = new ArrayList<>();
+        for (ItemSimpleInfo itemSimpleInfo : itemSimpleInfoList) {
+            itemUuidList.add(itemSimpleInfo.getItemUuid());
+            itemCountList.add(itemSimpleInfo.getCount());
+        }
+
         orderService.createOrder(userUuid, request);
+        itemServiceClient.orderItems(itemUuidList, itemCountList);
         return ResponseEntity.ok().build();
     }
 
@@ -41,7 +53,15 @@ public class OrderController {
         } else if (orderUuid.isEmpty()) {
             throw new NoSuchElementException(messageUtil.getOrderUuidEmptyErrorMessage());
         }
-        orderService.cancelOrder(userUuid, orderUuid);
+        List<ItemSimpleInfo> itemSimpleInfoList = orderService.cancelOrder(userUuid, orderUuid);
+        // itemServiceClient.cancelOrderItems() 파라미터 추출
+        List<String> itemUuidList = new ArrayList<>();
+        List<Integer> itemCountList = new ArrayList<>();
+        for (ItemSimpleInfo itemSimpleInfo : itemSimpleInfoList) {
+            itemUuidList.add(itemSimpleInfo.getItemUuid());
+            itemCountList.add(itemSimpleInfo.getCount());
+        }
+        itemServiceClient.cancelOrderItems(itemUuidList, itemCountList);
         return ResponseEntity.ok().build();
     }
 
@@ -52,6 +72,22 @@ public class OrderController {
             throw new NoSuchElementException(messageUtil.getUserUuidEmptyErrorMessage());
         }
         OrderListResponse orderListResponse = orderService.getOrderList(userUuid);
+        // itemUuidList 추출
+        List<String> itemUuidList = new ArrayList<>();
+        orderListResponse.getOrderSimpleList().forEach(orderSimple ->
+                orderSimple.getOrderItemSimpleList().forEach(oisimple -> itemUuidList.add(oisimple.getItemUuid())));
+        // itemName, itemImageUrl 추출 및 삽입
+        List<ItemSimpleWithoutPriceResponse> itemSimpleWxPList = itemServiceClient.getItemSimpleWithoutPrice(itemUuidList);
+        Map<String, ItemSimpleWithoutPriceResponse> itemSimpleWxPMap = new HashMap<>();
+        for (ItemSimpleWithoutPriceResponse itemSimpleWxP : itemSimpleWxPList) {
+            itemSimpleWxPMap.put(itemSimpleWxP.getItemUuid(), itemSimpleWxP);
+        }
+        orderListResponse.getOrderSimpleList().forEach(orderSimple ->
+                orderSimple.getOrderItemSimpleList().forEach(oisimple -> {
+                    String itemUuid = oisimple.getItemUuid();
+                    oisimple.setItemName(itemSimpleWxPMap.get(itemUuid).getItemName());
+                    oisimple.setItemImageUrl(itemSimpleWxPMap.get(itemUuid).getItemImageUrl());
+                }));
         return new ResponseEntity<>(orderListResponse, HttpStatus.OK);
     }
 

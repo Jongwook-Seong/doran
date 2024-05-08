@@ -63,9 +63,14 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public void cancelOrder(String userUuid, String orderUuid) {
+    public List<ItemSimpleInfo> cancelOrder(String userUuid, String orderUuid) {
         try {
             orderRepository.updateOrderStatusAsCancel(userUuid, orderUuid);
+            Order order = orderRepository.findByOrderUuid(orderUuid).get();
+            List<OrderItem> orderItems = order.getOrderItems();
+            List<ItemSimpleInfo> itemSimpleInfoList = new ArrayList<>();
+            orderItems.forEach(orderItem -> itemSimpleInfoList.add(ItemSimpleInfo.getInstance(orderItem)));
+            return itemSimpleInfoList;
         } catch (Exception e) {
             throw new RuntimeException(messageUtil.getOrderCancelErrorMessage());
         }
@@ -80,7 +85,7 @@ public class OrderServiceImpl implements OrderService {
                 List<OrderItemSimple> oisList = new ArrayList<>();
                 List<OrderItem> orderItems = order.getOrderItems();
                 for (OrderItem orderItem : orderItems) {
-                    oisList.add(OrderItemSimple.getInstance(orderItem.getCount(), orderItem.getOrderPrice()));
+                    oisList.add(OrderItemSimple.getInstance(orderItem.getItemUuid(), orderItem.getCount(), orderItem.getOrderPrice()));
                 }
                 orderSimpleList.add(OrderSimple.getInstance(oisList, order.getDelivery().getDeliveryStatus(), order.getOrderDate()));
             }
@@ -98,7 +103,7 @@ public class OrderServiceImpl implements OrderService {
         List<OrderItemSimple> orderItemSimpleList = new ArrayList<>();
         List<OrderItem> orderItems = order.getOrderItems();
         for (OrderItem orderItem : orderItems) {
-            orderItemSimpleList.add(OrderItemSimple.getInstance(orderItem.getCount(), orderItem.getOrderPrice()));
+            orderItemSimpleList.add(OrderItemSimple.getInstance(orderItem.getItemUuid(), orderItem.getCount(), orderItem.getOrderPrice()));
         }
         Delivery delivery = order.getDelivery();
 
