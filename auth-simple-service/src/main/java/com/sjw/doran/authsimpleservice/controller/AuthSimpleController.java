@@ -48,7 +48,8 @@ public class AuthSimpleController {
     }
 
     @DeleteMapping("/users")
-    public ResponseEntity<MemberResponse> deleteUser(Authentication authentication, @RequestHeader("userUuid") String userUuid) {
+    public ResponseEntity<MemberResponse> deleteUser(Authentication authentication,
+                                                     @RequestHeader("userUuid") String userUuid) {
         userService.deleteUser(authentication.getName(), userUuid);
         MemberResponse memberResponse = memberServiceClient.deleteMember(userUuid);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(memberResponse);

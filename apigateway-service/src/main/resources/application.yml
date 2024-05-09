@@ -30,6 +30,15 @@ spring:
           filters:
             - RemoveRequestHeader=Cookie
             - RewritePath=/auth-simple-service/(?<segment>/*), /$\{segment}
+        - id: auth-simple-service
+          uri: lb://AUTH-SIMPLE-SERVICE
+          predicates:
+            - Path=/auth-simple-service/**
+            - Method=GET
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/auth-simple-service/(?<segment>/*), /$\{segment}
+            - AuthorizationHeaderFilter
         - id: member-service
           uri: lb://MEMBER-SERVICE
           predicates:
