@@ -9,11 +9,16 @@ spring:
       on-profile: default
   messages:
     basename: errors, messages
+#  datasource:
+#    url: jdbc:h2:tcp://localhost/~/member-database
+#    username: sa
+#    password:
+#    driver-class-name: org.h2.Driver
   datasource:
-    url: jdbc:h2:tcp://localhost/~/member-database
-    username: sa
-    password:
-    driver-class-name: org.h2.Driver
+    url: jdbc:mysql://localhost:3306/member
+    username: root
+    password: mysql
+    driver-class-name: com.mysql.cj.jdbc.Driver
   h2:
     console:
       enabled: true
@@ -27,6 +32,7 @@ spring:
       hibernate:
         format_sql: true
         show_sql: true
+#        dialect: org.hibernate.dialect.MySQL5InnoDBDialect
 
 eureka:
   instance:

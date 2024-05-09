@@ -44,7 +44,7 @@ public class BasketController {
                     content = {@Content(schema = @Schema(implementation = ResponseEntity.class))}),
             @ApiResponse(responseCode = "500", description = "Fail")
     })
-    public ResponseEntity setBasketItem(@RequestHeader String userUuid, @Valid @RequestBody BasketItemCreateRequest basketItemCreateRequest) {
+    public ResponseEntity<BasketItemResponse> setBasketItem(@RequestHeader String userUuid, @Valid @RequestBody BasketItemCreateRequest basketItemCreateRequest) {
         if (userUuid.isEmpty()) {
             throw new NoSuchElementException(messageUtil.getUserUuidEmptyMessage());
         }
@@ -59,7 +59,7 @@ public class BasketController {
                     content = {@Content(schema = @Schema(implementation = ResponseEntity.class))}),
             @ApiResponse(responseCode = "500", description = "Fail")
     })
-    public ResponseEntity deleteBasketItem(@RequestHeader String userUuid, @RequestParam("itemUuid") String itemUuid) {
+    public ResponseEntity<BasketItemResponse> deleteBasketItem(@RequestHeader String userUuid, @RequestParam("itemUuid") String itemUuid) {
         basketService.deleteBasketItem(userUuid, itemUuid);
         return ResponseEntity.ok(BasketItemResponse.getInstance(itemUuid, messageUtil.getBasketItemDeleteMessage()));
     }

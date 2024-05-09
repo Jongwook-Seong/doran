@@ -50,7 +50,7 @@ public class MemberController {
                     content = {@Content(schema = @Schema(implementation = ResponseEntity.class))}),
             @ApiResponse(responseCode = "500", description = "Fail")
     })
-    public ResponseEntity joinMember(@RequestHeader("userUuid") String userUuid) {
+    public ResponseEntity<MemberResponse> joinMember(@RequestHeader("userUuid") String userUuid) {
         Member member = new Member(userUuid);
         memberService.saveMember(member);
         return ResponseEntity.ok(MemberResponse.getInstance(userUuid, messageUtil.getMemberCreateMessage()));
@@ -63,7 +63,7 @@ public class MemberController {
                     content = {@Content(schema = @Schema(implementation = ResponseEntity.class))}),
             @ApiResponse(responseCode = "500", description = "Fail")
     })
-    public ResponseEntity deleteMember(@RequestHeader("userUuid") String userUuid) {
+    public ResponseEntity<MemberResponse> deleteMember(@RequestHeader("userUuid") String userUuid) {
         memberService.deleteMember(userUuid);
         return ResponseEntity.ok(MemberResponse.getInstance(userUuid, messageUtil.getMemberDeleteMessage()));
     }
