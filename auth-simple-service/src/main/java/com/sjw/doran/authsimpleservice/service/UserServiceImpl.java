@@ -13,6 +13,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -45,6 +46,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public List<UserDto> getUsers() {
+        List<UserEntity> userEntityList = userRepository.findAll();
+        List<UserDto> userDtoList = new ArrayList<>();
+
+        ModelMapper mapper = new ModelMapper();
+        userEntityList.forEach(userEntity -> userDtoList.add(mapper.map(userEntity, UserDto.class)));
+        return userDtoList;
+    }
+
+    @Override
     public UserDto getUserByUserUuid(String userUuid) {
 
         UserEntity userEntity = userRepository.findByUserUuid(userUuid);
@@ -67,5 +78,14 @@ public class UserServiceImpl implements UserService {
 
         UserDto userDto = mapper.map(userEntity, UserDto.class);
         return userDto;
+    }
+
+    @Override
+    public void deleteUser(String userId, String userUuid) {
+        UserEntity userEntity = userRepository.findByUserUuid(userUuid);
+        if (!userEntity.getUserId().equals(userId)) {
+            throw new RuntimeException("아이디가 일치하지 않습니다.");
+        }
+        userRepository.delete(userEntity);
     }
 }

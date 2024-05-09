@@ -1,11 +1,9 @@
 package com.sjw.doran.authsimpleservice.security;
 
-import com.fasterxml.jackson.core.exc.StreamReadException;
-import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sjw.doran.authsimpleservice.dto.UserDto;
 import com.sjw.doran.authsimpleservice.service.UserService;
-import com.sjw.doran.authsimpleservice.vo.RequestLogin;
+import com.sjw.doran.authsimpleservice.vo.UserLoginRequest;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.servlet.FilterChain;
@@ -40,7 +38,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
 
         try {
-            RequestLogin creds = new ObjectMapper().readValue(request.getInputStream(), RequestLogin.class);
+            UserLoginRequest creds = new ObjectMapper().readValue(request.getInputStream(), UserLoginRequest.class);
             return getAuthenticationManager().authenticate(
                     new UsernamePasswordAuthenticationToken(
                             creds.getUserId(), creds.getPassword(), new ArrayList<>()
