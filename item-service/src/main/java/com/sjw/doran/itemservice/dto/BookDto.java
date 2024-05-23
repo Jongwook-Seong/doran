@@ -14,14 +14,14 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class BookDto {
+public class BookDto extends ItemDto {
 
-    private String itemUuid;
-    private String itemName;
-    private int price;
-    private int stockQuantity;
-    private String itemImageUrl;
-    private Category category;
+//    private String itemUuid;
+//    private String itemName;
+//    private int price;
+//    private int stockQuantity;
+//    private String itemImageUrl;
+//    private Category category;
 
     private String author;
     private String isbn;
@@ -31,12 +31,12 @@ public class BookDto {
     private String bookReview;
 
     public static BookDto getInstanceForCreate(BookCreateRequest bookCreateRequest) {
-        return BookDto.builder()
-                .itemUuid(UUID.randomUUID().toString())
-                .itemName(bookCreateRequest.getItemName())
-                .price(bookCreateRequest.getPrice())
-                .stockQuantity(bookCreateRequest.getStockQuantity())
-                .category(Category.BOOK)
+        BookDto bookDto = BookDto.builder()
+//                .itemUuid(UUID.randomUUID().toString())
+//                .itemName(bookCreateRequest.getItemName())
+//                .price(bookCreateRequest.getPrice())
+//                .stockQuantity(bookCreateRequest.getStockQuantity())
+//                .category(Category.BOOK)
                 .author(bookCreateRequest.getAuthor())
                 .isbn(bookCreateRequest.getIsbn())
                 .pages(bookCreateRequest.getPages())
@@ -44,5 +44,12 @@ public class BookDto {
                 .contentsTable(bookCreateRequest.getContentsTable())
                 .bookReview(bookCreateRequest.getBookReview())
                 .build();
+
+        bookDto.setItemUuid( UUID.randomUUID().toString() );
+        bookDto.setItemName( bookCreateRequest.getItemName() );
+        bookDto.setPrice( bookCreateRequest.getPrice() );
+        bookDto.setStockQuantity( bookCreateRequest.getStockQuantity() );
+
+        return bookDto;
     }
 }

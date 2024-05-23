@@ -7,7 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Getter @Setter
+@Getter
+//@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "dtype")
@@ -35,5 +36,14 @@ public abstract class Item extends AuditingFields {
             return;
         }
         this.stockQuantity = restStock;
+    }
+
+    @Builder
+    public Item(String itemUuid, String itemName, int price, int stockQuantity, String itemImageUrl) {
+        this.itemUuid = itemUuid;
+        this.itemName = itemName;
+        this.price = price;
+        this.stockQuantity = stockQuantity;
+        this.itemImageUrl = itemImageUrl;
     }
 }
