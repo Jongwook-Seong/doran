@@ -8,9 +8,7 @@ import java.util.Date;
 
 @Entity
 @Getter
-//@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-//@AllArgsConstructor
 @DiscriminatorValue("BOOK")
 public class Book extends Item {
 
