@@ -24,8 +24,7 @@ public class Book extends Item {
     @Builder
     public Book(String itemUuid, String itemName, int price, int stockQuantity, String itemImageUrl, Category category,
             String author, String isbn, int pages, Date publicationDate, String contentsTable, String bookReview) {
-//        super();
-        super(itemUuid, itemName, price, stockQuantity, itemImageUrl);
+        super(itemUuid, itemName, price, stockQuantity, itemImageUrl, category);
         this.author = author;
         this.isbn = isbn;
         this.pages = pages;

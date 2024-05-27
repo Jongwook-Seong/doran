@@ -1,27 +1,17 @@
 package com.sjw.doran.itemservice.dto;
 
-import com.sjw.doran.itemservice.entity.Category;
 import com.sjw.doran.itemservice.vo.request.BookCreateRequest;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.util.Date;
 import java.util.UUID;
 
 @Data
-@Builder
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 public class BookDto extends ItemDto {
-
-//    private String itemUuid;
-//    private String itemName;
-//    private int price;
-//    private int stockQuantity;
-//    private String itemImageUrl;
-//    private Category category;
 
     private String author;
     private String isbn;

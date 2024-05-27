@@ -26,13 +26,14 @@ public class TestController {
     }
 
     Book createBook(String itemName, int price, int quantity, String itemImageUrl) {
-        Book book = new Book();
-        book.setItemUuid(UUID.randomUUID().toString());
-        book.setItemName(itemName);
-        book.setPrice(price);
-        book.setStockQuantity(quantity);
-        book.setItemImageUrl(itemImageUrl);
-        book.setCategory(Category.BOOK);
+        Book book = Book.builder()
+                .itemUuid(UUID.randomUUID().toString())
+                .itemName(itemName)
+                .price(price)
+                .stockQuantity(quantity)
+                .itemImageUrl(itemImageUrl)
+                .category(Category.BOOK)
+                .build();
 
         return book;
     }

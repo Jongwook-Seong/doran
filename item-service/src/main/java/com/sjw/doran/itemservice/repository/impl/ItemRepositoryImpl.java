@@ -4,10 +4,6 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sjw.doran.itemservice.entity.*;
 import com.sjw.doran.itemservice.repository.ItemRepositoryCustom;
 import jakarta.persistence.EntityManager;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
@@ -104,7 +100,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
         for (Item item : items) {
             Integer count = itemUuidCountMap.get(item.getItemUuid());
             if (count != null) {
-                item.setStockQuantity(item.getStockQuantity() - count);
+                item.removeStock(count);
             }
         }
     }
