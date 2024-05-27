@@ -16,7 +16,6 @@ import com.sjw.doran.itemservice.vo.response.ItemSimpleResponse;
 import com.sjw.doran.itemservice.vo.response.ItemSimpleWithQuantityResponse;
 import com.sjw.doran.itemservice.vo.response.ItemSimpleWithoutPriceResponse;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,7 +26,6 @@ import java.util.*;
 public class ItemServiceImpl implements ItemService {
 
     private final ItemRepository itemRepository;
-//    private final ModelMapper modelMapper;
     private final ItemMapper itemMapper;
     private final BookMapper bookMapper;
     private final MessageUtil messageUtil;
@@ -69,7 +67,6 @@ public class ItemServiceImpl implements ItemService {
         List<ItemSimpleResponse> itemSimpleResponseList = new ArrayList<>();
         for (Item item : itemList) {
             if (item == null) continue;
-//            ItemSimpleResponse itemSimpleResponse = modelMapper.map(item, ItemSimpleResponse.class);
             ItemDto itemDto = itemMapper.toItemDto(item);
             ItemSimpleResponse itemSimpleResponse = itemMapper.toItemSimpleResponse(itemDto);
             itemSimpleResponseList.add(itemSimpleResponse);
@@ -83,7 +80,6 @@ public class ItemServiceImpl implements ItemService {
         ArrayList<ItemSimpleWithQuantityResponse> itemSimpleWQResponseList = new ArrayList<>();
         for (Item item : itemList) {
             if (item == null) continue;
-//            ItemSimpleWithQuantityResponse itemSimpleWQResponse = modelMapper.map(item, ItemSimpleWithQuantityResponse.class);
             ItemDto itemDto = itemMapper.toItemDto(item);
             ItemSimpleWithQuantityResponse itemSimpleWQResponse = itemMapper.toItemSimpleWQResponse(itemDto);
             itemSimpleWQResponseList.add(itemSimpleWQResponse);
@@ -97,7 +93,6 @@ public class ItemServiceImpl implements ItemService {
         List<ItemSimpleWithoutPriceResponse> itemSimpleWxPResponseList = new ArrayList<>();
         for (Item item : itemList) {
             if (item == null) continue;
-//            itemSimpleWxPResponseList.add(modelMapper.map(item, ItemSimpleWithoutPriceResponse.class));
             ItemDto itemDto = itemMapper.toItemDto(item);
             itemSimpleWxPResponseList.add(itemMapper.toItemSimpleWxPResponse(itemDto));
         }
@@ -110,9 +105,7 @@ public class ItemServiceImpl implements ItemService {
         List<Book> books = itemRepository.findBookByKeyword(keyword);
         List<ItemSimpleResponse> itemSimpleResponseList = new ArrayList<>();
         for (Book book : books) {
-//            BookDto bookDto = modelMapper.map(book, BookDto.class);
             BookDto bookDto = bookMapper.toBookDto(book);
-//            itemSimpleResponseList.add(ItemSimpleResponse.getInstanceAsBook(bookDto));
             itemSimpleResponseList.add(bookMapper.toItemSimpleResponse(bookDto));
         }
         return itemSimpleResponseList;

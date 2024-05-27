@@ -21,6 +21,5 @@ public interface BookMapper {
     @Mapping(target = "itemUuid", source = "itemUuid", defaultExpression = "java(UUID.randomUUID().toString())")
     @Mapping(target = "category", source = "category", defaultExpression = "java(Category.BOOK)")
     BookDto toBookDto(BookCreateRequest request, String itemUuid, Category category);
-
     ItemSimpleResponse toItemSimpleResponse(BookDto bookDto);
 }

@@ -33,7 +33,7 @@ public abstract class Item extends AuditingFields {
         }
         this.stockQuantity = restStock;
     }
-    
+
     public Item(String itemUuid, String itemName, int price, int stockQuantity, String itemImageUrl, Category category) {
         this.itemUuid = itemUuid;
         this.itemName = itemName;
