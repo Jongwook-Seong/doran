@@ -10,10 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Getter @Setter
+@Getter
 @Table(name = "orders")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
 public class Order extends AuditingFields {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,4 +35,8 @@ public class Order extends AuditingFields {
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime orderDate;
+
+    public void createDelivery(Delivery delivery) {
+        this.delivery = delivery;
+    }
 }

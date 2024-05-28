@@ -8,9 +8,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDateTime;
 
 @Entity
-@Getter @Setter
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
 public class DeliveryTracking {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,4 +26,12 @@ public class DeliveryTracking {
     private String postLocation;
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime postDateTime;
+
+    @Builder
+    public DeliveryTracking(Delivery delivery, String courier, String contactNumber, String postLocation) {
+        this.delivery = delivery;
+        this.courier = courier;
+        this.contactNumber = contactNumber;
+        this.postLocation = postLocation;
+    }
 }

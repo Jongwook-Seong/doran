@@ -8,9 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Getter @Setter
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
 public class Delivery {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,4 +31,12 @@ public class Delivery {
 
     @OneToMany(mappedBy = "delivery", cascade = CascadeType.ALL)
     private List<DeliveryTracking> deliveryTrackings = new ArrayList<>();
+
+    @Builder
+    public Delivery(Order order, DeliveryStatus deliveryStatus, TransceiverInfo transceiverInfo, Address address) {
+        this.order = order;
+        this.deliveryStatus = deliveryStatus;
+        this.transceiverInfo = transceiverInfo;
+        this.address = address;
+    }
 }

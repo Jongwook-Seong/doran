@@ -5,9 +5,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Getter @Setter
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
 public class OrderItem {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,4 +22,16 @@ public class OrderItem {
 
     private int orderPrice;
     private int count;
+
+    @Builder
+    public OrderItem(Order order, String itemUuid, int orderPrice, int count) {
+        this.order = order;
+        this.itemUuid = itemUuid;
+        this.orderPrice = orderPrice;
+        this.count = count;
+    }
+
+    public void createOrder(Order order) {
+        this.order = order;
+    }
 }

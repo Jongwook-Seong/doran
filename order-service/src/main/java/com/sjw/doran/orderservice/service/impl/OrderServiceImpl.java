@@ -46,12 +46,12 @@ public class OrderServiceImpl implements OrderService {
         Address address = request.getAddress();
 
         List<OrderItem> orderItemList = createOrderItemList(itemSimpleInfoList);
-        Order order = createOrder(userUuid, orderItemList);
-        Delivery delivery = createDelivery(transceiverInfo, address);
-        order.setDelivery(delivery);
+        Order order = constructOrder(userUuid, orderItemList);
+        Delivery delivery = constructDelivery(transceiverInfo, address);
+        order.createDelivery(delivery);
 
-        DeliveryTracking deliveryTracking = createDefaultDeliveryTracking();
-        deliveryTracking.setDelivery(delivery);
+        DeliveryTracking deliveryTracking = constructDefaultDeliveryTracking(delivery);
+//        deliveryTracking.setDelivery(delivery);
 
         try {
             orderRepository.save(order);
@@ -136,7 +136,7 @@ public class OrderServiceImpl implements OrderService {
 
             DeliveryTrackingDto deliveryTrackingDto = DeliveryTrackingDto.getInstanceForCreate(request.getCourier(), request.getContactNumber(), request.getPostLocation());
             DeliveryTracking deliveryTracking = modelMapper.map(deliveryTrackingDto, DeliveryTracking.class);
-            deliveryTracking.setDelivery(delivery);
+//            deliveryTracking.setDelivery(delivery);
 
             deliveryTrackingRepository.save(deliveryTracking);
         } catch (Exception e) {
@@ -155,19 +155,20 @@ public class OrderServiceImpl implements OrderService {
         return orderItemList;
     }
 
-    private Order createOrder(String userUuid, List<OrderItem> orderItemList) {
+    private Order constructOrder(String userUuid, List<OrderItem> orderItemList) {
         OrderDto orderDto = OrderDto.getInstanceForCreate(userUuid);
         Order order = modelMapper.map(orderDto, Order.class);
-        orderItemList.forEach(orderItem -> orderItem.setOrder(order));
+//        orderItemList.forEach(orderItem -> orderItem.setOrder(order));
+        orderItemList.forEach(orderItem -> orderItem.createOrder(order));
         return order;
     }
 
-    private Delivery createDelivery(TransceiverInfo transceiverInfo, Address address) {
+    private Delivery constructDelivery(TransceiverInfo transceiverInfo, Address address) {
         DeliveryDto deliveryDto = DeliveryDto.getInstanceForCreate(transceiverInfo, address);
         return modelMapper.map(deliveryDto, Delivery.class);
     }
 
-    private DeliveryTracking createDefaultDeliveryTracking() {
+    private DeliveryTracking constructDefaultDeliveryTracking(Delivery delivery) {
         DeliveryTrackingDto deliveryTrackingDto =
                 DeliveryTrackingDto.getInstanceForCreate("kim", "010-xxxx-xxxx", "seoul");
         return modelMapper.map(deliveryTrackingDto, DeliveryTracking.class);
