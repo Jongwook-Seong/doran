@@ -1,9 +1,9 @@
 package com.sjw.doran.memberservice.vo.request;
 
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 
-@Getter
+@Data
 @Builder
 public class BasketItemCreateRequest {
 

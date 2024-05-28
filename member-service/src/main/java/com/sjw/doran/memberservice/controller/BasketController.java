@@ -6,7 +6,6 @@ import com.sjw.doran.memberservice.service.BasketItemService;
 import com.sjw.doran.memberservice.service.BasketService;
 import com.sjw.doran.memberservice.service.MemberService;
 import com.sjw.doran.memberservice.util.MessageUtil;
-import com.sjw.doran.memberservice.util.ModelMapperUtil;
 import com.sjw.doran.memberservice.vo.request.BasketItemCreateRequest;
 import com.sjw.doran.memberservice.vo.response.BasketItemResponse;
 import com.sjw.doran.memberservice.vo.response.ItemSimpleWithCountResponse;
@@ -35,7 +34,6 @@ public class BasketController {
     private final BasketService basketService;
     private final BasketItemService basketItemService;
     private final MessageUtil messageUtil;
-    private final ModelMapperUtil modelMapperUtil;
 
     @PostMapping("/addItem")
     @Operation(summary = "장바구니 상품 추가", description = "장바구니에 해당 상품을 저장합니다.")

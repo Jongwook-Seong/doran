@@ -8,14 +8,11 @@ import com.sjw.doran.itemservice.vo.response.ItemSimpleResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -28,9 +25,6 @@ class ItemControllerTest {
 
     @Autowired
     private ItemController itemController;
-
-    @Autowired
-    private ModelMapper modelMapper;
 
     @Test
     void 아이템_저장_및_검색조회() {

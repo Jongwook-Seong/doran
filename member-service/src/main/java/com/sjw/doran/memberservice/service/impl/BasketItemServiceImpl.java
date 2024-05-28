@@ -4,9 +4,9 @@ import com.sjw.doran.memberservice.dto.BasketItemDto;
 import com.sjw.doran.memberservice.entity.Basket;
 import com.sjw.doran.memberservice.entity.BasketItem;
 import com.sjw.doran.memberservice.client.ItemServiceClient;
+import com.sjw.doran.memberservice.mapper.BasketItemMapper;
 import com.sjw.doran.memberservice.repository.BasketItemRepository;
 import com.sjw.doran.memberservice.service.BasketItemService;
-import com.sjw.doran.memberservice.util.ModelMapperUtil;
 import com.sjw.doran.memberservice.vo.request.BasketItemCreateRequest;
 import com.sjw.doran.memberservice.vo.response.ItemSimpleResponse;
 import com.sjw.doran.memberservice.vo.response.ItemSimpleWithCountResponse;
@@ -26,6 +26,7 @@ public class BasketItemServiceImpl implements BasketItemService {
     private final BasketItemRepository basketItemRepository;
     private final ItemServiceClient itemServiceClient;
     private final ModelMapperUtil modelMapperUtil;
+    private final BasketItemMapper basketItemMapper;
 
     @Override
     @Transactional(readOnly = true)
@@ -50,10 +51,12 @@ public class BasketItemServiceImpl implements BasketItemService {
 
     @Override
     @Transactional
-    public void addBasketItem(Basket basket, BasketItemCreateRequest basketItemCreateRequest) {
-        BasketItemDto basketItemDto = BasketItemDto.getInstanceForCreate(basketItemCreateRequest);
-        BasketItem basketItem = modelMapperUtil.BasketItemDtoConvertToEntity(basketItemDto);
-        basketItem.setBasket(basket);
+    public void addBasketItem(Basket basket, BasketItemCreateRequest request) {
+//        BasketItemDto basketItemDto = BasketItemDto.getInstanceForCreate(request);
+        BasketItemDto basketItemDto = basketItemMapper.toBasketItemDto(request);
+//        BasketItem basketItem = modelMapperUtil.BasketItemDtoConvertToEntity(basketItemDto);
+        BasketItem basketItem = basketItemMapper.toBasketItem(basketItemDto, basket);
+//        basketItem.setBasket(basket);
         basketItemRepository.save(basketItem);
     }
 
