@@ -5,6 +5,7 @@ import com.sjw.doran.orderservice.dto.DeliveryTrackingDto;
 import com.sjw.doran.orderservice.dto.OrderDto;
 import com.sjw.doran.orderservice.dto.OrderItemDto;
 import com.sjw.doran.orderservice.entity.*;
+import com.sjw.doran.orderservice.mapper.OrderMapper;
 import com.sjw.doran.orderservice.repository.DeliveryTrackingRepository;
 import com.sjw.doran.orderservice.repository.OrderItemRepository;
 import com.sjw.doran.orderservice.repository.OrderRepository;
@@ -20,7 +21,6 @@ import com.sjw.doran.orderservice.vo.response.DeliveryTrackingResponse;
 import com.sjw.doran.orderservice.vo.response.OrderDetailResponse;
 import com.sjw.doran.orderservice.vo.response.OrderListResponse;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,7 +35,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
     private final DeliveryTrackingRepository deliveryTrackingRepository;
-    private final ModelMapper modelMapper;
+    private final OrderMapper orderMapper;
     private final MessageUtil messageUtil;
 
     @Override
@@ -135,7 +135,8 @@ public class OrderServiceImpl implements OrderService {
             Delivery delivery = orderRepository.updateDeliveryStatus(orderUuid, request.getDeliveryStatus());
 
             DeliveryTrackingDto deliveryTrackingDto = DeliveryTrackingDto.getInstanceForCreate(request.getCourier(), request.getContactNumber(), request.getPostLocation());
-            DeliveryTracking deliveryTracking = modelMapper.map(deliveryTrackingDto, DeliveryTracking.class);
+//            DeliveryTracking deliveryTracking = modelMapper.map(deliveryTrackingDto, DeliveryTracking.class);
+            DeliveryTracking deliveryTracking = orderMapper.toDeliveryTracking(deliveryTrackingDto, delivery);
 //            deliveryTracking.setDelivery(delivery);
 
             deliveryTrackingRepository.save(deliveryTracking);
@@ -150,14 +151,16 @@ public class OrderServiceImpl implements OrderService {
                 orderItemDtoList.add(OrderItemDto.getInstanceForCreate(info)));
 
         List<OrderItem> orderItemList = new ArrayList<>();
-        orderItemDtoList.forEach(oiDto ->
-                orderItemList.add(modelMapper.map(oiDto, OrderItem.class)));
+        orderItemDtoList.forEach(orderItemDto ->
+//                orderItemList.add(modelMapper.map(orderItemDto, OrderItem.class)));
+                orderItemList.add(orderMapper.toOrderItem(orderItemDto)));
         return orderItemList;
     }
 
     private Order constructOrder(String userUuid, List<OrderItem> orderItemList) {
         OrderDto orderDto = OrderDto.getInstanceForCreate(userUuid);
-        Order order = modelMapper.map(orderDto, Order.class);
+//        Order order = modelMapper.map(orderDto, Order.class);
+        Order order = orderMapper.toOrder(orderDto);
 //        orderItemList.forEach(orderItem -> orderItem.setOrder(order));
         orderItemList.forEach(orderItem -> orderItem.createOrder(order));
         return order;
@@ -165,12 +168,14 @@ public class OrderServiceImpl implements OrderService {
 
     private Delivery constructDelivery(TransceiverInfo transceiverInfo, Address address) {
         DeliveryDto deliveryDto = DeliveryDto.getInstanceForCreate(transceiverInfo, address);
-        return modelMapper.map(deliveryDto, Delivery.class);
+        return orderMapper.toDelivery(deliveryDto);
+//        return modelMapper.map(deliveryDto, Delivery.class);
     }
 
     private DeliveryTracking constructDefaultDeliveryTracking(Delivery delivery) {
         DeliveryTrackingDto deliveryTrackingDto =
                 DeliveryTrackingDto.getInstanceForCreate("kim", "010-xxxx-xxxx", "seoul");
-        return modelMapper.map(deliveryTrackingDto, DeliveryTracking.class);
+        return orderMapper.toDeliveryTracking(deliveryTrackingDto, delivery);
+//        return modelMapper.map(deliveryTrackingDto, DeliveryTracking.class);
     }
 }

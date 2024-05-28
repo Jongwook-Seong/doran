@@ -5,13 +5,13 @@ import com.sjw.doran.orderservice.dto.DeliveryTrackingDto;
 import com.sjw.doran.orderservice.dto.OrderDto;
 import com.sjw.doran.orderservice.dto.OrderItemDto;
 import com.sjw.doran.orderservice.entity.*;
+import com.sjw.doran.orderservice.mapper.OrderMapper;
 import com.sjw.doran.orderservice.repository.DeliveryTrackingRepository;
 import com.sjw.doran.orderservice.repository.OrderItemRepository;
 import com.sjw.doran.orderservice.repository.OrderRepository;
 import com.sjw.doran.orderservice.vo.ItemSimpleInfo;
 import com.sjw.doran.orderservice.vo.request.OrderCreateRequest;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -25,7 +25,7 @@ public class TestController {
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
     private final DeliveryTrackingRepository deliveryTrackingRepository;
-    private final ModelMapper modelMapper;
+    private final OrderMapper orderMapper;
 
     @PostMapping("/new-order")
     public void newOrder(@RequestHeader("userUuid") String userUuid, @RequestBody OrderCreateRequest request) {
@@ -39,26 +39,30 @@ public class TestController {
             orderItemDtoList.add(OrderItemDto.getInstanceForCreate(itemSimpleInfo));
         }
 
-        Order order = modelMapper.map(orderDto, Order.class);
+//        Order order = modelMapper.map(orderDto, Order.class);
+        Order order = orderMapper.toOrder(orderDto);
         List<OrderItem> orderItemList = new ArrayList<>();
         for (OrderItemDto orderItemDto : orderItemDtoList) {
-            orderItemList.add(modelMapper.map(orderItemDto, OrderItem.class));
+//            orderItemList.add(modelMapper.map(orderItemDto, OrderItem.class));
+            orderItemList.add(orderMapper.toOrderItem(orderItemDto));
         }
         for (OrderItem orderItem : orderItemList) {
-            orderItem.setOrder(order);
+            orderItem.createOrder(order);
         }
 
         TransceiverInfo transceiverInfo = request.getTransceiverInfo();
         Address address = request.getAddress();
         DeliveryDto deliveryDto = DeliveryDto.getInstanceForCreate(transceiverInfo, address);
-        Delivery delivery = modelMapper.map(deliveryDto, Delivery.class);
+//        Delivery delivery = modelMapper.map(deliveryDto, Delivery.class);
+        Delivery delivery = orderMapper.toDelivery(deliveryDto);
 
-        order.setDelivery(delivery);
+        order.createDelivery(delivery);
 
         DeliveryTrackingDto deliveryTrackingDto =
                 DeliveryTrackingDto.getInstanceForCreate("kim", "010-xxxx-xxxx", "seoul");
-        DeliveryTracking deliveryTracking = modelMapper.map(deliveryTrackingDto, DeliveryTracking.class);
-        deliveryTracking.setDelivery(delivery);
+//        DeliveryTracking deliveryTracking = modelMapper.map(deliveryTrackingDto, DeliveryTracking.class);
+//        deliveryTracking.setDelivery(delivery);
+        DeliveryTracking deliveryTracking = orderMapper.toDeliveryTracking(deliveryTrackingDto, delivery);
 
         orderRepository.save(order);
         orderItemRepository.saveAll(orderItemList);
