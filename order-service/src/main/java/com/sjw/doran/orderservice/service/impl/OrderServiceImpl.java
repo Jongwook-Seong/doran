@@ -155,7 +155,6 @@ public class OrderServiceImpl implements OrderService {
 
     private Order constructOrder(String userUuid, List<OrderItem> orderItemList) {
         OrderDto orderDto = OrderDto.getInstanceForCreate(userUuid);
-        System.out.println("OrderServiceImpl.constructOrder : orderDto.getOrderDate() = " + orderDto.getOrderDate());
         Order order = orderMapper.toOrder(orderDto);
         orderItemList.forEach(orderItem -> orderItem.createOrder(order));
         return order;
