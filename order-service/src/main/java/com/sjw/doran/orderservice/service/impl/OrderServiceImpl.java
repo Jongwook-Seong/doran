@@ -51,7 +51,6 @@ public class OrderServiceImpl implements OrderService {
         order.createDelivery(delivery);
 
         DeliveryTracking deliveryTracking = constructDefaultDeliveryTracking(delivery);
-//        deliveryTracking.setDelivery(delivery);
 
         try {
             orderRepository.save(order);
@@ -135,9 +134,7 @@ public class OrderServiceImpl implements OrderService {
             Delivery delivery = orderRepository.updateDeliveryStatus(orderUuid, request.getDeliveryStatus());
 
             DeliveryTrackingDto deliveryTrackingDto = DeliveryTrackingDto.getInstanceForCreate(request.getCourier(), request.getContactNumber(), request.getPostLocation());
-//            DeliveryTracking deliveryTracking = modelMapper.map(deliveryTrackingDto, DeliveryTracking.class);
             DeliveryTracking deliveryTracking = orderMapper.toDeliveryTracking(deliveryTrackingDto, delivery);
-//            deliveryTracking.setDelivery(delivery);
 
             deliveryTrackingRepository.save(deliveryTracking);
         } catch (Exception e) {
@@ -152,16 +149,14 @@ public class OrderServiceImpl implements OrderService {
 
         List<OrderItem> orderItemList = new ArrayList<>();
         orderItemDtoList.forEach(orderItemDto ->
-//                orderItemList.add(modelMapper.map(orderItemDto, OrderItem.class)));
                 orderItemList.add(orderMapper.toOrderItem(orderItemDto)));
         return orderItemList;
     }
 
     private Order constructOrder(String userUuid, List<OrderItem> orderItemList) {
         OrderDto orderDto = OrderDto.getInstanceForCreate(userUuid);
-//        Order order = modelMapper.map(orderDto, Order.class);
+        System.out.println("OrderServiceImpl.constructOrder : orderDto.getOrderDate() = " + orderDto.getOrderDate());
         Order order = orderMapper.toOrder(orderDto);
-//        orderItemList.forEach(orderItem -> orderItem.setOrder(order));
         orderItemList.forEach(orderItem -> orderItem.createOrder(order));
         return order;
     }
@@ -169,13 +164,11 @@ public class OrderServiceImpl implements OrderService {
     private Delivery constructDelivery(TransceiverInfo transceiverInfo, Address address) {
         DeliveryDto deliveryDto = DeliveryDto.getInstanceForCreate(transceiverInfo, address);
         return orderMapper.toDelivery(deliveryDto);
-//        return modelMapper.map(deliveryDto, Delivery.class);
     }
 
     private DeliveryTracking constructDefaultDeliveryTracking(Delivery delivery) {
         DeliveryTrackingDto deliveryTrackingDto =
                 DeliveryTrackingDto.getInstanceForCreate("kim", "010-xxxx-xxxx", "seoul");
         return orderMapper.toDeliveryTracking(deliveryTrackingDto, delivery);
-//        return modelMapper.map(deliveryTrackingDto, DeliveryTracking.class);
     }
 }

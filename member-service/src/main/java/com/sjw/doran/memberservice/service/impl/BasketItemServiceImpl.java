@@ -25,7 +25,6 @@ public class BasketItemServiceImpl implements BasketItemService {
 
     private final BasketItemRepository basketItemRepository;
     private final ItemServiceClient itemServiceClient;
-    private final ModelMapperUtil modelMapperUtil;
     private final BasketItemMapper basketItemMapper;
 
     @Override

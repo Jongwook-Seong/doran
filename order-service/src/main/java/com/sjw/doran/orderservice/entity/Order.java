@@ -36,7 +36,19 @@ public class Order extends AuditingFields {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime orderDate;
 
+    @Builder
+    public Order(String orderUuid, String userUuid) {
+        this.orderUuid = orderUuid;
+        this.userUuid = userUuid;
+        this.orderStatus = OrderStatus.ORDER;
+        this.orderDate = LocalDateTime.now();
+    }
+
     public void createDelivery(Delivery delivery) {
         this.delivery = delivery;
+    }
+
+    public void updateOrderStatus(OrderStatus orderStatus) {
+        this.orderStatus = orderStatus;
     }
 }

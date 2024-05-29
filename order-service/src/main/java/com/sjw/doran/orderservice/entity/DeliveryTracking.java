@@ -33,5 +33,6 @@ public class DeliveryTracking {
         this.courier = courier;
         this.contactNumber = contactNumber;
         this.postLocation = postLocation;
+        this.postDateTime = LocalDateTime.now();
     }
 }

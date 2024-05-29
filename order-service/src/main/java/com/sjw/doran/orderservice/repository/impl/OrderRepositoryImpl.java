@@ -94,7 +94,7 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
                 .fetchOne();
 
         if (toCancelOrder.getDelivery().getDeliveryStatus() != DeliveryStatus.READY) return;
-        toCancelOrder.setOrderStatus(OrderStatus.CANCEL);
+        toCancelOrder.updateOrderStatus(OrderStatus.CANCEL);
     }
 
     @Override
@@ -107,7 +107,7 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
 
         Delivery delivery = toUpdateStatusOrder.getDelivery();
         if (delivery.getDeliveryStatus() != deliveryStatus)
-            delivery.setDeliveryStatus(deliveryStatus);
+            delivery.updateDeliveryStatus(deliveryStatus);
         return delivery;
     }
 

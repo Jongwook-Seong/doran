@@ -39,4 +39,8 @@ public class Delivery {
         this.transceiverInfo = transceiverInfo;
         this.address = address;
     }
+
+    public void updateDeliveryStatus(DeliveryStatus deliveryStatus) {
+        this.deliveryStatus = deliveryStatus;
+    }
 }
