@@ -2,10 +2,9 @@ package com.sjw.doran.authsimpleservice.service;
 
 import com.sjw.doran.authsimpleservice.dto.UserDto;
 import com.sjw.doran.authsimpleservice.entity.UserEntity;
+import com.sjw.doran.authsimpleservice.mapper.UserMapper;
 import com.sjw.doran.authsimpleservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
-import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -22,6 +21,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final UserMapper userMapper;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -37,9 +37,7 @@ public class UserServiceImpl implements UserService {
     public UserDto createUser(UserDto userDto) {
 
         userDto.setUserUuid(UUID.randomUUID().toString());
-        ModelMapper mapper = new ModelMapper();
-        mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-        UserEntity userEntity = mapper.map(userDto, UserEntity.class);
+        UserEntity userEntity = userMapper.toUserEntity(userDto);
         userEntity.setEncryptedPwd(passwordEncoder.encode(userDto.getPassword()));
         userRepository.save(userEntity);
         return userDto;
@@ -49,9 +47,7 @@ public class UserServiceImpl implements UserService {
     public List<UserDto> getUsers() {
         List<UserEntity> userEntityList = userRepository.findAll();
         List<UserDto> userDtoList = new ArrayList<>();
-
-        ModelMapper mapper = new ModelMapper();
-        userEntityList.forEach(userEntity -> userDtoList.add(mapper.map(userEntity, UserDto.class)));
+        userEntityList.forEach(userEntity -> userDtoList.add(userMapper.toUserDto(userEntity)));
         return userDtoList;
     }
 
@@ -62,7 +58,7 @@ public class UserServiceImpl implements UserService {
         if (userEntity == null) {
             throw new UsernameNotFoundException("User not found");
         }
-        UserDto userDto = new ModelMapper().map(userEntity, UserDto.class);
+        UserDto userDto = userMapper.toUserDto(userEntity);
         return userDto;
     }
 
@@ -72,11 +68,7 @@ public class UserServiceImpl implements UserService {
         if (userEntity == null) {
             throw new UsernameNotFoundException(userId);
         }
-
-        ModelMapper mapper = new ModelMapper();
-        mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-
-        UserDto userDto = mapper.map(userEntity, UserDto.class);
+        UserDto userDto = userMapper.toUserDto(userEntity);
         return userDto;
     }
 
