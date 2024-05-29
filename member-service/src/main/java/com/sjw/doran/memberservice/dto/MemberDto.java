@@ -3,7 +3,6 @@ package com.sjw.doran.memberservice.dto;
 import lombok.*;
 
 @Data
-@Getter
 @Builder
 @RequiredArgsConstructor
 @AllArgsConstructor

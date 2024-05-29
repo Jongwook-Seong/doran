@@ -2,13 +2,12 @@ package com.sjw.doran.authsimpleservice.controller;
 
 import com.sjw.doran.authsimpleservice.client.MemberServiceClient;
 import com.sjw.doran.authsimpleservice.dto.UserDto;
+import com.sjw.doran.authsimpleservice.mapper.UserMapper;
 import com.sjw.doran.authsimpleservice.service.UserService;
 import com.sjw.doran.authsimpleservice.vo.MemberResponse;
 import com.sjw.doran.authsimpleservice.vo.UserJoinRequest;
 import com.sjw.doran.authsimpleservice.vo.UserResponse;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
-import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -24,13 +23,12 @@ public class AuthSimpleController {
 
     private final UserService userService;
     private final MemberServiceClient memberServiceClient;
+    private final UserMapper userMapper;
 
     @PostMapping("/users")
     public ResponseEntity<MemberResponse> signUp(@RequestBody UserJoinRequest request) {
 
-        ModelMapper mapper = new ModelMapper();
-        mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-        UserDto userDto = mapper.map(request, UserDto.class);
+        UserDto userDto = userMapper.toUserDto(request);
 
         UserDto createdUserDto = userService.createUser(userDto);
         MemberResponse memberResponse = memberServiceClient.joinMember(createdUserDto.getUserUuid());
@@ -41,9 +39,7 @@ public class AuthSimpleController {
     public ResponseEntity<List<UserResponse>> getUsers() {
         List<UserDto> userDtoList = userService.getUsers();
         List<UserResponse> userResponseList = new ArrayList<>();
-
-        ModelMapper mapper = new ModelMapper();
-        userDtoList.forEach(userDto -> userResponseList.add(mapper.map(userDto, UserResponse.class)));
+        userDtoList.forEach(userDto -> userResponseList.add(userMapper.toUserResponse(userDto)));
         return ResponseEntity.status(HttpStatus.OK).body(userResponseList);
     }
 

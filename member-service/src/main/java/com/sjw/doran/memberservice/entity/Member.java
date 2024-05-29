@@ -3,10 +3,11 @@ package com.sjw.doran.memberservice.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Getter @Setter
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member extends BaseTimeEntity {
 
@@ -22,15 +23,17 @@ public class Member extends BaseTimeEntity {
 
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "order_uuid_list", joinColumns = @JoinColumn(name = "member_id"))
-    private List<String> orderUuid;
+    private List<String> orderUuid = new ArrayList<>();
 
     @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private Basket basket;
 
+    @Builder
     public Member(String userUuid) {
         this.userUuid = userUuid;
     }
 
+    @Builder
     public Member(String userUuid, String nickname, String profileImageUrl) {
         this.userUuid = userUuid;
         this.nickname = nickname;

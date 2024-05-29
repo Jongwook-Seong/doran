@@ -4,7 +4,6 @@ import com.sjw.doran.memberservice.vo.request.BasketItemCreateRequest;
 import lombok.*;
 
 @Data
-@Getter
 @Builder
 @RequiredArgsConstructor
 @AllArgsConstructor

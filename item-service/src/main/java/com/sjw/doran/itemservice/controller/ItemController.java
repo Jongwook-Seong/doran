@@ -1,18 +1,14 @@
 package com.sjw.doran.itemservice.controller;
 
-import com.sjw.doran.itemservice.dto.BookDto;
-import com.sjw.doran.itemservice.dto.ItemDto;
 import com.sjw.doran.itemservice.entity.Item;
 import com.sjw.doran.itemservice.service.ItemService;
 import com.sjw.doran.itemservice.util.MessageUtil;
 import com.sjw.doran.itemservice.vo.request.BookCreateRequest;
-import com.sjw.doran.itemservice.vo.request.ItemListRequest;
 import com.sjw.doran.itemservice.vo.response.ItemSimpleResponse;
 import com.sjw.doran.itemservice.vo.response.ItemSimpleWithQuantityResponse;
 import com.sjw.doran.itemservice.vo.response.ItemSimpleWithoutPriceResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +21,6 @@ import java.util.*;
 public class ItemController {
 
     private final ItemService itemService;
-    private final ModelMapper modelMapper;
     private final MessageUtil messageUtil;
 
     // 임시

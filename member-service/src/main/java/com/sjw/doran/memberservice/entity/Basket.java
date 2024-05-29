@@ -1,15 +1,14 @@
 package com.sjw.doran.memberservice.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Getter @Setter
-@NoArgsConstructor
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Basket {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,8 +20,9 @@ public class Basket {
     private Member member;
 
     @OneToMany(mappedBy = "basket", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<BasketItem> basketItems;
+    private List<BasketItem> basketItems = new ArrayList<>();
 
+    @Builder
     public Basket(Member member) {
         this.member = member;
     }

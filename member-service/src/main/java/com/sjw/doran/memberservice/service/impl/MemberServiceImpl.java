@@ -3,12 +3,12 @@ package com.sjw.doran.memberservice.service.impl;
 import com.sjw.doran.memberservice.dto.MemberDto;
 import com.sjw.doran.memberservice.entity.Basket;
 import com.sjw.doran.memberservice.entity.Member;
+import com.sjw.doran.memberservice.mapper.MemberMapper;
 import com.sjw.doran.memberservice.repository.BasketRepository;
 import com.sjw.doran.memberservice.repository.MemberRepository;
 import com.sjw.doran.memberservice.service.BasketService;
 import com.sjw.doran.memberservice.service.MemberService;
 import com.sjw.doran.memberservice.util.MessageUtil;
-import com.sjw.doran.memberservice.util.ModelMapperUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,7 +22,7 @@ public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
     private final BasketRepository basketRepository;
-    private final ModelMapperUtil modelMapperUtil;
+    private final MemberMapper memberMapper;
     private final MessageUtil messageUtil;
 
     @Override
@@ -36,7 +36,7 @@ public class MemberServiceImpl implements MemberService {
     @Transactional(readOnly = true)
     public MemberDto findMemberDto(String userUuid) {
         Optional<Member> member = memberRepository.findByUserUuid(userUuid);
-        MemberDto memberDto = modelMapperUtil.convertToMemberDto(member.get());
+        MemberDto memberDto = memberMapper.toMemberDto(member.get());
         return memberDto;
     }
 
@@ -44,7 +44,7 @@ public class MemberServiceImpl implements MemberService {
     @Transactional(readOnly = true)
     public List<MemberDto> findMembers() {
         List<Member> members = memberRepository.findAll();
-        List<MemberDto> memberDtos = modelMapperUtil.mapMemberEntityListToDtoList(members);
+        List<MemberDto> memberDtos = memberMapper.toMemberDtoList(members);
         return memberDtos;
     }
 
@@ -53,8 +53,7 @@ public class MemberServiceImpl implements MemberService {
     public void saveMember(Member member) {
         try {
             memberRepository.save(member);
-            Basket basket = new Basket();
-            basket.setMember(member);
+            Basket basket = new Basket(member);
             try {
                 basketRepository.save(basket);
             } catch (Exception e) {

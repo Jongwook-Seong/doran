@@ -35,10 +35,10 @@ public class OrderController {
         List<ItemSimpleInfo> itemSimpleInfoList = request.getItemSimpleInfoList();
         List<String> itemUuidList = new ArrayList<>();
         List<Integer> itemCountList = new ArrayList<>();
-        for (ItemSimpleInfo itemSimpleInfo : itemSimpleInfoList) {
-            itemUuidList.add(itemSimpleInfo.getItemUuid());
-            itemCountList.add(itemSimpleInfo.getCount());
-        }
+        itemSimpleInfoList.forEach(info -> {
+            itemUuidList.add(info.getItemUuid());
+            itemCountList.add(info.getCount());
+        });
 
         orderService.createOrder(userUuid, request);
         itemServiceClient.orderItems(itemUuidList, itemCountList);
@@ -57,10 +57,11 @@ public class OrderController {
         // itemServiceClient.cancelOrderItems() 파라미터 추출
         List<String> itemUuidList = new ArrayList<>();
         List<Integer> itemCountList = new ArrayList<>();
-        for (ItemSimpleInfo itemSimpleInfo : itemSimpleInfoList) {
-            itemUuidList.add(itemSimpleInfo.getItemUuid());
-            itemCountList.add(itemSimpleInfo.getCount());
-        }
+        itemSimpleInfoList.forEach(info -> {
+            itemUuidList.add(info.getItemUuid());
+            itemCountList.add(info.getCount());
+        });
+
         itemServiceClient.cancelOrderItems(itemUuidList, itemCountList);
         return ResponseEntity.ok().build();
     }
@@ -79,9 +80,7 @@ public class OrderController {
         // itemName, itemImageUrl 추출 및 삽입
         List<ItemSimpleWithoutPriceResponse> itemSimpleWxPList = itemServiceClient.getItemSimpleWithoutPrice(itemUuidList);
         Map<String, ItemSimpleWithoutPriceResponse> itemSimpleWxPMap = new HashMap<>();
-        for (ItemSimpleWithoutPriceResponse itemSimpleWxP : itemSimpleWxPList) {
-            itemSimpleWxPMap.put(itemSimpleWxP.getItemUuid(), itemSimpleWxP);
-        }
+        itemSimpleWxPList.forEach(item -> itemSimpleWxPMap.put(item.getItemUuid(), item));
         orderListResponse.getOrderSimpleList().forEach(orderSimple ->
                 orderSimple.getOrderItemSimpleList().forEach(oisimple -> {
                     String itemUuid = oisimple.getItemUuid();

@@ -3,11 +3,8 @@ package com.sjw.doran.itemservice.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Entity
-@Getter @Setter
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "dtype")
@@ -35,5 +32,14 @@ public abstract class Item extends AuditingFields {
             return;
         }
         this.stockQuantity = restStock;
+    }
+
+    public Item(String itemUuid, String itemName, int price, int stockQuantity, String itemImageUrl, Category category) {
+        this.itemUuid = itemUuid;
+        this.itemName = itemName;
+        this.price = price;
+        this.stockQuantity = stockQuantity;
+        this.itemImageUrl = itemImageUrl;
+        this.category = category;
     }
 }

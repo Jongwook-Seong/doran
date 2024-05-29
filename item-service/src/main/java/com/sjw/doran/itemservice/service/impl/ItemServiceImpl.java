@@ -3,7 +3,10 @@ package com.sjw.doran.itemservice.service.impl;
 import com.sjw.doran.itemservice.dto.BookDto;
 import com.sjw.doran.itemservice.dto.ItemDto;
 import com.sjw.doran.itemservice.entity.Book;
+import com.sjw.doran.itemservice.entity.Category;
 import com.sjw.doran.itemservice.entity.Item;
+import com.sjw.doran.itemservice.mapper.BookMapper;
+import com.sjw.doran.itemservice.mapper.ItemMapper;
 import com.sjw.doran.itemservice.repository.ItemRepository;
 import com.sjw.doran.itemservice.service.AwsS3UploadService;
 import com.sjw.doran.itemservice.service.ItemService;
@@ -13,25 +16,18 @@ import com.sjw.doran.itemservice.vo.response.ItemSimpleResponse;
 import com.sjw.doran.itemservice.vo.response.ItemSimpleWithQuantityResponse;
 import com.sjw.doran.itemservice.vo.response.ItemSimpleWithoutPriceResponse;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
 
     private final ItemRepository itemRepository;
-    private final ModelMapper modelMapper;
+    private final ItemMapper itemMapper;
+    private final BookMapper bookMapper;
     private final MessageUtil messageUtil;
 //    private final AwsS3UploadService awsS3UploadService;
 
@@ -48,8 +44,8 @@ public class ItemServiceImpl implements ItemService {
     @Override
     @Transactional
     public void saveBook(BookCreateRequest request) {
-        BookDto bookDto = BookDto.getInstanceForCreate(request);
-        Item item = modelMapper.map(bookDto, Book.class);
+        BookDto bookDto = bookMapper.toBookDto(request, UUID.randomUUID().toString(), Category.BOOK);
+        Item item = bookMapper.toBook(bookDto);
 //        String itemImageUrl = awsS3UploadService.saveFile(request.getFileData(), item.getItemUuid());
 //        item.setItemImageUrl(itemImageUrl);
         try {
@@ -71,7 +67,8 @@ public class ItemServiceImpl implements ItemService {
         List<ItemSimpleResponse> itemSimpleResponseList = new ArrayList<>();
         for (Item item : itemList) {
             if (item == null) continue;
-            ItemSimpleResponse itemSimpleResponse = modelMapper.map(item, ItemSimpleResponse.class);
+            ItemDto itemDto = itemMapper.toItemDto(item);
+            ItemSimpleResponse itemSimpleResponse = itemMapper.toItemSimpleResponse(itemDto);
             itemSimpleResponseList.add(itemSimpleResponse);
         }
         return itemSimpleResponseList;
@@ -83,7 +80,8 @@ public class ItemServiceImpl implements ItemService {
         ArrayList<ItemSimpleWithQuantityResponse> itemSimpleWQResponseList = new ArrayList<>();
         for (Item item : itemList) {
             if (item == null) continue;
-            ItemSimpleWithQuantityResponse itemSimpleWQResponse = modelMapper.map(item, ItemSimpleWithQuantityResponse.class);
+            ItemDto itemDto = itemMapper.toItemDto(item);
+            ItemSimpleWithQuantityResponse itemSimpleWQResponse = itemMapper.toItemSimpleWQResponse(itemDto);
             itemSimpleWQResponseList.add(itemSimpleWQResponse);
         }
         return itemSimpleWQResponseList;
@@ -95,7 +93,8 @@ public class ItemServiceImpl implements ItemService {
         List<ItemSimpleWithoutPriceResponse> itemSimpleWxPResponseList = new ArrayList<>();
         for (Item item : itemList) {
             if (item == null) continue;
-            itemSimpleWxPResponseList.add(modelMapper.map(item, ItemSimpleWithoutPriceResponse.class));
+            ItemDto itemDto = itemMapper.toItemDto(item);
+            itemSimpleWxPResponseList.add(itemMapper.toItemSimpleWxPResponse(itemDto));
         }
         return itemSimpleWxPResponseList;
     }
@@ -106,8 +105,8 @@ public class ItemServiceImpl implements ItemService {
         List<Book> books = itemRepository.findBookByKeyword(keyword);
         List<ItemSimpleResponse> itemSimpleResponseList = new ArrayList<>();
         for (Book book : books) {
-            BookDto bookDto = modelMapper.map(book, BookDto.class);
-            itemSimpleResponseList.add(ItemSimpleResponse.getInstanceAsBook(bookDto));
+            BookDto bookDto = bookMapper.toBookDto(book);
+            itemSimpleResponseList.add(bookMapper.toItemSimpleResponse(bookDto));
         }
         return itemSimpleResponseList;
     }

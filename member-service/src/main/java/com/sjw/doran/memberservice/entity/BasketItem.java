@@ -4,8 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Getter @Setter
-@NoArgsConstructor
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class BasketItem {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,6 +20,7 @@ public class BasketItem {
     private String itemUuid;
     private int count;
 
+    @Builder
     public BasketItem(Basket basket, String itemUuid, int count) {
         this.basket = basket;
         this.itemUuid = itemUuid;
