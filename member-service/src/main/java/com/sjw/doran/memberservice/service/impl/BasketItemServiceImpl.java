@@ -8,8 +8,8 @@ import com.sjw.doran.memberservice.mapper.BasketItemMapper;
 import com.sjw.doran.memberservice.repository.BasketItemRepository;
 import com.sjw.doran.memberservice.service.BasketItemService;
 import com.sjw.doran.memberservice.vo.request.BasketItemCreateRequest;
-import com.sjw.doran.memberservice.vo.response.ItemSimpleResponse;
-import com.sjw.doran.memberservice.vo.response.ItemSimpleWithCountResponse;
+import com.sjw.doran.memberservice.vo.response.item.ItemSimpleResponse;
+import com.sjw.doran.memberservice.vo.response.item.ItemSimpleWithCountResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,11 +51,8 @@ public class BasketItemServiceImpl implements BasketItemService {
     @Override
     @Transactional
     public void addBasketItem(Basket basket, BasketItemCreateRequest request) {
-//        BasketItemDto basketItemDto = BasketItemDto.getInstanceForCreate(request);
         BasketItemDto basketItemDto = basketItemMapper.toBasketItemDto(request);
-//        BasketItem basketItem = modelMapperUtil.BasketItemDtoConvertToEntity(basketItemDto);
         BasketItem basketItem = basketItemMapper.toBasketItem(basketItemDto, basket);
-//        basketItem.setBasket(basket);
         basketItemRepository.save(basketItem);
     }
 

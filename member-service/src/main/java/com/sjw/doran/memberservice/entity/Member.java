@@ -29,8 +29,9 @@ public class Member extends BaseTimeEntity {
     private Basket basket;
 
     @Builder
-    public Member(String userUuid) {
+    public Member(String userUuid, String username) {
         this.userUuid = userUuid;
+        this.nickname = username;
     }
 
     @Builder

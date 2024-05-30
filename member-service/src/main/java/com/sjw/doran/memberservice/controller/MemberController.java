@@ -5,7 +5,9 @@ import com.sjw.doran.memberservice.entity.Member;
 import com.sjw.doran.memberservice.service.BasketService;
 import com.sjw.doran.memberservice.service.MemberService;
 import com.sjw.doran.memberservice.util.MessageUtil;
+import com.sjw.doran.memberservice.vo.response.MemberOrderResponse;
 import com.sjw.doran.memberservice.vo.response.MemberResponse;
+import com.sjw.doran.memberservice.vo.response.order.DeliveryTrackingResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -50,8 +52,8 @@ public class MemberController {
                     content = {@Content(schema = @Schema(implementation = ResponseEntity.class))}),
             @ApiResponse(responseCode = "500", description = "Fail")
     })
-    public ResponseEntity<MemberResponse> joinMember(@RequestHeader("userUuid") String userUuid) {
-        Member member = new Member(userUuid);
+    public ResponseEntity<MemberResponse> joinMember(@RequestHeader("userUuid") String userUuid, @RequestParam("username") String username) {
+        Member member = new Member(userUuid, username);
         memberService.saveMember(member);
         return ResponseEntity.ok(MemberResponse.getInstance(userUuid, messageUtil.getMemberCreateMessage()));
     }
@@ -66,5 +68,24 @@ public class MemberController {
     public ResponseEntity<MemberResponse> deleteMember(@RequestHeader("userUuid") String userUuid) {
         memberService.deleteMember(userUuid);
         return ResponseEntity.ok(MemberResponse.getInstance(userUuid, messageUtil.getMemberDeleteMessage()));
+    }
+
+    /** 주문 서비스 호출 API **/
+    @GetMapping("/order/list")
+    public ResponseEntity<MemberOrderResponse> getMemberOrderList(@RequestHeader("userUuid") String userUuid) {
+        MemberOrderResponse memberOrderListResponse = memberService.findMemberOrderList(userUuid);
+        return new ResponseEntity<>(memberOrderListResponse, HttpStatus.OK);
+    }
+
+    @GetMapping("/order/detail")
+    public ResponseEntity<MemberOrderResponse> getMemberOrderDetail(@RequestHeader("userUuid") String userUuid, @RequestParam("orderUuid") String orderUuid) {
+        MemberOrderResponse memberOrderDetailResponse = memberService.findMemberOrderDetail(userUuid, orderUuid);
+        return new ResponseEntity<>(memberOrderDetailResponse, HttpStatus.OK);
+    }
+
+    @GetMapping("/delivery/tracking")
+    public ResponseEntity<MemberOrderResponse> inquireDeliveryTracking(@RequestHeader("userUuid") String userUuid, @RequestParam("orderUuid") String orderUuid) {
+        MemberOrderResponse memberOrderDTResponse = memberService.findMemberOrderDeliveryTracking(userUuid, orderUuid);
+        return new ResponseEntity<>(memberOrderDTResponse, HttpStatus.OK);
     }
 }

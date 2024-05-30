@@ -31,7 +31,7 @@ public class AuthSimpleController {
         UserDto userDto = userMapper.toUserDto(request);
 
         UserDto createdUserDto = userService.createUser(userDto);
-        MemberResponse memberResponse = memberServiceClient.joinMember(createdUserDto.getUserUuid());
+        MemberResponse memberResponse = memberServiceClient.joinMember(createdUserDto.getUserUuid(), createdUserDto.getUsername());
         return ResponseEntity.status(HttpStatus.CREATED).body(memberResponse);
     }
 

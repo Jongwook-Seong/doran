@@ -1,19 +1,24 @@
 package com.sjw.doran.memberservice.service.impl;
 
+import com.sjw.doran.memberservice.client.OrderServiceClient;
 import com.sjw.doran.memberservice.dto.MemberDto;
 import com.sjw.doran.memberservice.entity.Basket;
 import com.sjw.doran.memberservice.entity.Member;
 import com.sjw.doran.memberservice.mapper.MemberMapper;
 import com.sjw.doran.memberservice.repository.BasketRepository;
 import com.sjw.doran.memberservice.repository.MemberRepository;
-import com.sjw.doran.memberservice.service.BasketService;
 import com.sjw.doran.memberservice.service.MemberService;
 import com.sjw.doran.memberservice.util.MessageUtil;
+import com.sjw.doran.memberservice.vo.response.MemberOrderResponse;
+import com.sjw.doran.memberservice.vo.response.order.DeliveryTrackingResponse;
+import com.sjw.doran.memberservice.vo.response.order.OrderDetailResponse;
+import com.sjw.doran.memberservice.vo.response.order.OrderListResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -22,6 +27,7 @@ public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
     private final BasketRepository basketRepository;
+    private final OrderServiceClient orderServiceClient;
     private final MemberMapper memberMapper;
     private final MessageUtil messageUtil;
 
@@ -73,5 +79,32 @@ public class MemberServiceImpl implements MemberService {
         } catch (Exception e) {
             throw new RuntimeException(messageUtil.getMemberDeleteErrorMessage());
         }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public MemberOrderResponse findMemberOrderList(String userUuid) {
+        Member member = memberRepository.findByUserUuid(userUuid).orElseThrow(() -> {
+            throw new NoSuchElementException("Invalid Member"); });
+        OrderListResponse orderListResponse = orderServiceClient.inquireOrderList(userUuid);
+        return MemberOrderResponse.getInstance(member.getUserUuid(), member.getNickname(), member.getProfileImageUrl(), orderListResponse);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public MemberOrderResponse findMemberOrderDetail(String userUuid, String orderUuid) {
+        Member member = memberRepository.findByUserUuid(userUuid).orElseThrow(() -> {
+            throw new NoSuchElementException("Invalid Member"); });
+        OrderDetailResponse orderDetailResponse = orderServiceClient.inquireOrderDetail(userUuid, orderUuid);
+        return MemberOrderResponse.getInstance(member.getUserUuid(), member.getNickname(), member.getProfileImageUrl(), orderDetailResponse);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public MemberOrderResponse findMemberOrderDeliveryTracking(String userUuid, String orderUuid) {
+        Member member = memberRepository.findByUserUuid(userUuid).orElseThrow(() -> {
+            throw new NoSuchElementException("Invalid Member"); });
+        DeliveryTrackingResponse deliveryTrackingResponse = orderServiceClient.inquireDeliveryTracking(userUuid, orderUuid);
+        return MemberOrderResponse.getInstance(member.getUserUuid(), member.getNickname(), member.getProfileImageUrl(), deliveryTrackingResponse);
     }
 }

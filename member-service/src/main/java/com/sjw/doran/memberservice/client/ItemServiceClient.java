@@ -1,6 +1,6 @@
 package com.sjw.doran.memberservice.client;
 
-import com.sjw.doran.memberservice.vo.response.ItemSimpleResponse;
+import com.sjw.doran.memberservice.vo.response.item.ItemSimpleResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;

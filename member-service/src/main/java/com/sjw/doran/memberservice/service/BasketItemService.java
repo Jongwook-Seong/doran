@@ -1,9 +1,8 @@
 package com.sjw.doran.memberservice.service;
 
 import com.sjw.doran.memberservice.entity.Basket;
-import com.sjw.doran.memberservice.entity.BasketItem;
 import com.sjw.doran.memberservice.vo.request.BasketItemCreateRequest;
-import com.sjw.doran.memberservice.vo.response.ItemSimpleWithCountResponse;
+import com.sjw.doran.memberservice.vo.response.item.ItemSimpleWithCountResponse;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
