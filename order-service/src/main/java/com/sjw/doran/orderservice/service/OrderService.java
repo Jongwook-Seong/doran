@@ -13,7 +13,7 @@ public interface OrderService {
 
     void createOrder(String userUuid, OrderCreateRequest request);
 
-    List<ItemSimpleInfo> cancelOrder(String userUuid, String orderUuid);
+    void cancelOrder(String userUuid, String orderUuid);
 
     OrderListResponse getOrderList(String userUuid);
 

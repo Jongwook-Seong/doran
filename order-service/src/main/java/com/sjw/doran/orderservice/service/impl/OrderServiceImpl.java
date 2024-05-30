@@ -1,5 +1,6 @@
 package com.sjw.doran.orderservice.service.impl;
 
+import com.sjw.doran.orderservice.client.ItemServiceClient;
 import com.sjw.doran.orderservice.dto.DeliveryDto;
 import com.sjw.doran.orderservice.dto.DeliveryTrackingDto;
 import com.sjw.doran.orderservice.dto.OrderDto;
@@ -18,15 +19,14 @@ import com.sjw.doran.orderservice.vo.OrderSimple;
 import com.sjw.doran.orderservice.vo.request.DeliveryStatusPostRequest;
 import com.sjw.doran.orderservice.vo.request.OrderCreateRequest;
 import com.sjw.doran.orderservice.vo.response.DeliveryTrackingResponse;
+import com.sjw.doran.orderservice.vo.response.ItemSimpleWithoutPriceResponse;
 import com.sjw.doran.orderservice.vo.response.OrderDetailResponse;
 import com.sjw.doran.orderservice.vo.response.OrderListResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +35,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
     private final DeliveryTrackingRepository deliveryTrackingRepository;
+    private final ItemServiceClient itemServiceClient;
     private final OrderMapper orderMapper;
     private final MessageUtil messageUtil;
 
@@ -52,24 +53,42 @@ public class OrderServiceImpl implements OrderService {
 
         DeliveryTracking deliveryTracking = constructDefaultDeliveryTracking(delivery);
 
+        // itemServiceClient.orderItems() 파라미터 추출
+        List<String> itemUuidList = new ArrayList<>();
+        List<Integer> itemCountList = new ArrayList<>();
+        itemSimpleInfoList.forEach(info -> {
+            itemUuidList.add(info.getItemUuid());
+            itemCountList.add(info.getCount());
+        });
+
         try {
             orderRepository.save(order);
             orderItemRepository.saveAll(orderItemList);
             deliveryTrackingRepository.save(deliveryTracking);
+            itemServiceClient.orderItems(itemUuidList, itemCountList);
         } catch (Exception e) {
             throw new RuntimeException(messageUtil.getOrderCreateErrorMessage());
         }
     }
 
     @Override
-    public List<ItemSimpleInfo> cancelOrder(String userUuid, String orderUuid) {
+    public void cancelOrder(String userUuid, String orderUuid) {
         try {
             orderRepository.updateOrderStatusAsCancel(userUuid, orderUuid);
             Order order = orderRepository.findByOrderUuid(orderUuid).get();
             List<OrderItem> orderItems = order.getOrderItems();
             List<ItemSimpleInfo> itemSimpleInfoList = new ArrayList<>();
             orderItems.forEach(orderItem -> itemSimpleInfoList.add(ItemSimpleInfo.getInstance(orderItem)));
-            return itemSimpleInfoList;
+
+            // itemServiceClient.cancelOrderItems() 파라미터 추출
+            List<String> itemUuidList = new ArrayList<>();
+            List<Integer> itemCountList = new ArrayList<>();
+            itemSimpleInfoList.forEach(info -> {
+                itemUuidList.add(info.getItemUuid());
+                itemCountList.add(info.getCount());
+            });
+
+            itemServiceClient.cancelOrderItems(itemUuidList, itemCountList);
         } catch (Exception e) {
             throw new RuntimeException(messageUtil.getOrderCancelErrorMessage());
         }
@@ -88,10 +107,34 @@ public class OrderServiceImpl implements OrderService {
                 }
                 orderSimpleList.add(OrderSimple.getInstance(oisList, order.getDelivery().getDeliveryStatus(), order.getOrderDate()));
             }
+            // itemUuidList 추출 및 itemServiceClient.getItemSimpleWithoutPrice() 호출
+            List<String> itemUuidList = extractItemUuidList(orderSimpleList);
+            List<ItemSimpleWithoutPriceResponse> itemSimpleWxPList = itemServiceClient.getItemSimpleWithoutPrice(itemUuidList);
+            // itemName, itemImageUrl 추출 및 삽입
+            insertItemNameAndImageUrlIntoOrderSimpleList(itemSimpleWxPList, orderSimpleList);
+
             return OrderListResponse.getInstance(orderSimpleList);
         } catch (Exception e) {
             throw new NoSuchElementException(messageUtil.getNoSuchUserUuidErrorMessage(userUuid));
         }
+    }
+
+    private static List<String> extractItemUuidList(List<OrderSimple> orderSimpleList) {
+        List<String> itemUuidList = new ArrayList<>();
+        orderSimpleList.forEach(os -> os.getOrderItemSimpleList()
+                .forEach(ois -> itemUuidList.add(ois.getItemUuid())));
+        return itemUuidList;
+    }
+
+    private static void insertItemNameAndImageUrlIntoOrderSimpleList(List<ItemSimpleWithoutPriceResponse> itemSimpleWxPList, List<OrderSimple> orderSimpleList) {
+        Map<String, ItemSimpleWithoutPriceResponse> itemSimpleWxPMap = new HashMap<>();
+        itemSimpleWxPList.forEach(item -> itemSimpleWxPMap.put(item.getItemUuid(), item));
+        orderSimpleList.forEach(os -> os.getOrderItemSimpleList()
+                .forEach(ois -> {
+                    String itemUuid = ois.getItemUuid();
+                    ois.setItemName(itemSimpleWxPMap.get(itemUuid).getItemName());
+                    ois.setItemImageUrl(itemSimpleWxPMap.get(itemUuid).getItemImageUrl());
+                }));
     }
 
     @Override
