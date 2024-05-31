@@ -14,6 +14,8 @@ import com.sjw.doran.memberservice.vo.response.order.DeliveryTrackingResponse;
 import com.sjw.doran.memberservice.vo.response.order.OrderDetailResponse;
 import com.sjw.doran.memberservice.vo.response.order.OrderListResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cloud.client.circuitbreaker.CircuitBreaker;
+import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +32,7 @@ public class MemberServiceImpl implements MemberService {
     private final OrderServiceClient orderServiceClient;
     private final MemberMapper memberMapper;
     private final MessageUtil messageUtil;
+    private final CircuitBreakerFactory circuitBreakerFactory;
 
     @Override
     @Transactional(readOnly = true)
@@ -86,7 +89,9 @@ public class MemberServiceImpl implements MemberService {
     public MemberOrderResponse findMemberOrderList(String userUuid) {
         Member member = memberRepository.findByUserUuid(userUuid).orElseThrow(() -> {
             throw new NoSuchElementException("Invalid Member"); });
-        OrderListResponse orderListResponse = orderServiceClient.inquireOrderList(userUuid);
+        CircuitBreaker circuitBreaker = circuitBreakerFactory.create("MS-findMemberOrderList-circuitebreaker");
+        OrderListResponse orderListResponse = circuitBreaker.run(() ->
+                orderServiceClient.inquireOrderList(userUuid), throwable -> null);
         return MemberOrderResponse.getInstance(member.getUserUuid(), member.getNickname(), member.getProfileImageUrl(), orderListResponse);
     }
 
@@ -95,7 +100,9 @@ public class MemberServiceImpl implements MemberService {
     public MemberOrderResponse findMemberOrderDetail(String userUuid, String orderUuid) {
         Member member = memberRepository.findByUserUuid(userUuid).orElseThrow(() -> {
             throw new NoSuchElementException("Invalid Member"); });
-        OrderDetailResponse orderDetailResponse = orderServiceClient.inquireOrderDetail(userUuid, orderUuid);
+        CircuitBreaker circuitBreaker = circuitBreakerFactory.create("MS-findMemberOrderDetail-circuitbreaker");
+        OrderDetailResponse orderDetailResponse = circuitBreaker.run(() ->
+                orderServiceClient.inquireOrderDetail(userUuid, orderUuid), throwable -> null);
         return MemberOrderResponse.getInstance(member.getUserUuid(), member.getNickname(), member.getProfileImageUrl(), orderDetailResponse);
     }
 
@@ -104,7 +111,9 @@ public class MemberServiceImpl implements MemberService {
     public MemberOrderResponse findMemberOrderDeliveryTracking(String userUuid, String orderUuid) {
         Member member = memberRepository.findByUserUuid(userUuid).orElseThrow(() -> {
             throw new NoSuchElementException("Invalid Member"); });
-        DeliveryTrackingResponse deliveryTrackingResponse = orderServiceClient.inquireDeliveryTracking(userUuid, orderUuid);
+        CircuitBreaker circuitBreaker = circuitBreakerFactory.create("MS-findMemberOrderDeliveryTracking-circuitbreaker");
+        DeliveryTrackingResponse deliveryTrackingResponse = circuitBreaker.run(() ->
+                orderServiceClient.inquireDeliveryTracking(userUuid, orderUuid), throwable -> null);
         return MemberOrderResponse.getInstance(member.getUserUuid(), member.getNickname(), member.getProfileImageUrl(), deliveryTrackingResponse);
     }
 }
