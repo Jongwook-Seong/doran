@@ -11,6 +11,8 @@ import com.sjw.doran.memberservice.vo.request.BasketItemCreateRequest;
 import com.sjw.doran.memberservice.vo.response.item.ItemSimpleResponse;
 import com.sjw.doran.memberservice.vo.response.item.ItemSimpleWithCountResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cloud.client.circuitbreaker.CircuitBreaker;
+import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +28,7 @@ public class BasketItemServiceImpl implements BasketItemService {
     private final BasketItemRepository basketItemRepository;
     private final ItemServiceClient itemServiceClient;
     private final BasketItemMapper basketItemMapper;
+    private final CircuitBreakerFactory circuitBreakerFactory;
 
     @Override
     @Transactional(readOnly = true)
@@ -33,7 +36,9 @@ public class BasketItemServiceImpl implements BasketItemService {
         List<String> itemUuidList = new ArrayList<>();
         List<BasketItem> basketItemList = basketItemRepository.findAllByBasket(basket);
         basketItemList.forEach(basketItem -> itemUuidList.add(basketItem.getItemUuid()));
-        List<ItemSimpleResponse> itemSimpleResponseList = itemServiceClient.getBookBasket(itemUuidList);
+        CircuitBreaker circuitBreaker = circuitBreakerFactory.create("MS-findAllByBasket-circuitbreaker");
+        List<ItemSimpleResponse> itemSimpleResponseList = circuitBreaker.run(() ->
+                itemServiceClient.getBookBasket(itemUuidList), throwable -> new ArrayList<>());
         return getItemSimpleWithCountResponseList(basketItemList, itemSimpleResponseList);
     }
 
