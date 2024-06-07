@@ -1,5 +1,6 @@
 package com.sjw.doran.memberservice.service.impl;
 
+import com.sjw.doran.memberservice.client.ResilientItemServiceClient;
 import com.sjw.doran.memberservice.dto.BasketItemDto;
 import com.sjw.doran.memberservice.entity.Basket;
 import com.sjw.doran.memberservice.entity.BasketItem;
@@ -27,18 +28,20 @@ public class BasketItemServiceImpl implements BasketItemService {
 
     private final BasketItemRepository basketItemRepository;
     private final ItemServiceClient itemServiceClient;
+    private final ResilientItemServiceClient resilientItemServiceClient;
     private final BasketItemMapper basketItemMapper;
     private final CircuitBreakerFactory circuitBreakerFactory;
 
     @Override
     @Transactional(readOnly = true)
-    public List<ItemSimpleWithCountResponse> findAllByBasket(Basket basket) {
+    public List<ItemSimpleWithCountResponse> findAllByBasket(Basket basket) throws InterruptedException {
         List<String> itemUuidList = new ArrayList<>();
         List<BasketItem> basketItemList = basketItemRepository.findAllByBasket(basket);
         basketItemList.forEach(basketItem -> itemUuidList.add(basketItem.getItemUuid()));
-        CircuitBreaker circuitBreaker = circuitBreakerFactory.create("MS-findAllByBasket-circuitbreaker");
-        List<ItemSimpleResponse> itemSimpleResponseList = circuitBreaker.run(() ->
-                itemServiceClient.getBookBasket(itemUuidList), throwable -> new ArrayList<>());
+//        CircuitBreaker circuitBreaker = circuitBreakerFactory.create("MS-findAllByBasket-circuitbreaker");
+//        List<ItemSimpleResponse> itemSimpleResponseList = circuitBreaker.run(() ->
+//                itemServiceClient.getBookBasket(itemUuidList), throwable -> new ArrayList<>());
+        List<ItemSimpleResponse> itemSimpleResponseList = resilientItemServiceClient.getBookBasket(itemUuidList);
         return getItemSimpleWithCountResponseList(basketItemList, itemSimpleResponseList);
     }
 

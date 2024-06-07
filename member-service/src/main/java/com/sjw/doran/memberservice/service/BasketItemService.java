@@ -10,7 +10,7 @@ import java.util.List;
 public interface BasketItemService {
 
     @Transactional(readOnly = true)
-    List<ItemSimpleWithCountResponse> findAllByBasket(Basket basket);
+    List<ItemSimpleWithCountResponse> findAllByBasket(Basket basket) throws InterruptedException;
 
     @Transactional
     void addBasketItem(Basket basket, BasketItemCreateRequest basketItemCreateRequest);

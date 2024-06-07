@@ -65,9 +65,11 @@ resilience4j:
         automaticTransitionFromOpenToHalfOpenEnabled: true
 
         recordExceptions:
-          - com.sjw.doran.memberservice.exception.FeignException$FeignServerException
+          - com.sjw.doran.memberservice.exception.FeignException$FeignOrderServerException
+          - com.sjw.doran.memberservice.exception.FeignException$FeignItemServerException
         ignoreExceptions:
-          - com.sjw.doran.memberservice.exception.FeignException$FeignClientException
+          - com.sjw.doran.memberservice.exception.FeignException$FeignOrderClientException
+          - com.sjw.doran.memberservice.exception.FeignException$FeignItemClientException
     instances:
       baseCircuitBreakerConfig:
         baseConfig: default

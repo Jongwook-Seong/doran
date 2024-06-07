@@ -69,7 +69,7 @@ public class BasketController {
                 content = {@Content(schema = @Schema(implementation = ResponseEntity.class))}),
             @ApiResponse(responseCode = "500", description = "Fail")
     })
-    public ResponseEntity<List<ItemSimpleWithCountResponse>> getBasketItemList(@RequestHeader String userUuid) {
+    public ResponseEntity<List<ItemSimpleWithCountResponse>> getBasketItemList(@RequestHeader String userUuid) throws InterruptedException {
         if (userUuid.isEmpty()) {
             throw new NoSuchElementException(messageUtil.getUserUuidEmptyMessage());
         }

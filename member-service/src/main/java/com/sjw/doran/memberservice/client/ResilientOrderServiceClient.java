@@ -51,12 +51,12 @@ public class ResilientOrderServiceClient {
     }
 
     /** inquireOrderList fallback methods **/
-    public OrderListResponse inquireOrderListFallback(String userUuid, FeignException.FeignServerException exception) {
+    public OrderListResponse inquireOrderListFallback(String userUuid, FeignException.FeignOrderServerException exception) {
         log.info("Fallback for inquireOrderList: {}", exception.toString());
         return new OrderListResponse();
     }
 
-    public OrderListResponse inquireOrderListFallback(String userUuid, FeignException.FeignClientException exception) {
+    public OrderListResponse inquireOrderListFallback(String userUuid, FeignException.FeignOrderClientException exception) {
         log.info("Fallback for inquireOrderList: {}", exception.toString());
         return new OrderListResponse();
     }
@@ -67,12 +67,12 @@ public class ResilientOrderServiceClient {
     }
 
     /** inquireOrderDetail fallback methods **/
-    public OrderDetailResponse inquireOrderDetailFallback(String userUuid, String orderUuid, FeignException.FeignServerException exception) {
+    public OrderDetailResponse inquireOrderDetailFallback(String userUuid, String orderUuid, FeignException.FeignOrderServerException exception) {
         log.info("Fallback for inquireOrderDetail: {}", exception.toString());
         return new OrderDetailResponse();
     }
 
-    public OrderDetailResponse inquireOrderDetailFallback(String userUuid, String orderUuid, FeignException.FeignClientException exception) {
+    public OrderDetailResponse inquireOrderDetailFallback(String userUuid, String orderUuid, FeignException.FeignOrderClientException exception) {
         log.info("Fallback for inquireOrderDetail: {}", exception.toString());
         return new OrderDetailResponse();
     }
@@ -83,12 +83,12 @@ public class ResilientOrderServiceClient {
     }
 
     /** inquireDeliveryTracking fallback methods **/
-    public DeliveryTrackingResponse inquireDeliveryTrackingFallback(String userUuid, String orderUuid, FeignException.FeignServerException exception) {
+    public DeliveryTrackingResponse inquireDeliveryTrackingFallback(String userUuid, String orderUuid, FeignException.FeignOrderServerException exception) {
         log.info("Fallback for inquireDeliveryTracking: {}", exception.toString());
         return new DeliveryTrackingResponse();
     }
 
-    public DeliveryTrackingResponse inquireDeliveryTrackingFallback(String userUuid, String orderUuid, FeignException.FeignClientException exception) {
+    public DeliveryTrackingResponse inquireDeliveryTrackingFallback(String userUuid, String orderUuid, FeignException.FeignOrderClientException exception) {
         log.info("Fallback for inquireDeliveryTracking: {}", exception.toString());
         return new DeliveryTrackingResponse();
     }
@@ -99,6 +99,6 @@ public class ResilientOrderServiceClient {
     }
 
     private void replacementCall(String param) throws InterruptedException {
-        throw new FeignException.FeignServerException("feign server exception");
+        throw new FeignException.FeignOrderServerException("feign order-server exception");
     }
 }
