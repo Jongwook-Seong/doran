@@ -21,11 +21,11 @@ public interface MemberService {
     void deleteMember(String userUuid);
 
     @Transactional(readOnly = true)
-    MemberOrderResponse findMemberOrderList(String userUuid);
+    MemberOrderResponse findMemberOrderList(String userUuid) throws InterruptedException;
 
     @Transactional(readOnly = true)
-    MemberOrderResponse findMemberOrderDetail(String userUuid, String orderUuid);
+    MemberOrderResponse findMemberOrderDetail(String userUuid, String orderUuid) throws InterruptedException;
 
     @Transactional(readOnly = true)
-    MemberOrderResponse findMemberOrderDeliveryTracking(String userUuid, String orderUuid);
+    MemberOrderResponse findMemberOrderDeliveryTracking(String userUuid, String orderUuid) throws InterruptedException;
 }

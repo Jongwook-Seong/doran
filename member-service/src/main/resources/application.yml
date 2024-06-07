@@ -47,6 +47,31 @@ logging:
   level:
     org.hibernate.SQL: debug
 
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        slidingWindowType: COUNT_BASED
+        registerHealthIndicator: true
+        slidingWindowSize: 10
+        failureRateThreshold: 40
+        minimumNumberOfCalls: 7
+        waitDurationInOpenState: 10s
+
+        slowCallDurationThreshold: 3000
+        slowCallRateThreashold: 60
+
+        permittedNumberOfCallsInHalfOpenStatus: 5
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+
+        recordExceptions:
+          - com.sjw.doran.memberservice.exception.FeignException$FeignServerException
+        ignoreExceptions:
+          - com.sjw.doran.memberservice.exception.FeignException$FeignClientException
+    instances:
+      baseCircuitBreakerConfig:
+        baseConfig: default
+
 springdoc:
   packages-to-scan: com.sjw.doran.memberservice.controller
   default-consumes-media-type: application/json;charset=UTF-8

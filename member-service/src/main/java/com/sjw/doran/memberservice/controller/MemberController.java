@@ -72,19 +72,19 @@ public class MemberController {
 
     /** 주문 서비스 호출 API **/
     @GetMapping("/order/list")
-    public ResponseEntity<MemberOrderResponse> getMemberOrderList(@RequestHeader("userUuid") String userUuid) {
+    public ResponseEntity<MemberOrderResponse> getMemberOrderList(@RequestHeader("userUuid") String userUuid) throws InterruptedException {
         MemberOrderResponse memberOrderListResponse = memberService.findMemberOrderList(userUuid);
         return new ResponseEntity<>(memberOrderListResponse, HttpStatus.OK);
     }
 
     @GetMapping("/order/detail")
-    public ResponseEntity<MemberOrderResponse> getMemberOrderDetail(@RequestHeader("userUuid") String userUuid, @RequestParam("orderUuid") String orderUuid) {
+    public ResponseEntity<MemberOrderResponse> getMemberOrderDetail(@RequestHeader("userUuid") String userUuid, @RequestParam("orderUuid") String orderUuid) throws InterruptedException {
         MemberOrderResponse memberOrderDetailResponse = memberService.findMemberOrderDetail(userUuid, orderUuid);
         return new ResponseEntity<>(memberOrderDetailResponse, HttpStatus.OK);
     }
 
     @GetMapping("/delivery/tracking")
-    public ResponseEntity<MemberOrderResponse> inquireDeliveryTracking(@RequestHeader("userUuid") String userUuid, @RequestParam("orderUuid") String orderUuid) {
+    public ResponseEntity<MemberOrderResponse> inquireDeliveryTracking(@RequestHeader("userUuid") String userUuid, @RequestParam("orderUuid") String orderUuid) throws InterruptedException {
         MemberOrderResponse memberOrderDTResponse = memberService.findMemberOrderDeliveryTracking(userUuid, orderUuid);
         return new ResponseEntity<>(memberOrderDTResponse, HttpStatus.OK);
     }
