@@ -2,6 +2,12 @@ package com.sjw.doran.memberservice.exception;
 
 public class FeignException {
 
+    public static class FeignRetryException extends RuntimeException {
+        public FeignRetryException(String message) {
+            super(message);
+        }
+    }
+
     public static class FeignOrderServerException extends RuntimeException {
         public FeignOrderServerException(String message) {
             super(message);

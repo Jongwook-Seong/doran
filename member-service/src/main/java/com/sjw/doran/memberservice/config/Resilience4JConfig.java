@@ -49,13 +49,33 @@ public class Resilience4JConfig {
                 .build());
     }
 
+    public RegistryEventConsumer<Retry> retryRegistryEventConsumer() {
+        return new RegistryEventConsumer<Retry>() {
+            @Override
+            public void onEntryAddedEvent(EntryAddedEvent<Retry> entryAddedEvent) {
+                log.info("RegistryEventConsumer<Retry>.onEntryAddedEvent");
+                entryAddedEvent.getAddedEntry().getEventPublisher().onEvent(event -> log.info(event.toString()));
+            }
+
+            @Override
+            public void onEntryRemovedEvent(EntryRemovedEvent<Retry> entryRemoveEvent) {
+                log.info("RegistryEventConsumer<Retry>.onEntryRemovedEvent");
+            }
+
+            @Override
+            public void onEntryReplacedEvent(EntryReplacedEvent<Retry> entryReplacedEvent) {
+                log.info("RegistryEventConsumer<Retry>.onEntryReplacedEvent");
+            }
+        };
+    }
+
     @Bean
-    public RegistryEventConsumer<CircuitBreaker> registryEventConsumer() {
+    public RegistryEventConsumer<CircuitBreaker> circuitBreakerRegistryEventConsumer() {
 
         return new RegistryEventConsumer<CircuitBreaker>() {
             @Override
             public void onEntryAddedEvent(EntryAddedEvent<CircuitBreaker> entryAddedEvent) {
-                log.info("Resilience4JConfig.onEntryAddedEvent");
+                log.info("RegistryEventConsumer<CircuitBreaker>.onEntryAddedEvent");
 
                 CircuitBreaker.EventPublisher eventPublisher = entryAddedEvent.getAddedEntry().getEventPublisher();
 
@@ -71,12 +91,12 @@ public class Resilience4JConfig {
 
             @Override
             public void onEntryRemovedEvent(EntryRemovedEvent<CircuitBreaker> entryRemoveEvent) {
-                log.info("RegistryEventConsumer.onEntryRemovedEvent");
+                log.info("RegistryEventConsumer<CircuitBreaker>.onEntryRemovedEvent");
             }
 
             @Override
             public void onEntryReplacedEvent(EntryReplacedEvent<CircuitBreaker> entryReplacedEvent) {
-                log.info("RegistryEventConsumer.onEntryReplacedEvent");
+                log.info("RegistryEventConsumer<CircuitBreaker>.onEntryReplacedEvent");
             }
         };
     }
