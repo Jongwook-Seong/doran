@@ -48,6 +48,19 @@ spring:
 #            - RemoveRequestHeader=Cookie
             - RewritePath=/member-service/(?<segment>/*), /$\{segment}
 #            - AuthorizationHeaderFilter
+            - name: CircuitBreaker
+              args:
+                name: baseCircuitBreakerConfig
+                fallbackUri: forward:/fallback/member
+            - name: Retry
+              args:
+                name: baseRetryConfig
+#                retries: 3
+                statuses: BAD_GATEWAY, GATEWAY_TIMEOUT
+#                backoff:
+#                  firstBackoff: 1000ms
+#                  maxBackoff: 2000ms
+#                  factor: 2
         - id: item-service
           uri: lb://ITEM-SERVICE
           predicates:
@@ -55,6 +68,19 @@ spring:
             - Method=GET,POST,PUT,DELETE
           filters:
             - RewritePath=/item-service/(?<segment>/*), /$\{segment}
+            - name: CircuitBreaker
+              args:
+                name: baseCircuitBreakerConfig
+                fallbackUri: forward:/fallback/item
+            - name: Retry
+              args:
+                name: baseRetryConfig
+#                retries: 3
+                statuses: BAD_GATEWAY, GATEWAY_TIMEOUT
+#                backoff:
+#                  firstBackoff: 1000ms
+#                  maxBackoff: 2000ms
+#                  factor: 2
         - id: order-service
           uri: lb://ORDER-SERVICE
           predicates:
@@ -62,3 +88,53 @@ spring:
             - Method=GET,POST,PUT,DELETE
           filters:
             - RewritePath=/order-service/(?<segment>/*), /$\{segment}
+            - name: CircuitBreaker
+              args:
+                name: baseCircuitBreakerConfig
+                fallbackUri: forward:/fallback/order
+            - name: Retry
+              args:
+                name: baseRetryConfig
+#                retries: 3
+                statuses: BAD_GATEWAY, GATEWAY_TIMEOUT
+#                backoff:
+#                  firstBackoff: 1000ms
+#                  maxBackoff: 2000ms
+#                  factor: 2
+
+resilience4j.retry:
+  configs:
+    default:
+      maxAttempts: 3
+      waitDuration: 1000
+      retryExceptions:
+        - com.sjw.doran.apigateway.exception.RetryException
+      ignoreExceptions:
+        - com.sjw.doran.apigateway.exception.IgnoreException
+  instances:
+    baseRetryConfig:
+      baseConfig: default
+
+resilience4j.circuitbreaker:
+  configs:
+    default:
+      slidingWindowType: COUNT_BASED
+      registerHealthIndicator: true
+      slidingWindowSize: 10
+      failureRateThreshold: 40
+      minimumNumberOfCalls: 7
+      waitDurationInOpenState: 10s
+
+      slowCallDurationThreshold: 3000
+      slowCallRateThreshold: 60
+
+      permittedNumberOfCallsInHalfOpenState: 5
+      automaticTransitionFromOpenToHalfOpenEnabled: true
+
+      recordExceptions:
+        - com.sjw.doran.apigateway.exception.RecordException
+      ignoreExceptions:
+        - com.sjw.doran.apigateway.exception.IgnoreException
+  instances:
+    baseCircuitBreakerConfig:
+      baseConfig: default
