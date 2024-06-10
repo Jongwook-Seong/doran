@@ -9,10 +9,10 @@ import org.springframework.web.bind.annotation.*;
 
 @FeignClient(name = "order-service")
 public interface OrderServiceClient {
-    @GetMapping("/order-service/list")
+    @GetMapping("/list")
     OrderListResponse inquireOrderList(@RequestHeader("userUuid") String userUuid);
-    @GetMapping("/order-service/detail")
+    @GetMapping("/detail")
     OrderDetailResponse inquireOrderDetail(@RequestHeader("userUuid") String userUuid, @RequestParam("orderUuid") String orderUuid);
-    @GetMapping("/order-service/delivery/tracking")
+    @GetMapping("/delivery/tracking")
     DeliveryTrackingResponse inquireDeliveryTracking(@RequestHeader("userUuid") String userUuid, @RequestParam("orderUuid") String orderUuid);
 }

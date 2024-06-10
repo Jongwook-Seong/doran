@@ -33,6 +33,8 @@ spring:
         format_sql: true
         show_sql: true
 #        dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+  main:
+    allow-bean-definition-overriding: true
 
 eureka:
   instance:
@@ -97,3 +99,4 @@ springdoc:
     disable-swagger-default-url: true
     display-request-duration: true
     operations-sorter: alpha
+

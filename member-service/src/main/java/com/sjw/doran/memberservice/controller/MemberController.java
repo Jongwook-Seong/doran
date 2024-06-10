@@ -7,7 +7,6 @@ import com.sjw.doran.memberservice.service.MemberService;
 import com.sjw.doran.memberservice.util.MessageUtil;
 import com.sjw.doran.memberservice.vo.response.MemberOrderResponse;
 import com.sjw.doran.memberservice.vo.response.MemberResponse;
-import com.sjw.doran.memberservice.vo.response.order.DeliveryTrackingResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -24,7 +23,6 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/")
 @Tag(name = "Member Service", description = "Member Service Swagger API")
 public class MemberController {
 

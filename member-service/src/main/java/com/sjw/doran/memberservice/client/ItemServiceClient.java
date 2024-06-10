@@ -10,6 +10,6 @@ import java.util.List;
 @FeignClient(name = "item-service")
 public interface ItemServiceClient {
 
-    @GetMapping("/item-service/book/basket")
+    @GetMapping("/book/basket")
     List<ItemSimpleResponse> getBookBasket(@RequestParam("itemUuidList") List<String> itemUuidList);
 }

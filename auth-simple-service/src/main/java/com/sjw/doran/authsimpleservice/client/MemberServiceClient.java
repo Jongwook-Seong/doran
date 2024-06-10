@@ -10,11 +10,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 @FeignClient(name = "member-service")
 public interface MemberServiceClient {
 
-//    @PostMapping("/member-service/join")
     @PostMapping("/join")
     MemberResponse joinMember(@RequestHeader("userUuid") String userUuid, @RequestParam("username") String username);
 
-//    @DeleteMapping("/member-service/delete")
     @DeleteMapping("/delete")
     MemberResponse deleteMember(@RequestHeader("userUuid") String userUuid);
 }

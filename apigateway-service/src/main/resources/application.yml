@@ -45,12 +45,20 @@ spring:
             - Path=/member-service/**
             - Method=GET,POST
           filters:
+#            - RemoveRequestHeader=Cookie
             - RewritePath=/member-service/(?<segment>/*), /$\{segment}
+#            - AuthorizationHeaderFilter
         - id: item-service
           uri: lb://ITEM-SERVICE
           predicates:
             - Path=/item-service/**
+            - Method=GET,POST,PUT,DELETE
+          filters:
+            - RewritePath=/item-service/(?<segment>/*), /$\{segment}
         - id: order-service
           uri: lb://ORDER-SERVICE
           predicates:
             - Path=/order-service/**
+            - Method=GET,POST,PUT,DELETE
+          filters:
+            - RewritePath=/order-service/(?<segment>/*), /$\{segment}
