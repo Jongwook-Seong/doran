@@ -1,6 +1,5 @@
 package com.sjw.doran.memberservice.client;
 
-import com.sjw.doran.memberservice.exception.FeignException;
 import com.sjw.doran.memberservice.exception.IgnoreException;
 import com.sjw.doran.memberservice.exception.RecordException;
 import com.sjw.doran.memberservice.vo.response.order.DeliveryTrackingResponse;
@@ -14,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Slf4j
-//@Component
 @Service
 public class ResilientOrderServiceClient {
 
@@ -68,7 +66,7 @@ public class ResilientOrderServiceClient {
         return new OrderListResponse();
     }
 
-    private OrderListResponse inquireOrderListFallback(String userUuid, CallNotPermittedException exception) {
+    public OrderListResponse inquireOrderListFallback(String userUuid, CallNotPermittedException exception) {
         log.info("Fallback for inquireOrderList: {}", exception.toString());
         return new OrderListResponse();
     }
@@ -84,7 +82,7 @@ public class ResilientOrderServiceClient {
         return new OrderDetailResponse();
     }
 
-    private OrderDetailResponse inquireOrderDetailFallback(String userUuid, String orderUuid, CallNotPermittedException exception) {
+    public OrderDetailResponse inquireOrderDetailFallback(String userUuid, String orderUuid, CallNotPermittedException exception) {
         log.info("Fallback for inquireOrderDetail: {}", exception.toString());
         return new OrderDetailResponse();
     }
@@ -100,7 +98,7 @@ public class ResilientOrderServiceClient {
         return new DeliveryTrackingResponse();
     }
 
-    private DeliveryTrackingResponse inquireDeliveryTrackingFallback(String userUuid, String orderUuid, CallNotPermittedException exception) {
+    public DeliveryTrackingResponse inquireDeliveryTrackingFallback(String userUuid, String orderUuid, CallNotPermittedException exception) {
         log.info("Fallback for inquireDeliveryTracking: {}", exception.toString());
         return new DeliveryTrackingResponse();
     }

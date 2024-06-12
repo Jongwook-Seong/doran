@@ -35,6 +35,12 @@ spring:
 #        dialect: org.hibernate.dialect.MySQL5InnoDBDialect
   main:
     allow-bean-definition-overriding: true
+  cloud:
+    openfeign:
+      circuitbreaker:
+        enabled: true
+        group:
+          enabled: true
 
 eureka:
   instance:
@@ -48,6 +54,11 @@ eureka:
 logging:
   level:
     org.hibernate.SQL: debug
+
+management:
+  health:
+    circuitbreakers:
+      enabled: true
 
 resilience4j.retry:
   configs:

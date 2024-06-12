@@ -49,6 +49,7 @@ public class Resilience4JConfig {
                 .build());
     }
 
+    @Bean
     public RegistryEventConsumer<Retry> retryRegistryEventConsumer() {
         return new RegistryEventConsumer<Retry>() {
             @Override
