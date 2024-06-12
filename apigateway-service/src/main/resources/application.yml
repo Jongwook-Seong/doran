@@ -68,19 +68,6 @@ spring:
             - Method=GET,POST,PUT,DELETE
           filters:
             - RewritePath=/item-service/(?<segment>/*), /$\{segment}
-            - name: CircuitBreaker
-              args:
-                name: baseCircuitBreakerConfig
-                fallbackUri: forward:/fallback/item
-            - name: Retry
-              args:
-                name: baseRetryConfig
-#                retries: 3
-                statuses: BAD_GATEWAY, GATEWAY_TIMEOUT
-#                backoff:
-#                  firstBackoff: 1000ms
-#                  maxBackoff: 2000ms
-#                  factor: 2
         - id: order-service
           uri: lb://ORDER-SERVICE
           predicates:
@@ -108,9 +95,9 @@ resilience4j.retry:
       maxAttempts: 3
       waitDuration: 1000
       retryExceptions:
-        - com.sjw.doran.apigateway.exception.RetryException
+        - com.sjw.doran.apigatewayservice.exception.RetryException
       ignoreExceptions:
-        - com.sjw.doran.apigateway.exception.IgnoreException
+        - com.sjw.doran.apigatewayservice.exception.IgnoreException
   instances:
     baseRetryConfig:
       baseConfig: default
@@ -132,9 +119,9 @@ resilience4j.circuitbreaker:
       automaticTransitionFromOpenToHalfOpenEnabled: true
 
       recordExceptions:
-        - com.sjw.doran.apigateway.exception.RecordException
+        - com.sjw.doran.apigatewayservice.exception.RecordException
       ignoreExceptions:
-        - com.sjw.doran.apigateway.exception.IgnoreException
+        - com.sjw.doran.apigatewayservice.exception.IgnoreException
   instances:
     baseCircuitBreakerConfig:
       baseConfig: default
