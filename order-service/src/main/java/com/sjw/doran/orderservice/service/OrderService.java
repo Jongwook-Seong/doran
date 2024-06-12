@@ -11,11 +11,11 @@ import java.util.List;
 
 public interface OrderService {
 
-    void createOrder(String userUuid, OrderCreateRequest request);
+    void createOrder(String userUuid, OrderCreateRequest request) throws InterruptedException;
 
-    void cancelOrder(String userUuid, String orderUuid);
+    void cancelOrder(String userUuid, String orderUuid) throws InterruptedException;
 
-    OrderListResponse getOrderList(String userUuid);
+    OrderListResponse getOrderList(String userUuid) throws InterruptedException;
 
     OrderDetailResponse getOrderDetail(String userUuid, String orderUuid);
 

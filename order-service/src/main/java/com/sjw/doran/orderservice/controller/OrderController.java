@@ -22,7 +22,7 @@ public class OrderController {
 
     /** 주문 생성하기 **/
     @PostMapping("/orders")
-    public ResponseEntity<Void> createOrder(@RequestHeader("userUuid") String userUuid, @Valid @RequestBody OrderCreateRequest request) {
+    public ResponseEntity<Void> createOrder(@RequestHeader("userUuid") String userUuid, @Valid @RequestBody OrderCreateRequest request) throws InterruptedException {
         if (userUuid.isEmpty()) {
             throw new NoSuchElementException(messageUtil.getUserUuidEmptyErrorMessage());
         }
@@ -32,7 +32,7 @@ public class OrderController {
 
     /** 주문 취소하기 **/
     @PutMapping("/cancel")
-    public ResponseEntity<Void> cancelOrder(@RequestHeader("userUuid") String userUuid, @RequestParam("orderUuid") String orderUuid) {
+    public ResponseEntity<Void> cancelOrder(@RequestHeader("userUuid") String userUuid, @RequestParam("orderUuid") String orderUuid) throws InterruptedException {
         if (userUuid.isEmpty()) {
             throw new NoSuchElementException(messageUtil.getUserUuidEmptyErrorMessage());
         } else if (orderUuid.isEmpty()) {
@@ -44,7 +44,7 @@ public class OrderController {
 
     /** 주문 목록 조회하기 **/
     @GetMapping("/list")
-    public ResponseEntity<OrderListResponse> inquireOrderList(@RequestHeader("userUuid") String userUuid) {
+    public ResponseEntity<OrderListResponse> inquireOrderList(@RequestHeader("userUuid") String userUuid) throws InterruptedException {
         if (userUuid.isEmpty()) {
             throw new NoSuchElementException(messageUtil.getUserUuidEmptyErrorMessage());
         }
