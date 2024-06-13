@@ -131,25 +131,13 @@ public class OrderServiceImpl implements OrderService {
             }
             // itemUuidList 추출 및 itemServiceClient.getItemSimpleWithoutPrice() 호출
             itemUuidList = extractItemUuidList(orderSimpleList);
-//            List<ItemSimpleWithoutPriceResponse> itemSimpleWxPList = itemServiceClient.getItemSimpleWithoutPrice(itemUuidList);
-            List<ItemSimpleWithoutPriceResponse> itemSimpleWxPList = resilientItemServiceClient.getItemSimpleWithoutPrice(itemUuidList);
-            // itemName, itemImageUrl 추출 및 삽입
-            insertItemNameAndImageUrlIntoOrderSimpleList(itemSimpleWxPList, orderSimpleList);
-
-            return OrderListResponse.getInstance(orderSimpleList);
-//        } catch (RetryException e) {
-//            throw e;
-        } catch (RecordException e) {
-            throw e;
-//        } catch (IgnoreException e) {
-//            throw e;
         } catch (Exception e) {
             throw new NoSuchElementException(messageUtil.getNoSuchUserUuidErrorMessage(userUuid));
         }
-//        List<ItemSimpleWithoutPriceResponse> itemSimpleWxPList = resilientItemServiceClient.getItemSimpleWithoutPrice(itemUuidList);
-//        // itemName, itemImageUrl 추출 및 삽입
-//        insertItemNameAndImageUrlIntoOrderSimpleList(itemSimpleWxPList, orderSimpleList);
-//        return OrderListResponse.getInstance(orderSimpleList);
+        List<ItemSimpleWithoutPriceResponse> itemSimpleWxPList = resilientItemServiceClient.getItemSimpleWithoutPrice(itemUuidList);
+        // itemName, itemImageUrl 추출 및 삽입
+        insertItemNameAndImageUrlIntoOrderSimpleList(itemSimpleWxPList, orderSimpleList);
+        return OrderListResponse.getInstance(orderSimpleList);
     }
 
     private static List<String> extractItemUuidList(List<OrderSimple> orderSimpleList) {
@@ -165,7 +153,7 @@ public class OrderServiceImpl implements OrderService {
         orderSimpleList.forEach(os -> os.getOrderItemSimpleList()
                 .forEach(ois -> {
                     String itemUuid = ois.getItemUuid();
-                    if (itemSimpleWxPMap.get(itemUuid) == null) {
+                    if (itemSimpleWxPMap.get(itemUuid) != null) {
                         ois.setItemName(itemSimpleWxPMap.get(itemUuid).getItemName());
                         ois.setItemImageUrl(itemSimpleWxPMap.get(itemUuid).getItemImageUrl());
                     }
