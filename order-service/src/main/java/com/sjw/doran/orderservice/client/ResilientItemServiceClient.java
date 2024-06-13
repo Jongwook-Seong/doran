@@ -88,6 +88,7 @@ public class ResilientItemServiceClient {
     /** orderItems fallback methods **/
     public void orderItemsFallback(List<String> itemUuidList, List<Integer> countList, RecordException exception) {
         log.info("Fallback for orderItems: {}", exception.toString());
+        throw exception;
     }
 
     public void orderItemsFallback(List<String> itemUuidList, List<Integer> countList, IgnoreException exception) {
@@ -96,11 +97,13 @@ public class ResilientItemServiceClient {
 
     public void orderItemsFallback(List<String> itemUuidList, List<Integer> countList, CallNotPermittedException exception) {
         log.info("Fallback for orderItems: {}", exception.toString());
+        throw exception;
     }
 
     /** cancelOrderItems fallback methods **/
     public void cancelOrderItemsFallback(List<String> itemUuidList, List<Integer> countList, RecordException exception) {
         log.info("Fallback for cancelOrderItems: {}", exception.toString());
+        throw exception;
     }
 
     public void cancelOrderItemsFallback(List<String> itemUuidList, List<Integer> countList, IgnoreException exception) {
@@ -109,6 +112,7 @@ public class ResilientItemServiceClient {
 
     public void cancelOrderItemsFallback(List<String> itemUuidList, List<Integer> countList, CallNotPermittedException exception) {
         log.info("Fallback for cancelOrderItems: {}", exception.toString());
+        throw exception;
     }
 
     /** getItemSimpleWithoutPrice fallback methods **/

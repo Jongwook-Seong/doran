@@ -7,6 +7,9 @@ import com.sjw.doran.orderservice.dto.DeliveryTrackingDto;
 import com.sjw.doran.orderservice.dto.OrderDto;
 import com.sjw.doran.orderservice.dto.OrderItemDto;
 import com.sjw.doran.orderservice.entity.*;
+import com.sjw.doran.orderservice.exception.IgnoreException;
+import com.sjw.doran.orderservice.exception.RecordException;
+import com.sjw.doran.orderservice.exception.RetryException;
 import com.sjw.doran.orderservice.mapper.OrderMapper;
 import com.sjw.doran.orderservice.repository.DeliveryTrackingRepository;
 import com.sjw.doran.orderservice.repository.OrderItemRepository;
@@ -68,16 +71,20 @@ public class OrderServiceImpl implements OrderService {
             orderItemRepository.saveAll(orderItemList);
             deliveryTrackingRepository.save(deliveryTracking);
 //            itemServiceClient.orderItems(itemUuidList, itemCountList);
-//            resilientItemServiceClient.orderItems(itemUuidList, itemCountList);
+            resilientItemServiceClient.orderItems(itemUuidList, itemCountList);
+        } catch (RetryException e) {
+            throw e;
+        } catch (RecordException e) {
+            throw e;
+//        } catch (IgnoreException e) {
+//            throw e;
         } catch (Exception e) {
             throw new RuntimeException(messageUtil.getOrderCreateErrorMessage());
         }
-        System.out.println("OrderServiceImpl.createOrder - resilientItemServiceClient.orderItems() start");
-        resilientItemServiceClient.orderItems(itemUuidList, itemCountList);
-        System.out.println("OrderServiceImpl.createOrder - resilientItemServiceClient.orderItems() end");
     }
 
     @Override
+    @Transactional
     public void cancelOrder(String userUuid, String orderUuid) throws InterruptedException {
         List<String> itemUuidList = new ArrayList<>();
         List<Integer> itemCountList = new ArrayList<>();
@@ -95,7 +102,13 @@ public class OrderServiceImpl implements OrderService {
             });
 
 //            itemServiceClient.cancelOrderItems(itemUuidList, itemCountList);
-//            resilientItemServiceClient.cancelOrderItems(itemUuidList, itemCountList);
+            resilientItemServiceClient.cancelOrderItems(itemUuidList, itemCountList);
+        } catch (RetryException e) {
+            throw e;
+        } catch (RecordException e) {
+            throw e;
+//        } catch (IgnoreException e) {
+//            throw e;
         } catch (Exception e) {
             throw new RuntimeException(messageUtil.getOrderCancelErrorMessage());
         }
@@ -119,20 +132,24 @@ public class OrderServiceImpl implements OrderService {
             // itemUuidList 추출 및 itemServiceClient.getItemSimpleWithoutPrice() 호출
             itemUuidList = extractItemUuidList(orderSimpleList);
 //            List<ItemSimpleWithoutPriceResponse> itemSimpleWxPList = itemServiceClient.getItemSimpleWithoutPrice(itemUuidList);
-//            List<ItemSimpleWithoutPriceResponse> itemSimpleWxPList = resilientItemServiceClient.getItemSimpleWithoutPrice(itemUuidList);
-//            // itemName, itemImageUrl 추출 및 삽입
-//            insertItemNameAndImageUrlIntoOrderSimpleList(itemSimpleWxPList, orderSimpleList);
-//
-//            return OrderListResponse.getInstance(orderSimpleList);
+            List<ItemSimpleWithoutPriceResponse> itemSimpleWxPList = resilientItemServiceClient.getItemSimpleWithoutPrice(itemUuidList);
+            // itemName, itemImageUrl 추출 및 삽입
+            insertItemNameAndImageUrlIntoOrderSimpleList(itemSimpleWxPList, orderSimpleList);
+
+            return OrderListResponse.getInstance(orderSimpleList);
+//        } catch (RetryException e) {
+//            throw e;
+        } catch (RecordException e) {
+            throw e;
+//        } catch (IgnoreException e) {
+//            throw e;
         } catch (Exception e) {
             throw new NoSuchElementException(messageUtil.getNoSuchUserUuidErrorMessage(userUuid));
         }
-        System.out.println("OrderServiceImpl.getOrderList - resilientItemServiceClient.getItemSimpleWithoutPrice() start");
-        List<ItemSimpleWithoutPriceResponse> itemSimpleWxPList = resilientItemServiceClient.getItemSimpleWithoutPrice(itemUuidList);
-        System.out.println("OrderServiceImpl.getOrderList - resilientItemServiceClient.getItemSimpleWithoutPrice() end");
-        // itemName, itemImageUrl 추출 및 삽입
-        insertItemNameAndImageUrlIntoOrderSimpleList(itemSimpleWxPList, orderSimpleList);
-        return OrderListResponse.getInstance(orderSimpleList);
+//        List<ItemSimpleWithoutPriceResponse> itemSimpleWxPList = resilientItemServiceClient.getItemSimpleWithoutPrice(itemUuidList);
+//        // itemName, itemImageUrl 추출 및 삽입
+//        insertItemNameAndImageUrlIntoOrderSimpleList(itemSimpleWxPList, orderSimpleList);
+//        return OrderListResponse.getInstance(orderSimpleList);
     }
 
     private static List<String> extractItemUuidList(List<OrderSimple> orderSimpleList) {
@@ -148,8 +165,10 @@ public class OrderServiceImpl implements OrderService {
         orderSimpleList.forEach(os -> os.getOrderItemSimpleList()
                 .forEach(ois -> {
                     String itemUuid = ois.getItemUuid();
-                    ois.setItemName(itemSimpleWxPMap.get(itemUuid).getItemName());
-                    ois.setItemImageUrl(itemSimpleWxPMap.get(itemUuid).getItemImageUrl());
+                    if (itemSimpleWxPMap.get(itemUuid) == null) {
+                        ois.setItemName(itemSimpleWxPMap.get(itemUuid).getItemName());
+                        ois.setItemImageUrl(itemSimpleWxPMap.get(itemUuid).getItemImageUrl());
+                    }
                 }));
     }
 
