@@ -6,7 +6,7 @@ import io.github.resilience4j.core.registry.EntryRemovedEvent;
 import io.github.resilience4j.core.registry.EntryReplacedEvent;
 import io.github.resilience4j.core.registry.RegistryEventConsumer;
 import io.github.resilience4j.retry.Retry;
-//import io.github.resilience4j.timelimiter.TimeLimiterConfig;
+import io.github.resilience4j.timelimiter.TimeLimiter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +14,32 @@ import org.springframework.context.annotation.Configuration;
 @Slf4j
 @Configuration
 public class Resilience4JConfig {
+
+    @Bean
+    public RegistryEventConsumer<TimeLimiter> timeLimiterRegistryEventConsumer() {
+        return new RegistryEventConsumer<TimeLimiter>() {
+            @Override
+            public void onEntryAddedEvent(EntryAddedEvent<TimeLimiter> entryAddedEvent) {
+                log.info("RegistryEventConsumer<TimeLimiter>.onEntryAddedEvent");
+
+                TimeLimiter.EventPublisher eventPublisher = entryAddedEvent.getAddedEntry().getEventPublisher();
+
+                eventPublisher.onEvent(event -> log.info("onEvent {}", event));
+                eventPublisher.onSuccess(event -> log.info("onSuccess {}", event));
+                eventPublisher.onError(event -> log.info("onError {}", event));
+            }
+
+            @Override
+            public void onEntryRemovedEvent(EntryRemovedEvent<TimeLimiter> entryRemoveEvent) {
+                log.info("RegistryEventConsumer<TimeLimiter>.onEntryRemovedEvent");
+            }
+
+            @Override
+            public void onEntryReplacedEvent(EntryReplacedEvent<TimeLimiter> entryReplacedEvent) {
+                log.info("RegistryEventConsumer<TimeLimiter>.onEntryReplacedEvent");
+            }
+        };
+    }
 
     @Bean
     public RegistryEventConsumer<Retry> retryRegistryEventConsumer() {

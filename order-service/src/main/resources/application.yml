@@ -63,6 +63,15 @@ management:
     circuitbreakers:
       enabled: true
 
+resilience4j.timelimiter:
+  time-limiter-aspect-order: 3
+  configs:
+    default:
+      timeoutDuration: 4s
+  instances:
+    baseTimeLimiterConfig:
+      baseConfig: default
+
 resilience4j.retry:
   retry-aspect-order: 2
   configs:
