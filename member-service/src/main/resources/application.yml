@@ -33,6 +33,14 @@ spring:
         format_sql: true
         show_sql: true
 #        dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+  main:
+    allow-bean-definition-overriding: true
+  cloud:
+    openfeign:
+      circuitbreaker:
+        enabled: true
+        group:
+          enabled: true
 
 eureka:
   instance:
@@ -47,6 +55,52 @@ logging:
   level:
     org.hibernate.SQL: debug
 
+management:
+  health:
+    circuitbreakers:
+      enabled: true
+
+resilience4j.retry:
+  configs:
+    default:
+      maxAttempts: 3
+      waitDuration: 1000
+      retryExceptions:
+        - com.sjw.doran.memberservice.exception.RetryException
+      ignoreExceptions:
+        - com.sjw.doran.memberservice.exception.IgnoreException
+  instances:
+    baseRetryConfig:
+      baseConfig: default
+
+resilience4j.circuitbreaker:
+  configs:
+    default:
+      slidingWindowType: COUNT_BASED
+      registerHealthIndicator: true
+      slidingWindowSize: 10
+      failureRateThreshold: 40
+      minimumNumberOfCalls: 7
+      waitDurationInOpenState: 10s
+
+      slowCallDurationThreshold: 3000
+      slowCallRateThreshold: 60
+
+      permittedNumberOfCallsInHalfOpenState: 5
+      automaticTransitionFromOpenToHalfOpenEnabled: true
+
+      recordExceptions:
+#        - com.sjw.doran.memberservice.exception.FeignException.FeignOrderServerException
+#        - com.sjw.doran.memberservice.exception.FeignException.FeignItemServerException
+        - com.sjw.doran.memberservice.exception.RecordException
+      ignoreExceptions:
+#        - com.sjw.doran.memberservice.exception.FeignException.FeignOrderClientException
+#        - com.sjw.doran.memberservice.exception.FeignException.FeignItemClientException
+        - com.sjw.doran.memberservice.exception.IgnoreException
+  instances:
+    baseCircuitBreakerConfig:
+      baseConfig: default
+
 springdoc:
   packages-to-scan: com.sjw.doran.memberservice.controller
   default-consumes-media-type: application/json;charset=UTF-8
@@ -56,3 +110,4 @@ springdoc:
     disable-swagger-default-url: true
     display-request-duration: true
     operations-sorter: alpha
+

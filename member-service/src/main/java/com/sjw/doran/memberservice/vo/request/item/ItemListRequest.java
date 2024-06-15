@@ -1,4 +1,4 @@
-package com.sjw.doran.memberservice.vo.request;
+package com.sjw.doran.memberservice.vo.request.item;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

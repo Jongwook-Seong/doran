@@ -1,4 +1,4 @@
-package com.sjw.doran.memberservice.vo.response;
+package com.sjw.doran.memberservice.vo.response.item;
 
 import lombok.Builder;
 import lombok.Data;

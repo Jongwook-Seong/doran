@@ -17,7 +17,6 @@ import java.util.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/item-service")
 public class ItemController {
 
     private final ItemService itemService;

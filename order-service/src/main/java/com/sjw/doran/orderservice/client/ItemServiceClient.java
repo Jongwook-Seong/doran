@@ -12,15 +12,15 @@ import java.util.List;
 @FeignClient(name = "item-service")
 public interface ItemServiceClient {
 
-    @GetMapping("/item-service/orderitems")
+    @GetMapping("/orderitems")
     List<ItemSimpleWithQuantityResponse> getOrderItems(@RequestParam("itemUuidList") List<String> itemUuidList);
 
-    @PutMapping("/item-service/orderitems")
+    @PutMapping("/orderitems")
     void orderItems(@RequestParam("itemUuidList") List<String> itemUuidList, @RequestParam("countList") List<Integer> countList);
 
-    @PutMapping("/item-service/orderitems/cancel")
+    @PutMapping("/orderitems/cancel")
     void cancelOrderItems(@RequestParam("itemUuidList") List<String> itemUuidList, @RequestParam("countList") List<Integer> countList);
 
-    @GetMapping("/item-service/items/simple")
+    @GetMapping("/items/simple")
     List<ItemSimpleWithoutPriceResponse> getItemSimpleWithoutPrice(@RequestParam("itemUuidList") List<String> itemUuidList);
 }
