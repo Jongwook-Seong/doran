@@ -10,14 +10,16 @@ import lombok.*;
 @Builder
 public class Address {
 
-    private String roadName;
-    private String detailedAddr;
+    private String city;
+    private String street;
+    private String details;
     private String zipcode;
 
-    public static Address getInstance(String roadName, String detailedAddr, String zipcode) {
+    public static Address getInstance(String city, String street, String details, String zipcode) {
         return Address.builder()
-                .roadName(roadName)
-                .detailedAddr(detailedAddr)
+                .city(city)
+                .street(street)
+                .details(details)
                 .zipcode(zipcode)
                 .build();
     }

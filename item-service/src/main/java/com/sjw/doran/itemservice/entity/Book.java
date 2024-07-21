@@ -4,6 +4,7 @@ import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -23,6 +24,18 @@ public class Book extends Item {
     public Book(String itemUuid, String itemName, int price, int stockQuantity, String itemImageUrl, Category category,
             String author, String isbn, int pages, Date publicationDate, String contentsTable, String bookReview) {
         super(itemUuid, itemName, price, stockQuantity, itemImageUrl, category);
+        this.author = author;
+        this.isbn = isbn;
+        this.pages = pages;
+        this.publicationDate = publicationDate;
+        this.contentsTable = contentsTable;
+        this.bookReview = bookReview;
+    }
+
+    @Builder
+    public Book(Long id, String itemUuid, String itemName, int price, int stockQuantity, String itemImageUrl, Category category,
+                String author, String isbn, int pages, Date publicationDate, String contentsTable, String bookReview) {
+        super(id, itemUuid, itemName, price, stockQuantity, itemImageUrl, category);
         this.author = author;
         this.isbn = isbn;
         this.pages = pages;

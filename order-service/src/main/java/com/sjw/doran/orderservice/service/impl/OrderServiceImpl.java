@@ -1,16 +1,23 @@
 package com.sjw.doran.orderservice.service.impl;
 
-import com.sjw.doran.orderservice.client.ItemServiceClient;
 import com.sjw.doran.orderservice.client.ResilientItemServiceClient;
 import com.sjw.doran.orderservice.dto.DeliveryDto;
 import com.sjw.doran.orderservice.dto.DeliveryTrackingDto;
 import com.sjw.doran.orderservice.dto.OrderDto;
 import com.sjw.doran.orderservice.dto.OrderItemDto;
 import com.sjw.doran.orderservice.entity.*;
-import com.sjw.doran.orderservice.exception.IgnoreException;
 import com.sjw.doran.orderservice.exception.RecordException;
 import com.sjw.doran.orderservice.exception.RetryException;
+import com.sjw.doran.orderservice.kafka.common.OperationType;
+import com.sjw.doran.orderservice.kafka.delivery.DeliveryEvent;
+import com.sjw.doran.orderservice.kafka.delivery.DeliveryTopicMessage;
+import com.sjw.doran.orderservice.kafka.order.OrderEvent;
+import com.sjw.doran.orderservice.kafka.order.OrderTopicMessage;
+import com.sjw.doran.orderservice.mapper.DeliveryMapper;
+import com.sjw.doran.orderservice.mapper.DeliveryTrackingMapper;
 import com.sjw.doran.orderservice.mapper.OrderMapper;
+import com.sjw.doran.orderservice.mongodb.DeliveryDocument;
+import com.sjw.doran.orderservice.mongodb.DeliveryDocumentRepository;
 import com.sjw.doran.orderservice.repository.DeliveryTrackingRepository;
 import com.sjw.doran.orderservice.repository.OrderItemRepository;
 import com.sjw.doran.orderservice.repository.OrderRepository;
@@ -27,10 +34,13 @@ import com.sjw.doran.orderservice.vo.response.ItemSimpleWithoutPriceResponse;
 import com.sjw.doran.orderservice.vo.response.OrderDetailResponse;
 import com.sjw.doran.orderservice.vo.response.OrderListResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 @RequiredArgsConstructor
@@ -39,9 +49,13 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
     private final DeliveryTrackingRepository deliveryTrackingRepository;
+    private final DeliveryDocumentRepository deliveryDocumentRepository;
 //    private final ItemServiceClient itemServiceClient;
     private final ResilientItemServiceClient resilientItemServiceClient;
+    private final ApplicationEventPublisher applicationEventPublisher;
     private final OrderMapper orderMapper;
+    private final DeliveryMapper deliveryMapper;
+    private final DeliveryTrackingMapper deliveryTrackingMapper;
     private final MessageUtil messageUtil;
 
     @Override
@@ -67,11 +81,17 @@ public class OrderServiceImpl implements OrderService {
         });
 
         try {
-            orderRepository.save(order);
-            orderItemRepository.saveAll(orderItemList);
-            deliveryTrackingRepository.save(deliveryTracking);
+            Order savedOrder = orderRepository.save(order);
+            List<OrderItem> savedOrderItems = orderItemRepository.saveAll(orderItemList);
+            DeliveryTracking savedDeliveryTracking = deliveryTrackingRepository.save(deliveryTracking);
+            Delivery savedDelivery = savedOrder.getDelivery();
 //            itemServiceClient.orderItems(itemUuidList, itemCountList);
             resilientItemServiceClient.orderItems(itemUuidList, itemCountList);
+            /* Publish kafka message */
+            OrderTopicMessage orderTopicMessage = orderMapper.toOrderTopicMessage(savedOrder, savedOrderItems, savedDelivery.getId(), null);
+            applicationEventPublisher.publishEvent(new OrderEvent(this, savedOrder.getId(), orderTopicMessage.getPayload(), OperationType.CREATE));
+            DeliveryTopicMessage deliveryTopicMessage = deliveryMapper.toDeliveryTopicMessage(savedDelivery, List.of(savedDeliveryTracking), null);
+            applicationEventPublisher.publishEvent(new DeliveryEvent(this, savedDelivery.getId(), deliveryTopicMessage.getPayload(), OperationType.CREATE));
         } catch (RetryException e) {
             throw e;
         } catch (RecordException e) {
@@ -103,6 +123,9 @@ public class OrderServiceImpl implements OrderService {
 
 //            itemServiceClient.cancelOrderItems(itemUuidList, itemCountList);
             resilientItemServiceClient.cancelOrderItems(itemUuidList, itemCountList);
+            /* Kafka produce */
+            applicationEventPublisher.publishEvent(new OrderEvent(this, order.getId(), null, OperationType.DELETE));
+            applicationEventPublisher.publishEvent(new DeliveryEvent(this, order.getDelivery().getId(), null, OperationType.DELETE));
         } catch (RetryException e) {
             throw e;
         } catch (RecordException e) {
@@ -112,7 +135,7 @@ public class OrderServiceImpl implements OrderService {
         } catch (Exception e) {
             throw new RuntimeException(messageUtil.getOrderCancelErrorMessage());
         }
-        resilientItemServiceClient.cancelOrderItems(itemUuidList, itemCountList);
+//        resilientItemServiceClient.cancelOrderItems(itemUuidList, itemCountList);
     }
 
     @Override
@@ -176,13 +199,36 @@ public class OrderServiceImpl implements OrderService {
                 delivery.getDeliveryStatus(), delivery.getTransceiverInfo(), delivery.getAddress());
     }
 
+    /** getOrderDetail - @Async, CompletableFuture 테스트 적용 **/
+    @Override
+    @Async
+    public CompletableFuture<OrderDetailResponse> getOrderDetailAsync(String userUuid, String orderUuid) {
+        return CompletableFuture.supplyAsync(() -> {
+            Order order = orderRepository.findOrderWithItemsAndDeliveryByUserUuidAndOrderUuid(userUuid, orderUuid).orElseThrow(() -> {
+                throw new NoSuchElementException("Invalid Order");
+            });
+
+            List<OrderItemSimple> orderItemSimpleList = new ArrayList<>();
+            List<OrderItem> orderItems = order.getOrderItems();
+            for (OrderItem orderItem : orderItems) {
+                orderItemSimpleList.add(OrderItemSimple.getInstance(orderItem.getItemUuid(), orderItem.getCount(), orderItem.getOrderPrice()));
+            }
+            Delivery delivery = order.getDelivery();
+
+            return OrderDetailResponse.getInstance(orderItemSimpleList, order.getOrderDate(),
+                    delivery.getDeliveryStatus(), delivery.getTransceiverInfo(), delivery.getAddress());
+        });
+    }
+
     @Override
     public DeliveryTrackingResponse getDeliveryTrackingInfo(String userUuid, String orderUuid) {
         Order order = orderRepository.findOrderWithDeliveryByUserUuidAndOrderUuid(userUuid, orderUuid).orElseThrow(() -> {
             throw new NoSuchElementException("Invalid Order"); });
 
         Delivery delivery = order.getDelivery();
-        List<DeliveryTracking> deliveryTrackings = deliveryTrackingRepository.findAllByDelivery(delivery);
+//        List<DeliveryTracking> deliveryTrackings = deliveryTrackingRepository.findAllByDelivery(delivery);
+        DeliveryDocument deliveryDocument = deliveryDocumentRepository.findById(delivery.getId()).get();
+        List<DeliveryTracking> deliveryTrackings = deliveryTrackingMapper.toDeliveryTrackingList(deliveryDocument.getDeliveryTrackings());
 
         List<DeliveryTrackingInfo> deliveryTrackingInfoList = new ArrayList<>();
         for (DeliveryTracking tracking : deliveryTrackings) {
@@ -200,9 +246,11 @@ public class OrderServiceImpl implements OrderService {
             Delivery delivery = orderRepository.updateDeliveryStatus(orderUuid, request.getDeliveryStatus());
 
             DeliveryTrackingDto deliveryTrackingDto = DeliveryTrackingDto.getInstanceForCreate(request.getCourier(), request.getContactNumber(), request.getPostLocation());
-            DeliveryTracking deliveryTracking = orderMapper.toDeliveryTracking(deliveryTrackingDto, delivery);
-
-            deliveryTrackingRepository.save(deliveryTracking);
+            DeliveryTracking deliveryTracking = deliveryMapper.toDeliveryTracking(deliveryTrackingDto, delivery);
+            DeliveryTracking savedDeliveryTracking = deliveryTrackingRepository.save(deliveryTracking);
+            /* Publish kafka message */
+            DeliveryTopicMessage deliveryTopicMessage = deliveryMapper.toDeliveryTopicMessage(delivery, List.of(savedDeliveryTracking), null);
+            applicationEventPublisher.publishEvent(new DeliveryEvent(this, delivery.getId(), deliveryTopicMessage.getPayload(), OperationType.UPDATE));
         } catch (Exception e) {
             throw new RuntimeException(messageUtil.getDeliveryUpdateErrorMessage());
         }
@@ -228,12 +276,12 @@ public class OrderServiceImpl implements OrderService {
 
     private Delivery constructDelivery(TransceiverInfo transceiverInfo, Address address) {
         DeliveryDto deliveryDto = DeliveryDto.getInstanceForCreate(transceiverInfo, address);
-        return orderMapper.toDelivery(deliveryDto);
+        return deliveryMapper.toDelivery(deliveryDto);
     }
 
     private DeliveryTracking constructDefaultDeliveryTracking(Delivery delivery) {
         DeliveryTrackingDto deliveryTrackingDto =
                 DeliveryTrackingDto.getInstanceForCreate("kim", "010-xxxx-xxxx", "seoul");
-        return orderMapper.toDeliveryTracking(deliveryTrackingDto, delivery);
+        return deliveryMapper.toDeliveryTracking(deliveryTrackingDto, delivery);
     }
 }

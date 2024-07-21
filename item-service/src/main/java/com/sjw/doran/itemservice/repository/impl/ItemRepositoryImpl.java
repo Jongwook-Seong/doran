@@ -17,9 +17,11 @@ import static com.sjw.doran.itemservice.entity.QItem.item;
 
 public class ItemRepositoryImpl implements ItemRepositoryCustom {
 
+    private EntityManager entityManager;
     private JPAQueryFactory queryFactory;
 
     public ItemRepositoryImpl(EntityManager entityManager) {
+        this.entityManager = entityManager;
         this.queryFactory = new JPAQueryFactory(entityManager);
     }
 
@@ -83,7 +85,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
 
     @Override
     @Transactional
-    public void updateStockQuantity(List<String> itemUuidList, List<Integer> countList) {
+    public List<Item> updateStockQuantity(List<String> itemUuidList, List<Integer> countList) {
 
         Map<String, Integer> itemUuidCountMap = new HashMap<>();
         for (int i = 0; i < itemUuidList.size(); i++) {
@@ -103,5 +105,14 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
                 item.removeStock(count);
             }
         }
+        entityManager.flush();
+        entityManager.clear();
+
+        List<Item> updatedItems = queryFactory
+                .selectFrom(item)
+                .where(item.itemUuid.in(itemUuidList))
+                .fetch();
+
+        return updatedItems;
     }
 }

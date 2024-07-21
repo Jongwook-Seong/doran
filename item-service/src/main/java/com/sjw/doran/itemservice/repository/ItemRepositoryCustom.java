@@ -28,5 +28,5 @@ public interface ItemRepositoryCustom {
     void deleteByItemUuid(String itemUuid);
 
     @Transactional
-    void updateStockQuantity(List<String> itemUuidList, List<Integer> countList);
+    List<Item> updateStockQuantity(List<String> itemUuidList, List<Integer> countList);
 }

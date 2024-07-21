@@ -5,6 +5,13 @@ import com.sjw.doran.memberservice.client.ResilientOrderServiceClient;
 import com.sjw.doran.memberservice.dto.MemberDto;
 import com.sjw.doran.memberservice.entity.Basket;
 import com.sjw.doran.memberservice.entity.Member;
+import com.sjw.doran.memberservice.kafka.basket.BasketEvent;
+import com.sjw.doran.memberservice.kafka.basket.BasketTopicMessage;
+import com.sjw.doran.memberservice.kafka.common.BasketOperationType;
+import com.sjw.doran.memberservice.kafka.common.OperationType;
+import com.sjw.doran.memberservice.kafka.member.MemberEvent;
+import com.sjw.doran.memberservice.kafka.member.MemberTopicMessage;
+import com.sjw.doran.memberservice.mapper.BasketMapper;
 import com.sjw.doran.memberservice.mapper.MemberMapper;
 import com.sjw.doran.memberservice.repository.BasketRepository;
 import com.sjw.doran.memberservice.repository.MemberRepository;
@@ -17,6 +24,7 @@ import com.sjw.doran.memberservice.vo.response.order.OrderListResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cloud.client.circuitbreaker.CircuitBreaker;
 import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,7 +40,9 @@ public class MemberServiceImpl implements MemberService {
     private final BasketRepository basketRepository;
     private final OrderServiceClient orderServiceClient;
     private final ResilientOrderServiceClient resilientOrderServiceClient;
+    private final ApplicationEventPublisher applicationEventPublisher;
     private final MemberMapper memberMapper;
+    private final BasketMapper basketMapper;
     private final MessageUtil messageUtil;
     private final CircuitBreakerFactory circuitBreakerFactory;
 
@@ -63,10 +73,17 @@ public class MemberServiceImpl implements MemberService {
     @Transactional
     public void saveMember(Member member) {
         try {
-            memberRepository.save(member);
+            Member savedMember = memberRepository.save(member);
             Basket basket = new Basket(member);
             try {
-                basketRepository.save(basket);
+                Basket savedBasket = basketRepository.save(basket);
+                /* Publish kafka message */
+                MemberTopicMessage memberTopicMessage = memberMapper.toMemberTopicMessage(savedMember, savedMember.getAddress(), null);
+                applicationEventPublisher.publishEvent(
+                        new MemberEvent(this, memberTopicMessage.getId(), memberTopicMessage.getPayload(), OperationType.CREATE));
+                BasketTopicMessage basketTopicMessage = basketMapper.toBasketTopicMessage(savedBasket, null, null);
+                applicationEventPublisher.publishEvent(
+                        new BasketEvent(this, basketTopicMessage.getId(), basketTopicMessage.getPayload(), BasketOperationType.CREATE));
             } catch (Exception e) {
                 throw new RuntimeException(messageUtil.getBasketCreateErrorMessage());
             }
@@ -79,8 +96,12 @@ public class MemberServiceImpl implements MemberService {
     @Transactional
     public void deleteMember(String userUuid) {
         try {
-            Optional<Member> member = memberRepository.findByUserUuid(userUuid);
-            memberRepository.delete(member.get());
+            Member member = memberRepository.findByUserUuid(userUuid).get();
+            Basket basket = member.getBasket();
+            memberRepository.delete(member);
+            /* Publish kafka message */
+            applicationEventPublisher.publishEvent(new MemberEvent(this, member.getId(), null, OperationType.DELETE));
+            applicationEventPublisher.publishEvent(new BasketEvent(this, basket.getId(), null, BasketOperationType.DELETE));
         } catch (Exception e) {
             throw new RuntimeException(messageUtil.getMemberDeleteErrorMessage());
         }
