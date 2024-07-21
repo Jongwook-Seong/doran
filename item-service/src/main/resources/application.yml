@@ -32,6 +32,12 @@ spring:
       hibernate:
         format_sql: true
         show_sql: true
+  kafka:
+    bootstrap-servers: localhost:9092,localhost:9093,localhost:9094
+  data:
+    mongodb:
+      uri: mongodb://rootuser:1234@localhost:27017/doran?authSource=admin
+      authentication-database: admin
 
 eureka:
   instance:

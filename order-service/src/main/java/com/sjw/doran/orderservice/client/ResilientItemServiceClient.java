@@ -2,17 +2,18 @@ package com.sjw.doran.orderservice.client;
 
 import com.sjw.doran.orderservice.exception.RecordException;
 import com.sjw.doran.orderservice.exception.IgnoreException;
+import com.sjw.doran.orderservice.service.SlackService;
 import com.sjw.doran.orderservice.vo.response.ItemSimpleWithQuantityResponse;
 import com.sjw.doran.orderservice.vo.response.ItemSimpleWithoutPriceResponse;
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
-import io.github.resilience4j.timelimiter.annotation.TimeLimiter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 @Slf4j
@@ -21,6 +22,9 @@ public class ResilientItemServiceClient {
 
     @Autowired
     private ItemServiceClient itemServiceClient;
+
+    @Autowired
+    private SlackService slackService;
 
     private static final String BASE_CIRCUIT_BREAKER_CONFIG = "baseCircuitBreakerConfig";
     private static final String BASE_RETRY_CONFIG = "baseRetryConfig";
@@ -74,19 +78,23 @@ public class ResilientItemServiceClient {
     }
 
     /** getOrderItems fallback methods **/
-    public List<ItemSimpleWithQuantityResponse> getOrderItemsFallback(List<String> itemUuidList, RecordException exception) {
+    public List<ItemSimpleWithQuantityResponse> fallback(List<String> itemUuidList, RecordException exception) {
         log.info("Fallback for getOrderItems: {}", exception.toString());
         return new ArrayList<>();
     }
 
-    public List<ItemSimpleWithQuantityResponse> getOrderItemsFallback(List<String> itemUuidList, IgnoreException exception) {
+    public List<ItemSimpleWithQuantityResponse> fallback(List<String> itemUuidList, IgnoreException exception) {
         log.info("Fallback for getOrderItems: {}", exception.toString());
         return new ArrayList<>();
     }
 
-    public List<ItemSimpleWithQuantityResponse> getOrderItemsFallback(List<String> itemUuidList, CallNotPermittedException exception) {
+    public List<ItemSimpleWithQuantityResponse> fallback(List<String> itemUuidList, CallNotPermittedException exception) {
         log.info("Fallback for getOrderItems: {}", exception.toString());
-        return new ArrayList<>();
+        HashMap<String, String> data = new HashMap<>();
+        data.put(exception.toString(), exception.getMessage());
+        slackService.sendMessage("[ORDER-SERVICE] o.s.c.l.core.RoundRobinLoadBalancer: No servers available for service: item-service", data);
+        throw exception;
+//        return new ArrayList<>();
     }
 
     /** orderItems fallback methods **/
@@ -101,6 +109,9 @@ public class ResilientItemServiceClient {
 
     public void orderItemsFallback(List<String> itemUuidList, List<Integer> countList, CallNotPermittedException exception) {
         log.info("Fallback for orderItems: {}", exception.toString());
+        HashMap<String, String> data = new HashMap<>();
+        data.put(exception.toString(), exception.getMessage());
+        slackService.sendMessage("[ORDER-SERVICE] o.s.c.l.core.RoundRobinLoadBalancer: No servers available for service: item-service", data);
         throw exception;
     }
 
@@ -116,6 +127,9 @@ public class ResilientItemServiceClient {
 
     public void cancelOrderItemsFallback(List<String> itemUuidList, List<Integer> countList, CallNotPermittedException exception) {
         log.info("Fallback for cancelOrderItems: {}", exception.toString());
+        HashMap<String, String> data = new HashMap<>();
+        data.put(exception.toString(), exception.getMessage());
+        slackService.sendMessage("[ORDER-SERVICE] o.s.c.l.core.RoundRobinLoadBalancer: No servers available for service: item-service", data);
         throw exception;
     }
 
@@ -132,7 +146,11 @@ public class ResilientItemServiceClient {
 
     public List<ItemSimpleWithoutPriceResponse> getItemSimpleWithoutPriceFallback(List<String> itemUuidList, CallNotPermittedException exception) {
         log.info("Fallback for getItemSimpleWithoutPrice: {}", exception.toString());
-        return new ArrayList<>();
+        HashMap<String, String> data = new HashMap<>();
+        data.put(exception.toString(), exception.getMessage());
+        slackService.sendMessage("[ORDER-SERVICE] o.s.c.l.core.RoundRobinLoadBalancer: No servers available for service: item-service", data);
+        throw exception;
+//        return new ArrayList<>();
     }
 
     private void replacementCall(String param) throws InterruptedException {

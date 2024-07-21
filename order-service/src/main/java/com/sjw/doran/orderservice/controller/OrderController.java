@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 @RestController
 @RequiredArgsConstructor
@@ -64,6 +66,18 @@ public class OrderController {
         }
         OrderDetailResponse orderDetailResponse = orderService.getOrderDetail(userUuid, orderUuid);
         return new ResponseEntity<>(orderDetailResponse, HttpStatus.OK);
+    }
+
+    /** 주문 상세 조회하기 - @Async, CompletableFuture 테스트 적용 **/
+    @GetMapping("/detail/async")
+    public CompletableFuture<ResponseEntity<OrderDetailResponse>> inquireOrderDetailAsync(@RequestHeader("userUuid") String userUuid, @RequestParam("orderUuid") String orderUuid) {
+        if (userUuid.isEmpty()) {
+            throw new NoSuchElementException(messageUtil.getUserUuidEmptyErrorMessage());
+        } else if (orderUuid.isEmpty()) {
+            throw new NoSuchElementException(messageUtil.getOrderUuidEmptyErrorMessage());
+        }
+        return orderService.getOrderDetailAsync(userUuid, orderUuid)
+                .thenApply(ResponseEntity::ok);
     }
 
     /** 배송 추적 조회하기 **/

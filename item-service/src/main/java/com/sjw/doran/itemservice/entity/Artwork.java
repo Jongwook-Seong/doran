@@ -26,4 +26,14 @@ public class Artwork extends Item {
         this.workSize = workSize;
         this.productionYear = productionYear;
     }
+
+    @Builder
+    public Artwork(Long id, String itemUuid, String itemName, int price, int stockQuantity, String itemImageUrl, Category category,
+                   String artist, String explanation, String workSize, int productionYear) {
+        super(id, itemUuid, itemName, price, stockQuantity, itemImageUrl, category);
+        this.artist = artist;
+        this.explanation = explanation;
+        this.workSize = workSize;
+        this.productionYear = productionYear;
+    }
 }

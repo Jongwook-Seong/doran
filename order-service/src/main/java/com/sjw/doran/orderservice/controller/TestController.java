@@ -5,6 +5,7 @@ import com.sjw.doran.orderservice.dto.DeliveryTrackingDto;
 import com.sjw.doran.orderservice.dto.OrderDto;
 import com.sjw.doran.orderservice.dto.OrderItemDto;
 import com.sjw.doran.orderservice.entity.*;
+import com.sjw.doran.orderservice.mapper.DeliveryMapper;
 import com.sjw.doran.orderservice.mapper.OrderMapper;
 import com.sjw.doran.orderservice.repository.DeliveryTrackingRepository;
 import com.sjw.doran.orderservice.repository.OrderItemRepository;
@@ -26,6 +27,7 @@ public class TestController {
     private final OrderItemRepository orderItemRepository;
     private final DeliveryTrackingRepository deliveryTrackingRepository;
     private final OrderMapper orderMapper;
+    private final DeliveryMapper deliveryMapper;
 
     @PostMapping("/new-order")
     public void newOrder(@RequestHeader("userUuid") String userUuid, @RequestBody OrderCreateRequest request) {
@@ -54,7 +56,7 @@ public class TestController {
         Address address = request.getAddress();
         DeliveryDto deliveryDto = DeliveryDto.getInstanceForCreate(transceiverInfo, address);
 //        Delivery delivery = modelMapper.map(deliveryDto, Delivery.class);
-        Delivery delivery = orderMapper.toDelivery(deliveryDto);
+        Delivery delivery = deliveryMapper.toDelivery(deliveryDto);
 
         order.createDelivery(delivery);
 
@@ -62,7 +64,7 @@ public class TestController {
                 DeliveryTrackingDto.getInstanceForCreate("kim", "010-xxxx-xxxx", "seoul");
 //        DeliveryTracking deliveryTracking = modelMapper.map(deliveryTrackingDto, DeliveryTracking.class);
 //        deliveryTracking.setDelivery(delivery);
-        DeliveryTracking deliveryTracking = orderMapper.toDeliveryTracking(deliveryTrackingDto, delivery);
+        DeliveryTracking deliveryTracking = deliveryMapper.toDeliveryTracking(deliveryTrackingDto, delivery);
 
         orderRepository.save(order);
         orderItemRepository.saveAll(orderItemList);

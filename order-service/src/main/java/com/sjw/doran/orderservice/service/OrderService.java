@@ -8,6 +8,7 @@ import com.sjw.doran.orderservice.vo.response.OrderDetailResponse;
 import com.sjw.doran.orderservice.vo.response.OrderListResponse;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public interface OrderService {
 
@@ -18,6 +19,8 @@ public interface OrderService {
     OrderListResponse getOrderList(String userUuid) throws InterruptedException;
 
     OrderDetailResponse getOrderDetail(String userUuid, String orderUuid);
+
+    CompletableFuture<OrderDetailResponse> getOrderDetailAsync(String userUuid, String orderUuid);
 
     DeliveryTrackingResponse getDeliveryTrackingInfo(String userUuid, String orderUuid);
 

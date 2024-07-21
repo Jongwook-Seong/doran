@@ -3,6 +3,8 @@ package com.sjw.doran.itemservice.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -35,6 +37,16 @@ public abstract class Item extends AuditingFields {
     }
 
     public Item(String itemUuid, String itemName, int price, int stockQuantity, String itemImageUrl, Category category) {
+        this.itemUuid = itemUuid;
+        this.itemName = itemName;
+        this.price = price;
+        this.stockQuantity = stockQuantity;
+        this.itemImageUrl = itemImageUrl;
+        this.category = category;
+    }
+
+    public Item(Long id, String itemUuid, String itemName, int price, int stockQuantity, String itemImageUrl, Category category) {
+        this.id = id;
         this.itemUuid = itemUuid;
         this.itemName = itemName;
         this.price = price;

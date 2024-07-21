@@ -65,6 +65,7 @@ public class ItemController {
     @GetMapping("/book/search")
     public ResponseEntity<List<ItemSimpleResponse>> bookSearch(@RequestParam String keywords) {
         List<ItemSimpleResponse> itemSimpleResponseList = itemService.getBooksByKeyword(keywords);
+//        List<ItemSimpleResponse> itemSimpleResponseList = itemService.getItemsByKeyword(keywords);
         return new ResponseEntity<>(itemSimpleResponseList, HttpStatus.OK);
     }
 
