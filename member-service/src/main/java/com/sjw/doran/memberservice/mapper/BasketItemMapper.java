@@ -28,6 +28,10 @@ public interface BasketItemMapper {
     List<BasketTopicMessage.BasketItemData> toBasketItemDataList(List<BasketItem> basketItems);
 
     @Mapping(target = "itemUuid", source = "basketItemData.itemUuid")
+    @Mapping(target = "itemName", source = "basketItemData.itemName")
+    @Mapping(target = "itemImageUrl", source = "basketItemData.itemImageUrl")
+    @Mapping(target = "category", source = "basketItemData.category")
+    @Mapping(target = "price", source = "basketItemData.price")
     @Mapping(target = "count", source = "basketItemData.count")
     BasketDocument.Item toBasketDocumentItem(BasketTopicMessage.BasketItemData basketItemData);
 

@@ -2,6 +2,7 @@ package com.sjw.doran.itemservice.vo.response;
 
 import com.sjw.doran.itemservice.dto.BookDto;
 import com.sjw.doran.itemservice.dto.ItemDto;
+import com.sjw.doran.itemservice.entity.Category;
 import lombok.*;
 
 @Data
@@ -14,6 +15,7 @@ public class ItemSimpleResponse {
     private String itemName;
     private int price;
     private String itemImageUrl;
+    private Category category;
 
     public static ItemSimpleResponse getInstanceAsItem(ItemDto itemDto) {
         return ItemSimpleResponse.builder()
@@ -21,6 +23,7 @@ public class ItemSimpleResponse {
                 .itemName(itemDto.getItemName())
                 .price(itemDto.getPrice())
                 .itemImageUrl(itemDto.getItemImageUrl())
+                .category(itemDto.getCategory())
                 .build();
     }
 
@@ -30,6 +33,7 @@ public class ItemSimpleResponse {
                 .itemName(bookDto.getItemName())
                 .price(bookDto.getPrice())
                 .itemImageUrl(bookDto.getItemImageUrl())
+                .category(Category.BOOK)
                 .build();
     }
 }
