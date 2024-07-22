@@ -58,11 +58,10 @@ public class BasketItemListCacheImpl implements BasketItemListCache {
     }
 
     @Override
-    public void removeBasketItem(Long basketId, CachedBasket.CachedBasketItem basketItem) {
+    public void removeBasketItem(Long basketId, String itemUuid) {
         CachedBasket cachedBasket = this.get(basketId);
         if (cachedBasket != null) {
-            cachedBasket.getItems().removeIf(item ->
-                    item.getItemUuid().equals(basketItem.getItemUuid()));
+            cachedBasket.getItems().removeIf(item -> item.getItemUuid().equals(itemUuid));
             String jsonString;
             try {
                 jsonString = objectMapper.writeValueAsString(cachedBasket);

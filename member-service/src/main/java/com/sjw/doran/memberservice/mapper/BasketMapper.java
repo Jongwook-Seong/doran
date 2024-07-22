@@ -5,6 +5,7 @@ import com.sjw.doran.memberservice.entity.BasketItem;
 import com.sjw.doran.memberservice.kafka.basket.BasketTopicMessage;
 import com.sjw.doran.memberservice.kafka.common.BasketOperationType;
 import com.sjw.doran.memberservice.mongodb.BasketDocument;
+import com.sjw.doran.memberservice.redis.CachedBasket;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
@@ -30,4 +31,10 @@ public interface BasketMapper {
             @Mapping(target = "items", source = "payload.basketItems")
     })
     BasketDocument toBasketDocument(BasketTopicMessage.Payload payload);
+
+    @Mappings({
+            @Mapping(target = "id", source = "basketDocument.id"),
+            @Mapping(target = "items", source = "basketDocument.items")
+    })
+    CachedBasket toCachedBasket(BasketDocument basketDocument);
 }

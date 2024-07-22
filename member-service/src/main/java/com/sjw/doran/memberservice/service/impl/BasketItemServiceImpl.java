@@ -12,6 +12,8 @@ import com.sjw.doran.memberservice.mapper.BasketItemMapper;
 import com.sjw.doran.memberservice.mapper.BasketMapper;
 import com.sjw.doran.memberservice.mongodb.BasketDocument;
 import com.sjw.doran.memberservice.mongodb.BasketDocumentRepository;
+import com.sjw.doran.memberservice.redis.BasketItemListCache;
+import com.sjw.doran.memberservice.redis.CachedBasket;
 import com.sjw.doran.memberservice.repository.BasketItemRepository;
 import com.sjw.doran.memberservice.service.BasketItemService;
 import com.sjw.doran.memberservice.vo.request.BasketItemCreateRequest;
@@ -35,6 +37,7 @@ public class BasketItemServiceImpl implements BasketItemService {
 
     private final BasketItemRepository basketItemRepository;
     private final BasketDocumentRepository basketDocumentRepository;
+    private final BasketItemListCache basketItemListCache;
     private final ItemServiceClient itemServiceClient;
     private final ResilientItemServiceClient resilientItemServiceClient;
     private final ApplicationEventPublisher applicationEventPublisher;
@@ -51,8 +54,14 @@ public class BasketItemServiceImpl implements BasketItemService {
 //        CircuitBreaker circuitBreaker = circuitBreakerFactory.create("MS-findAllByBasket-circuitbreaker");
 //        List<ItemSimpleResponse> itemSimpleResponseList = circuitBreaker.run(() ->
 //                itemServiceClient.getBookBasket(itemUuidList), throwable -> new ArrayList<>());
-        /* Read basketDocument from MongoDB */
+        /* Read from Redis cache server at first */
+        CachedBasket cachedBasket = basketItemListCache.get(basket.getId());
+        if (cachedBasket != null)
+            return basketItemMapper.toItemSimpleWCResponseList(cachedBasket.getItems());
+        /* Read basketDocument from MongoDB if not exist in cache */
         BasketDocument basketDocument = basketDocumentRepository.findById(basket.getId()).get();
+        /* Set cache */
+        basketItemListCache.set(basketMapper.toCachedBasket(basketDocument));
         basketDocument.getItems().forEach(item -> itemUuidList.add(item.getItemUuid()));
         List<BasketItem> basketItemList = new ArrayList<>();
         basketDocument.getItems().forEach(item -> basketItemList.add(basketItemMapper.toBasketItem(basket, item)));
@@ -73,12 +82,18 @@ public class BasketItemServiceImpl implements BasketItemService {
 
     @Override
     @Transactional
-    public void addBasketItem(Basket basket, BasketItemCreateRequest request) {
+    public void addBasketItem(Basket basket, BasketItemCreateRequest request) throws InterruptedException {
         BasketItemDto basketItemDto = basketItemMapper.toBasketItemDto(request);
         BasketItem basketItem = basketItemMapper.toBasketItem(basketItemDto, basket);
         basketItemRepository.save(basketItem);
+        /* Get additional fields of BasketItem from FeignClient */
+        ItemSimpleResponse itemSimpleResponse = resilientItemServiceClient.getBookBasket(List.of(basketItem.getItemUuid())).get(0);
+        /* Mapping */
+        BasketTopicMessage.BasketItemData basketItemData =
+                basketItemMapper.toBasketTopicMessageBasketItemDataFromItemSimpleResponse(itemSimpleResponse, basketItem.getCount());
+        BasketTopicMessage basketTopicMessage = basketMapper.toBasketTopicMessage(basket, null, null);
+        basketTopicMessage.getPayload().getBasketItems().add(basketItemData);
         /* Publish kafka message */
-        BasketTopicMessage basketTopicMessage = basketMapper.toBasketTopicMessage(basket, List.of(basketItem), null);
         applicationEventPublisher.publishEvent(new BasketEvent(this, basket.getId(), basketTopicMessage.getPayload(), BasketOperationType.ADD_ITEM));
     }
 

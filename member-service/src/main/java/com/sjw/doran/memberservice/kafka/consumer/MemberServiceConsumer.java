@@ -6,9 +6,12 @@ import com.sjw.doran.memberservice.kafka.common.BasketOperationType;
 import com.sjw.doran.memberservice.kafka.common.OperationType;
 import com.sjw.doran.memberservice.kafka.common.Topic;
 import com.sjw.doran.memberservice.kafka.member.MemberTopicMessage;
+import com.sjw.doran.memberservice.mapper.BasketItemMapper;
 import com.sjw.doran.memberservice.mapper.BasketMapper;
 import com.sjw.doran.memberservice.mapper.CustomObjectMapper;
+import com.sjw.doran.memberservice.mongodb.BasketDocument;
 import com.sjw.doran.memberservice.mongodb.BasketDocumentRepository;
+import com.sjw.doran.memberservice.redis.BasketItemListCache;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -22,7 +25,9 @@ public class MemberServiceConsumer {
 
     private final CustomObjectMapper objectMapper = new CustomObjectMapper();
     private final BasketMapper basketMapper;
+    private final BasketItemMapper basketItemMapper;
     private final BasketDocumentRepository basketDocumentRepository;
+    private final BasketItemListCache basketItemListCache;
 
     @KafkaListener(topics = {Topic.MEMBER_TOPIC }, groupId = "member-consumer-group", concurrency = "3")
     public void listenMemberTopic(ConsumerRecord<String, String> record) throws JsonProcessingException {
@@ -82,7 +87,9 @@ public class MemberServiceConsumer {
             BasketTopicMessage.Payload payload = message.getPayload();
             log.info("[{}] Consumed BasketTopicMessage: {}",
                     message.getOperationType(), objectMapper.writeValueAsString(payload));
-            basketDocumentRepository.save(basketMapper.toBasketDocument(payload));
+            BasketDocument basketDocument = basketMapper.toBasketDocument(payload);
+            basketDocumentRepository.save(basketDocument);
+            basketItemListCache.set(basketMapper.toCachedBasket(basketDocument));
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
@@ -94,6 +101,7 @@ public class MemberServiceConsumer {
             log.info("[{}] Consumed BasketTopicMessage: {}",
                     message.getOperationType(), objectMapper.writeValueAsString(payload));
             basketDocumentRepository.addBasketItem(payload.getId(), payload.getBasketItems().get(0));
+            basketItemListCache.addBasketItem(payload.getId(), basketItemMapper.toCachedBasketItem(payload.getBasketItems().get(0)));
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
@@ -105,6 +113,7 @@ public class MemberServiceConsumer {
             log.info("[{}] Consumed BasketTopicMessage: {}",
                     message.getOperationType(), objectMapper.writeValueAsString(payload));
             basketDocumentRepository.deleteBasketItemByItemUuid(payload.getId(), payload.getBasketItems().get(0).getItemUuid());
+            basketItemListCache.removeBasketItem(payload.getId(), payload.getBasketItems().get(0).getItemUuid());
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
@@ -116,6 +125,7 @@ public class MemberServiceConsumer {
             log.info("[{}] Consumed BasketTopicMessage: {}",
                     message.getOperationType(), objectMapper.writeValueAsString(payload));
             basketDocumentRepository.delete(basketMapper.toBasketDocument(payload));
+            basketItemListCache.delete(payload.getId());
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }

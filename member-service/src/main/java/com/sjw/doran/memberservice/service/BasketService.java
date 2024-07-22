@@ -17,7 +17,7 @@ public interface BasketService {
     void deleteBasket(Member member);
 
     @Transactional
-    void addBasketItem(String userUuid, BasketItemCreateRequest basketItemCreateRequest);
+    void addBasketItem(String userUuid, BasketItemCreateRequest basketItemCreateRequest) throws InterruptedException;
 
     @Transactional
     void deleteBasketItem(String userUuid, String itemUuid);

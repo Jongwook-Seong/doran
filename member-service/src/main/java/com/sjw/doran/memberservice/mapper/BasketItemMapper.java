@@ -5,7 +5,10 @@ import com.sjw.doran.memberservice.entity.Basket;
 import com.sjw.doran.memberservice.entity.BasketItem;
 import com.sjw.doran.memberservice.kafka.basket.BasketTopicMessage;
 import com.sjw.doran.memberservice.mongodb.BasketDocument;
+import com.sjw.doran.memberservice.redis.CachedBasket;
 import com.sjw.doran.memberservice.vo.request.BasketItemCreateRequest;
+import com.sjw.doran.memberservice.vo.response.item.ItemSimpleResponse;
+import com.sjw.doran.memberservice.vo.response.item.ItemSimpleWithCountResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -27,6 +30,14 @@ public interface BasketItemMapper {
 
     List<BasketTopicMessage.BasketItemData> toBasketItemDataList(List<BasketItem> basketItems);
 
+    @Mapping(target = "itemUuid", source = "itemSimpleResponse.itemUuid")
+    @Mapping(target = "itemName", source = "itemSimpleResponse.itemName")
+    @Mapping(target = "itemImageUrl", source = "itemSimpleResponse.itemImageUrl")
+    @Mapping(target = "category", source = "itemSimpleResponse.category")
+    @Mapping(target = "price", source = "itemSimpleResponse.price")
+    @Mapping(target = "count", source = "count")
+    BasketTopicMessage.BasketItemData toBasketTopicMessageBasketItemDataFromItemSimpleResponse(ItemSimpleResponse itemSimpleResponse, int count);
+
     @Mapping(target = "itemUuid", source = "basketItemData.itemUuid")
     @Mapping(target = "itemName", source = "basketItemData.itemName")
     @Mapping(target = "itemImageUrl", source = "basketItemData.itemImageUrl")
@@ -42,6 +53,16 @@ public interface BasketItemMapper {
     BasketDocument.Item toBasketDocumentItem(BasketItem basketItem);
 
     List<BasketDocument.Item> toBasketDocumentItemListFromBasketItemList(List<BasketItem> basketItems);
+
+    ItemSimpleWithCountResponse toItemSimpleWCResponse(CachedBasket.CachedBasketItem basketItem);
+
+    List<ItemSimpleWithCountResponse> toItemSimpleWCResponseList(List<CachedBasket.CachedBasketItem> basketItems);
+
+    CachedBasket.CachedBasketItem toCachedBasketItem(BasketDocument.Item item);
+
+    List<CachedBasket.CachedBasketItem> toCachedBasketItemList(List<BasketDocument.Item> items);
+
+    CachedBasket.CachedBasketItem toCachedBasketItem(BasketTopicMessage.BasketItemData item);
 
     @Mapping(target = "basket", source = "basket")
     @Mapping(target = "itemUuid", source = "basketDocumentItem.itemUuid")

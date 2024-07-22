@@ -41,7 +41,7 @@ public class BasketServiceImpl implements BasketService {
 
     @Override
     @Transactional
-    public void addBasketItem(String userUuid, BasketItemCreateRequest basketItemCreateRequest) {
+    public void addBasketItem(String userUuid, BasketItemCreateRequest basketItemCreateRequest) throws InterruptedException {
         Optional<Member> member = memberRepository.findByUserUuid(userUuid);
         if (member.isEmpty()) {
             return;

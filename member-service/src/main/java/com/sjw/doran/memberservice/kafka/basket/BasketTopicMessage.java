@@ -37,5 +37,10 @@ public class BasketTopicMessage {
         private Category category;
         private int price;
         private int count;
+
+        public BasketItemData(String itemUuid, int count) {
+            this.itemUuid = itemUuid;
+            this.count = count;
+        }
     }
 }
