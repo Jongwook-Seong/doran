@@ -89,3 +89,10 @@ services:
       - MONGO_INITDB_DATABASE=doran
     volumes:
       - ./.data/mongodb:/data/db
+  redis:
+    image: 'redis:6.0.20'
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./.data/redis:/data
