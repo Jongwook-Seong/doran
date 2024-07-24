@@ -1,4 +1,4 @@
-package com.sjw.doran.itemservice.mongodb;
+package com.sjw.doran.itemservice.mongodb.item;
 
 import com.sjw.doran.itemservice.entity.Category;
 import lombok.AllArgsConstructor;

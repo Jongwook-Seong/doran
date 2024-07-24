@@ -36,6 +36,8 @@ public class ItemTopicMessage {
 
         private LocalDateTime createdAt;
         private LocalDateTime modifiedAt;
+
+        private int latestOrderQuantity;
     }
 
     @Data

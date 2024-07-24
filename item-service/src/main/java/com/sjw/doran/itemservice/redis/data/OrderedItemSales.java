@@ -15,5 +15,4 @@ public class OrderedItemSales {
     @Id
     private String itemUuid;
     private Long sales;
-    private boolean isBest;
 }

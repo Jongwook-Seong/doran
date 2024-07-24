@@ -1,9 +1,8 @@
-package com.sjw.doran.itemservice.mongodb;
+package com.sjw.doran.itemservice.mongodb.item;
 
 import com.sjw.doran.itemservice.entity.Category;
 import com.sjw.doran.itemservice.kafka.item.ItemTopicMessage;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.mongodb.core.BulkOperations;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;

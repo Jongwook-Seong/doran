@@ -5,7 +5,8 @@ import com.sjw.doran.itemservice.entity.Book;
 import com.sjw.doran.itemservice.entity.Category;
 import com.sjw.doran.itemservice.kafka.common.OperationType;
 import com.sjw.doran.itemservice.kafka.item.ItemTopicMessage;
-import com.sjw.doran.itemservice.mongodb.ItemDocument;
+import com.sjw.doran.itemservice.mongodb.item.ItemDocument;
+import com.sjw.doran.itemservice.redis.data.BestItem;
 import com.sjw.doran.itemservice.vo.request.BookCreateRequest;
 import com.sjw.doran.itemservice.vo.response.ItemSimpleResponse;
 import org.mapstruct.Mapper;
@@ -38,7 +39,8 @@ public interface BookMapper {
     @Mapping(target = "payload.bookData", source = "book")
     @Mapping(target = "payload.createdAt", source = "book.createdAt")
     @Mapping(target = "payload.modifiedAt", source = "book.modifiedAt")
-    ItemTopicMessage toItemTopicMessage(Book book, OperationType operationType);
+    @Mapping(target = "payload.latestOrderQuantity", source = "orderQuantity")
+    ItemTopicMessage toItemTopicMessage(Book book, int orderQuantity, OperationType operationType);
 
     @Mapping(target = "author", source = "book.author")
     @Mapping(target = "isbn", source = "book.isbn")
@@ -79,4 +81,6 @@ public interface BookMapper {
     @Mapping(target = "contentsTable", source = "itemDocument.bookInfo.contentsTable")
     @Mapping(target = "bookReview", source = "itemDocument.bookInfo.bookReview")
     Book toBook(ItemDocument itemDocument);
+
+    BestItem.BookInfo toBestItemBookInfo(ItemDocument.BookInfo bookInfo);
 }

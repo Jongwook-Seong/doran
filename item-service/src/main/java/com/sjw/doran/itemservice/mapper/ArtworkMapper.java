@@ -3,7 +3,8 @@ package com.sjw.doran.itemservice.mapper;
 import com.sjw.doran.itemservice.entity.Artwork;
 import com.sjw.doran.itemservice.kafka.common.OperationType;
 import com.sjw.doran.itemservice.kafka.item.ItemTopicMessage;
-import com.sjw.doran.itemservice.mongodb.ItemDocument;
+import com.sjw.doran.itemservice.mongodb.item.ItemDocument;
+import com.sjw.doran.itemservice.redis.data.BestItem;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -27,7 +28,8 @@ public interface ArtworkMapper {
     @Mapping(target = "payload.artworkData", source = "artwork")
     @Mapping(target = "payload.createdAt", source = "artwork.createdAt")
     @Mapping(target = "payload.modifiedAt", source = "artwork.modifiedAt")
-    ItemTopicMessage toItemTopicMessage(Artwork artwork, OperationType operationType);
+    @Mapping(target = "payload.latestOrderQuantity", source = "orderQuantity")
+    ItemTopicMessage toItemTopicMessage(Artwork artwork, int orderQuantity, OperationType operationType);
 
     @Mapping(target = "artist", source = "artwork.artist")
     @Mapping(target = "explanation", source = "artwork.explanation")
@@ -49,4 +51,6 @@ public interface ArtworkMapper {
     @Mapping(target = "createdAt", source = "createdAt")
     @Mapping(target = "modifiedAt", source = "modifiedAt")
     ItemDocument toItemDocument(ItemTopicMessage.Payload payload);
+
+    BestItem.ArtworkInfo toBestItemArtworkInfo(ItemDocument.ArtworkInfo artworkInfo);
 }

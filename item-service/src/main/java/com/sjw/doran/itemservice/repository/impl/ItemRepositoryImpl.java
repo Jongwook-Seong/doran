@@ -113,6 +113,12 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
                 .where(item.itemUuid.in(itemUuidList))
                 .fetch();
 
-        return updatedItems;
+        Map<String, Item> updatedItemsMap = updatedItems.stream()
+                .collect(Collectors.toMap(Item::getItemUuid, item -> item));
+        List<Item> sortedUpdatedItems = itemUuidList.stream()
+                .map(updatedItemsMap::get)
+                .collect(Collectors.toList());
+
+        return sortedUpdatedItems;
     }
 }

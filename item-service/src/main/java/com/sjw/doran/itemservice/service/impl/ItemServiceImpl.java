@@ -1,7 +1,6 @@
 package com.sjw.doran.itemservice.service.impl;
 
 import com.sjw.doran.itemservice.dto.BookDto;
-import com.sjw.doran.itemservice.dto.ItemDto;
 import com.sjw.doran.itemservice.entity.Artwork;
 import com.sjw.doran.itemservice.entity.Book;
 import com.sjw.doran.itemservice.entity.Category;
@@ -12,10 +11,9 @@ import com.sjw.doran.itemservice.kafka.item.ItemTopicMessage;
 import com.sjw.doran.itemservice.mapper.ArtworkMapper;
 import com.sjw.doran.itemservice.mapper.BookMapper;
 import com.sjw.doran.itemservice.mapper.ItemMapper;
-import com.sjw.doran.itemservice.mongodb.ItemDocument;
-import com.sjw.doran.itemservice.mongodb.ItemDocumentRepository;
+import com.sjw.doran.itemservice.mongodb.item.ItemDocument;
+import com.sjw.doran.itemservice.mongodb.item.ItemDocumentRepository;
 import com.sjw.doran.itemservice.repository.ItemRepository;
-import com.sjw.doran.itemservice.service.AwsS3UploadService;
 import com.sjw.doran.itemservice.service.ItemService;
 import com.sjw.doran.itemservice.util.MessageUtil;
 import com.sjw.doran.itemservice.vo.request.BookCreateRequest;
@@ -62,7 +60,7 @@ public class ItemServiceImpl implements ItemService {
         try {
             Item savedItem = itemRepository.save(item);
             /* Publish kafka message */
-            ItemTopicMessage message = bookMapper.toItemTopicMessage((Book)savedItem, null);
+            ItemTopicMessage message = bookMapper.toItemTopicMessage((Book)savedItem, 0, null);
             applicationEventPublisher.publishEvent(new ItemEvent(this, message.getId(), message.getPayload(), OperationType.CREATE));
         } catch (Exception e) {
             throw new RuntimeException(messageUtil.getItemCreateErrorMessage());
@@ -120,12 +118,12 @@ public class ItemServiceImpl implements ItemService {
     public void subtractItems(List<String> itemUuidList, List<Integer> countList) {
         List<Item> items = itemRepository.updateStockQuantity(itemUuidList, countList);
         /* Publish kafka message */
-        for (Item item : items) {
-            if (item.getCategory() == Category.BOOK) {
-                ItemTopicMessage message = bookMapper.toItemTopicMessage((Book) item, null);
+        for (int i = 0; i < items.size(); i++) {
+            if (items.get(i).getCategory() == Category.BOOK) {
+                ItemTopicMessage message = bookMapper.toItemTopicMessage((Book) items.get(i), countList.get(i), null);
                 applicationEventPublisher.publishEvent(new ItemEvent(this, message.getId(), message.getPayload(), OperationType.UPDATE));
-            } else if (item.getCategory() == Category.ARTWORK) {
-                ItemTopicMessage message = artworkMapper.toItemTopicMessage((Artwork) item, null);
+            } else if (items.get(i).getCategory() == Category.ARTWORK) {
+                ItemTopicMessage message = artworkMapper.toItemTopicMessage((Artwork) items.get(i), countList.get(i), null);
                 applicationEventPublisher.publishEvent(new ItemEvent(this, message.getId(), message.getPayload(), OperationType.UPDATE));
             }
         }
@@ -137,12 +135,12 @@ public class ItemServiceImpl implements ItemService {
         countList.replaceAll(count -> -count);
         List<Item> items = itemRepository.updateStockQuantity(itemUuidList, countList);
         /* Publish kafka message */
-        for (Item item : items) {
-            if (item.getCategory() == Category.BOOK) {
-                ItemTopicMessage message = bookMapper.toItemTopicMessage((Book) item, null);
+        for (int i = 0; i < items.size(); i++) {
+            if (items.get(i).getCategory() == Category.BOOK) {
+                ItemTopicMessage message = bookMapper.toItemTopicMessage((Book) items.get(i), countList.get(i), null);
                 applicationEventPublisher.publishEvent(new ItemEvent(this, message.getId(), message.getPayload(), OperationType.UPDATE));
-            } else if (item.getCategory() == Category.ARTWORK) {
-                ItemTopicMessage message = artworkMapper.toItemTopicMessage((Artwork) item, null);
+            } else if (items.get(i).getCategory() == Category.ARTWORK) {
+                ItemTopicMessage message = artworkMapper.toItemTopicMessage((Artwork) items.get(i), countList.get(i), null);
                 applicationEventPublisher.publishEvent(new ItemEvent(this, message.getId(), message.getPayload(), OperationType.UPDATE));
             }
         }
