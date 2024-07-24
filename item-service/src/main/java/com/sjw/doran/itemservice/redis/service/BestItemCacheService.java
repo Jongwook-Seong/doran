@@ -8,5 +8,5 @@ public interface BestItemCacheService {
 
     List<BestItem> getBestItems();
     void setBestItems();
-    void appendOrderData(String itemUuid, int orderQuantity);
+    void setOrderedItemSales();
 }

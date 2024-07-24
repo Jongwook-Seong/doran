@@ -1,6 +1,8 @@
 package com.sjw.doran.itemservice.redis.service;
 
 import com.sjw.doran.itemservice.mapper.ItemMapper;
+import com.sjw.doran.itemservice.mongodb.incidental.IncidentalDocument;
+import com.sjw.doran.itemservice.mongodb.incidental.IncidentalDocumentRepository;
 import com.sjw.doran.itemservice.mongodb.item.ItemDocument;
 import com.sjw.doran.itemservice.mongodb.item.ItemDocumentRepository;
 import com.sjw.doran.itemservice.redis.data.BestItem;
@@ -8,6 +10,7 @@ import com.sjw.doran.itemservice.redis.data.OrderedItemSales;
 import com.sjw.doran.itemservice.redis.repository.BestItemRedisRepository;
 import com.sjw.doran.itemservice.redis.repository.OrderedItemSalesRedisRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -22,7 +25,18 @@ public class BestItemCacheServiceImpl implements BestItemCacheService {
     private final OrderedItemSalesRedisRepository orderedItemSalesRedisRepository;
     private final BestItemRedisRepository bestItemRedisRepository;
     private final ItemDocumentRepository itemDocumentRepository;
+    private final IncidentalDocumentRepository incidentalDocumentRepository;
     private final ItemMapper itemMapper;
+
+    @Scheduled(cron = "0 0 0/1 * * *")
+    public void setOrderedItemSalesOnRedis() {
+        this.setOrderedItemSales();
+    }
+
+    @Scheduled(cron = "0 0 0/1 * * *")
+    public void setBestItemsOnRedis() {
+        this.setBestItems();
+    }
 
     @Override
     public List<BestItem> getBestItems() {
@@ -49,6 +63,15 @@ public class BestItemCacheServiceImpl implements BestItemCacheService {
     }
 
     @Override
-    public void appendOrderData(String itemUuid, int orderQuantity) {
+    public void setOrderedItemSales() {
+        List<IncidentalDocument> allIncidentalDocuments = incidentalDocumentRepository.findAll();
+        orderedItemSalesRedisRepository.deleteAll();
+        for (IncidentalDocument incidentalDocument : allIncidentalDocuments) {
+            long sales = 0L;
+            List<IncidentalDocument.OrderIncidentalData> incidentalDataList = incidentalDocument.getIncidentalDataList();
+            for (IncidentalDocument.OrderIncidentalData orderIncidentalData : incidentalDataList)
+                sales += orderIncidentalData.getOrderQuantity();
+            orderedItemSalesRedisRepository.save(new OrderedItemSales(incidentalDocument.getItemUuid(), sales));
+        }
     }
 }

@@ -13,7 +13,7 @@ import java.util.Date;
 @AllArgsConstructor
 @ToString
 @Builder
-@RedisHash(value = "best_item", timeToLive = 30)
+@RedisHash(value = "best_item", timeToLive = 7200)
 public class BestItem {
 
     @Id

@@ -26,7 +26,7 @@ public class IncidentalDocumentRepositoryImpl implements IncidentalDocumentCusto
         MatchOperation matchItemUuid = Aggregation.match(Criteria.where("_id").is(itemUuid));
         UnwindOperation unwindIncidentalDataList = Aggregation.unwind("incidentalDataList");
         MatchOperation matchWithinAnHour = Aggregation.match(Criteria.where("incidentalDataList.orderDateTime")
-                .gte(LocalDateTime.now().minusHours(1)));
+                .gte(LocalDateTime.now().minusDays(1L)));
         Aggregation aggregation = Aggregation.newAggregation(matchItemUuid, unwindIncidentalDataList, matchWithinAnHour,
                 Aggregation.project("itemUuid", "incidentalDataList")
                         .and("incidentalDataList.orderQuantity").as("orderQuantity")
@@ -58,7 +58,7 @@ public class IncidentalDocumentRepositoryImpl implements IncidentalDocumentCusto
     public void deleteOlderThanOneHour() {
         Query query = new Query();
         Update update = new Update().pull("incidentalDataList",
-                new Query(Criteria.where("orderDateTime").lt(LocalDateTime.now().minusHours(1))));
+                new Query(Criteria.where("orderDateTime").lt(LocalDateTime.now().minusDays(1L))));
         mongoTemplate.updateMulti(query, update, IncidentalDocument.class);
     }
 }
