@@ -10,6 +10,7 @@ import com.sjw.doran.itemservice.redis.data.OrderedItemSales;
 import com.sjw.doran.itemservice.redis.repository.BestItemRedisRepository;
 import com.sjw.doran.itemservice.redis.repository.OrderedItemSalesRedisRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -39,6 +40,7 @@ public class BestItemCacheServiceImpl implements BestItemCacheService {
     }
 
     @Override
+    @Cacheable(value = "BestItemList")
     public List<BestItem> getBestItems() {
         Iterable<BestItem> findBestItemIterable = bestItemRedisRepository.findAll();
         List<BestItem> bestItems = new ArrayList<>();
