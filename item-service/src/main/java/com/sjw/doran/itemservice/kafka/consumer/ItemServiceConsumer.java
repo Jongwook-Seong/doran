@@ -8,7 +8,8 @@ import com.sjw.doran.itemservice.kafka.item.ItemTopicMessage;
 import com.sjw.doran.itemservice.mapper.ArtworkMapper;
 import com.sjw.doran.itemservice.mapper.BookMapper;
 import com.sjw.doran.itemservice.mapper.CustomObjectMapper;
-import com.sjw.doran.itemservice.mongodb.ItemDocumentRepository;
+import com.sjw.doran.itemservice.mongodb.incidental.IncidentalDocumentRepository;
+import com.sjw.doran.itemservice.mongodb.item.ItemDocumentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -24,6 +25,7 @@ public class ItemServiceConsumer {
     private final BookMapper bookMapper;
     private final ArtworkMapper artworkMapper;
     private final ItemDocumentRepository itemDocumentRepository;
+    private final IncidentalDocumentRepository incidentalDocumentRepository;
 
     @KafkaListener(topics = { Topic.ITEM_TOPIC }, groupId = "item-consumer-group", concurrency = "3")
     public void listenItemTopic(ConsumerRecord<String, String> record) throws JsonProcessingException {
@@ -58,6 +60,7 @@ public class ItemServiceConsumer {
             log.info("[{}] Consumed ItemTopicMessage: {}",
                     message.getOperationType(), objectMapper.writeValueAsString(payload));
             itemDocumentRepository.updateItemDocument(message.getId(), payload);
+            incidentalDocumentRepository.saveAnIncidentalData(payload.getItemUuid(), payload.getLatestOrderQuantity());
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }

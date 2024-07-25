@@ -13,8 +13,8 @@ public interface BasketItemService {
     List<ItemSimpleWithCountResponse> findAllByBasket(Basket basket) throws InterruptedException;
 
     @Transactional
-    void addBasketItem(Basket basket, BasketItemCreateRequest basketItemCreateRequest);
+    void addBasketItem(Basket basket, String userUuid, BasketItemCreateRequest basketItemCreateRequest) throws InterruptedException;
 
     @Transactional
-    void deleteBasketItem(Basket basket, String itemUuid);
+    void deleteBasketItem(Basket basket, String userUuid, String itemUuid);
 }

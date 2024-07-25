@@ -81,7 +81,7 @@ public class MemberServiceImpl implements MemberService {
                 MemberTopicMessage memberTopicMessage = memberMapper.toMemberTopicMessage(savedMember, savedMember.getAddress(), null);
                 applicationEventPublisher.publishEvent(
                         new MemberEvent(this, memberTopicMessage.getId(), memberTopicMessage.getPayload(), OperationType.CREATE));
-                BasketTopicMessage basketTopicMessage = basketMapper.toBasketTopicMessage(savedBasket, null, null);
+                BasketTopicMessage basketTopicMessage = basketMapper.toBasketTopicMessage(savedBasket, null, member.getUserUuid(), null);
                 applicationEventPublisher.publishEvent(
                         new BasketEvent(this, basketTopicMessage.getId(), basketTopicMessage.getPayload(), BasketOperationType.CREATE));
             } catch (Exception e) {

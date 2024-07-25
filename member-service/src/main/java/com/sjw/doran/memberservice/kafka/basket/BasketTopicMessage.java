@@ -1,5 +1,6 @@
 package com.sjw.doran.memberservice.kafka.basket;
 
+import com.sjw.doran.memberservice.entity.Category;
 import com.sjw.doran.memberservice.kafka.common.BasketOperationType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,6 +23,7 @@ public class BasketTopicMessage {
     public static class Payload {
 
         private Long id;
+        private String userUuid;
         private List<BasketItemData> basketItems;
     }
 
@@ -31,6 +33,15 @@ public class BasketTopicMessage {
     public static class BasketItemData {
 
         private String itemUuid;
+        private String itemName;
+        private String itemImageUrl;
+        private Category category;
+        private int price;
         private int count;
+
+        public BasketItemData(String itemUuid, int count) {
+            this.itemUuid = itemUuid;
+            this.count = count;
+        }
     }
 }

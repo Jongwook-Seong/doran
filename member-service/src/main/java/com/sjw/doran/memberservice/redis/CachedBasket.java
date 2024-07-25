@@ -1,28 +1,26 @@
-package com.sjw.doran.memberservice.mongodb;
+package com.sjw.doran.memberservice.redis;
 
 import com.sjw.doran.memberservice.entity.Category;
-import org.springframework.data.annotation.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.annotation.Id;
 
 import java.util.List;
 
-@Document(collection = "basketItemList")
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
-public class BasketDocument {
+public class CachedBasket {
 
     @Id
-    private Long id;
     private String userUuid;
-    private List<Item> items;
+    private List<CachedBasketItem> items;
 
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class Item {
+    public static class CachedBasketItem {
 
         private String itemUuid;
         private String itemName;

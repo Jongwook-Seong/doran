@@ -41,13 +41,13 @@ public class BasketServiceImpl implements BasketService {
 
     @Override
     @Transactional
-    public void addBasketItem(String userUuid, BasketItemCreateRequest basketItemCreateRequest) {
+    public void addBasketItem(String userUuid, BasketItemCreateRequest basketItemCreateRequest) throws InterruptedException {
         Optional<Member> member = memberRepository.findByUserUuid(userUuid);
         if (member.isEmpty()) {
             return;
         }
         Basket basket = basketRepository.findByMember(member.get());
-        basketItemService.addBasketItem(basket, basketItemCreateRequest);
+        basketItemService.addBasketItem(basket, userUuid, basketItemCreateRequest);
     }
 
     @Override
@@ -58,6 +58,6 @@ public class BasketServiceImpl implements BasketService {
             return;
         }
         Basket basket = basketRepository.findByMember(member.get());
-        basketItemService.deleteBasketItem(basket, itemUuid);
+        basketItemService.deleteBasketItem(basket, userUuid, itemUuid);
     }
 }

@@ -1,4 +1,4 @@
-package com.sjw.doran.itemservice.mongodb;
+package com.sjw.doran.itemservice.mongodb.item;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 

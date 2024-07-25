@@ -1,5 +1,6 @@
 package com.sjw.doran.memberservice.vo.response.item;
 
+import com.sjw.doran.memberservice.entity.Category;
 import lombok.Builder;
 import lombok.Data;
 
@@ -10,6 +11,7 @@ public class ItemSimpleWithCountResponse {
     private String itemUuid;
     private String itemName;
     private String itemImageUrl;
+    private Category category;
     private int price;
     private int totalPrice;
     private int count;
@@ -19,6 +21,7 @@ public class ItemSimpleWithCountResponse {
                 .itemUuid(itemSimpleResponse.getItemUuid())
                 .itemName(itemSimpleResponse.getItemName())
                 .itemImageUrl(itemSimpleResponse.getItemImageUrl())
+                .category(itemSimpleResponse.getCategory())
                 .price(itemSimpleResponse.getPrice())
                 .totalPrice(itemSimpleResponse.getPrice() * count)
                 .count(count)

@@ -1,26 +1,26 @@
-package com.sjw.doran.itemservice.mongodb;
+package com.sjw.doran.itemservice.redis.data;
 
 import com.sjw.doran.itemservice.entity.Category;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.redis.core.RedisHash;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Date;
 
-@Document(collection = "itemInfo")
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
-public class ItemDocument {
+@ToString
+@Builder
+@RedisHash(value = "best_item", timeToLive = 7200)
+public class BestItem implements Serializable {
 
     @Id
-    private Long id;
     private String itemUuid;
     private String itemName;
     private int price;
-    private int stockQuantity;
     private String itemImageUrl;
     private Category category;
 
@@ -33,7 +33,7 @@ public class ItemDocument {
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class BookInfo {
+    public static class BookInfo implements Serializable {
 
         private String author;
         private String isbn;
@@ -46,7 +46,7 @@ public class ItemDocument {
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class ArtworkInfo {
+    public static class ArtworkInfo implements Serializable {
 
         private String artist;
         private String explanation;

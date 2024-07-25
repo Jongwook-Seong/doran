@@ -2,6 +2,9 @@ package com.sjw.doran.memberservice.controller;
 
 import com.sjw.doran.memberservice.entity.Basket;
 import com.sjw.doran.memberservice.entity.Member;
+import com.sjw.doran.memberservice.mapper.BasketItemMapper;
+import com.sjw.doran.memberservice.redis.BasketItemListCache;
+import com.sjw.doran.memberservice.redis.CachedBasket;
 import com.sjw.doran.memberservice.service.BasketItemService;
 import com.sjw.doran.memberservice.service.BasketService;
 import com.sjw.doran.memberservice.service.MemberService;
@@ -33,6 +36,8 @@ public class BasketController {
     private final MemberService memberService;
     private final BasketService basketService;
     private final BasketItemService basketItemService;
+    private final BasketItemListCache basketItemListCache;
+    private final BasketItemMapper basketItemMapper;
     private final MessageUtil messageUtil;
 
     @PostMapping("/addItem")
@@ -42,7 +47,7 @@ public class BasketController {
                     content = {@Content(schema = @Schema(implementation = ResponseEntity.class))}),
             @ApiResponse(responseCode = "500", description = "Fail")
     })
-    public ResponseEntity<BasketItemResponse> setBasketItem(@RequestHeader String userUuid, @Valid @RequestBody BasketItemCreateRequest basketItemCreateRequest) {
+    public ResponseEntity<BasketItemResponse> setBasketItem(@RequestHeader String userUuid, @Valid @RequestBody BasketItemCreateRequest basketItemCreateRequest) throws InterruptedException {
         if (userUuid.isEmpty()) {
             throw new NoSuchElementException(messageUtil.getUserUuidEmptyMessage());
         }
@@ -73,6 +78,12 @@ public class BasketController {
         if (userUuid.isEmpty()) {
             throw new NoSuchElementException(messageUtil.getUserUuidEmptyMessage());
         }
+
+        CachedBasket cachedBasket = basketItemListCache.get(userUuid);
+        if (cachedBasket != null)
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(basketItemMapper.toItemSimpleWCResponseList(cachedBasket.getItems()));
+
         Member member = memberService.findMember(userUuid);
         Basket basket = basketService.findBasket(member);
         List<ItemSimpleWithCountResponse> basketItemSimpleWithCountResponseList = basketItemService.findAllByBasket(basket);

@@ -1,6 +1,8 @@
 package com.sjw.doran.itemservice.controller;
 
 import com.sjw.doran.itemservice.entity.Item;
+import com.sjw.doran.itemservice.redis.data.BestItem;
+import com.sjw.doran.itemservice.redis.service.BestItemCacheService;
 import com.sjw.doran.itemservice.service.ItemService;
 import com.sjw.doran.itemservice.util.MessageUtil;
 import com.sjw.doran.itemservice.vo.request.BookCreateRequest;
@@ -20,7 +22,15 @@ import java.util.*;
 public class ItemController {
 
     private final ItemService itemService;
+    private final BestItemCacheService bestItemCacheService;
     private final MessageUtil messageUtil;
+
+    /** 베스트상품 목록 조회하기 **/
+    @GetMapping("/bestitems")
+    public ResponseEntity<List<BestItem>> getBestItems() {
+        List<BestItem> bestItems = bestItemCacheService.getBestItems();
+        return new ResponseEntity<>(bestItems, HttpStatus.OK);
+    }
 
     // 임시
     /** 책 상세 보기 **/
