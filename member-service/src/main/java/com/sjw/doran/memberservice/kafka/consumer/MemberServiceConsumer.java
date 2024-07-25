@@ -101,7 +101,7 @@ public class MemberServiceConsumer {
             log.info("[{}] Consumed BasketTopicMessage: {}",
                     message.getOperationType(), objectMapper.writeValueAsString(payload));
             basketDocumentRepository.addBasketItem(payload.getId(), payload.getBasketItems().get(0));
-            basketItemListCache.addBasketItem(payload.getId(), basketItemMapper.toCachedBasketItem(payload.getBasketItems().get(0)));
+            basketItemListCache.addBasketItem(payload.getUserUuid(), basketItemMapper.toCachedBasketItem(payload.getBasketItems().get(0)));
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
@@ -113,7 +113,7 @@ public class MemberServiceConsumer {
             log.info("[{}] Consumed BasketTopicMessage: {}",
                     message.getOperationType(), objectMapper.writeValueAsString(payload));
             basketDocumentRepository.deleteBasketItemByItemUuid(payload.getId(), payload.getBasketItems().get(0).getItemUuid());
-            basketItemListCache.removeBasketItem(payload.getId(), payload.getBasketItems().get(0).getItemUuid());
+            basketItemListCache.removeBasketItem(payload.getUserUuid(), payload.getBasketItems().get(0).getItemUuid());
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
@@ -125,7 +125,7 @@ public class MemberServiceConsumer {
             log.info("[{}] Consumed BasketTopicMessage: {}",
                     message.getOperationType(), objectMapper.writeValueAsString(payload));
             basketDocumentRepository.delete(basketMapper.toBasketDocument(payload));
-            basketItemListCache.delete(payload.getId());
+            basketItemListCache.delete(payload.getUserUuid());
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }

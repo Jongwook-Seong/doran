@@ -11,6 +11,7 @@ import com.sjw.doran.itemservice.vo.request.BookCreateRequest;
 import com.sjw.doran.itemservice.vo.response.ItemSimpleResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
 
 import java.util.UUID;
@@ -29,17 +30,7 @@ public interface BookMapper {
 
     @Mapping(target = "id", source = "book.id")
     @Mapping(target = "operationType", source = "operationType")
-    @Mapping(target = "payload.id", source = "book.id")
-    @Mapping(target = "payload.itemUuid", source = "book.itemUuid")
-    @Mapping(target = "payload.itemName", source = "book.itemName")
-    @Mapping(target = "payload.price", source = "book.price")
-    @Mapping(target = "payload.stockQuantity", source = "book.stockQuantity")
-    @Mapping(target = "payload.itemImageUrl", source = "book.itemImageUrl")
-    @Mapping(target = "payload.category", source = "book.category")
-    @Mapping(target = "payload.bookData", source = "book")
-    @Mapping(target = "payload.createdAt", source = "book.createdAt")
-    @Mapping(target = "payload.modifiedAt", source = "book.modifiedAt")
-    @Mapping(target = "payload.latestOrderQuantity", source = "orderQuantity")
+    @Mapping(target = "payload", expression = "java(mapPayload(book, orderQuantity))")
     ItemTopicMessage toItemTopicMessage(Book book, int orderQuantity, OperationType operationType);
 
     @Mapping(target = "author", source = "book.author")
@@ -49,6 +40,19 @@ public interface BookMapper {
     @Mapping(target = "contentsTable", source = "book.contentsTable")
     @Mapping(target = "bookReview", source = "book.bookReview")
     ItemTopicMessage.BookData toItemTopicMessageBookData(Book book);
+
+    @Mapping(target = "id", source = "book.id")
+    @Mapping(target = "itemUuid", source = "book.itemUuid")
+    @Mapping(target = "itemName", source = "book.itemName")
+    @Mapping(target = "price", source = "book.price")
+    @Mapping(target = "stockQuantity", source = "book.stockQuantity")
+    @Mapping(target = "itemImageUrl", source = "book.itemImageUrl")
+    @Mapping(target = "category", source = "book.category")
+    @Mapping(target = "bookData", source = "book")
+    @Mapping(target = "createdAt", source = "book.createdAt")
+    @Mapping(target = "modifiedAt", source = "book.modifiedAt")
+    @Mapping(target = "latestOrderQuantity", source = "orderQuantity")
+    ItemTopicMessage.Payload mapPayload(Book book, int orderQuantity);
 
     @Mapping(target = "id", source = "id")
     @Mapping(target = "itemUuid", source = "itemUuid")

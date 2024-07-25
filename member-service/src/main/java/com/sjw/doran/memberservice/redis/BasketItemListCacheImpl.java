@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -27,12 +29,12 @@ public class BasketItemListCacheImpl implements BasketItemListCache {
             throw new RuntimeException(e);
         }
         redisTemplate.opsForValue().set(
-                this.generateCacheKey(cachedBasket.getId()), jsonString, Duration.ofSeconds(EXPIRE_SECONDS));
+                this.generateCacheKey(cachedBasket.getUserUuid()), jsonString, Duration.ofSeconds(EXPIRE_SECONDS));
     }
 
     @Override
-    public CachedBasket get(Long basketId) {
-        String jsonString = redisTemplate.opsForValue().get(this.generateCacheKey(basketId));
+    public CachedBasket get(String userUuid) {
+        String jsonString = redisTemplate.opsForValue().get(this.generateCacheKey(userUuid));
         if (jsonString == null) return null;
         try {
             return objectMapper.readValue(jsonString, CachedBasket.class);
@@ -42,24 +44,30 @@ public class BasketItemListCacheImpl implements BasketItemListCache {
     }
 
     @Override
-    public void addBasketItem(Long basketId, CachedBasket.CachedBasketItem basketItem) {
-        CachedBasket cachedBasket = this.get(basketId);
-        if (cachedBasket != null) {
-            cachedBasket.getItems().add(basketItem);
-            String jsonString;
-            try {
-                jsonString = objectMapper.writeValueAsString(cachedBasket);
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
-            redisTemplate.opsForValue().set(
-                    this.generateCacheKey(cachedBasket.getId()), jsonString, Duration.ofSeconds(EXPIRE_SECONDS));
+    public void addBasketItem(String userUuid, CachedBasket.CachedBasketItem basketItem) {
+        CachedBasket cachedBasket = this.get(userUuid);
+        if (cachedBasket == null) {
+            cachedBasket = new CachedBasket(userUuid, List.of(basketItem));
+        } else {
+            if (cachedBasket.getItems() == null)
+                cachedBasket.setItems(List.of(basketItem));
+            else
+                cachedBasket.getItems().add(basketItem);
         }
+        String jsonString;
+        try {
+            jsonString = objectMapper.writeValueAsString(cachedBasket);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+        redisTemplate.opsForValue().set(
+                this.generateCacheKey(cachedBasket.getUserUuid()), jsonString, Duration.ofSeconds(EXPIRE_SECONDS));
+//        }
     }
 
     @Override
-    public void removeBasketItem(Long basketId, String itemUuid) {
-        CachedBasket cachedBasket = this.get(basketId);
+    public void removeBasketItem(String userUuid, String itemUuid) {
+        CachedBasket cachedBasket = this.get(userUuid);
         if (cachedBasket != null) {
             cachedBasket.getItems().removeIf(item -> item.getItemUuid().equals(itemUuid));
             String jsonString;
@@ -69,16 +77,16 @@ public class BasketItemListCacheImpl implements BasketItemListCache {
                 throw new RuntimeException(e);
             }
             redisTemplate.opsForValue().set(
-                    this.generateCacheKey(cachedBasket.getId()), jsonString, Duration.ofSeconds(EXPIRE_SECONDS));
+                    this.generateCacheKey(cachedBasket.getUserUuid()), jsonString, Duration.ofSeconds(EXPIRE_SECONDS));
         }
     }
 
     @Override
-    public void delete(Long basketId) {
-        redisTemplate.delete(this.generateCacheKey(basketId));
+    public void delete(String userUuid) {
+        redisTemplate.delete(this.generateCacheKey(userUuid));
     }
 
-    private String generateCacheKey(Long basketId) {
-        return KEY_PREFIX + basketId;
+    private String generateCacheKey(String userUuid) {
+        return KEY_PREFIX + userUuid;
     }
 }

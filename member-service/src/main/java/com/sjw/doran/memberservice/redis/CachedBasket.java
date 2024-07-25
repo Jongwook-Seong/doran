@@ -4,6 +4,7 @@ import com.sjw.doran.memberservice.entity.Category;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
 
 import java.util.List;
 
@@ -12,7 +13,8 @@ import java.util.List;
 @AllArgsConstructor
 public class CachedBasket {
 
-    private Long id;
+    @Id
+    private String userUuid;
     private List<CachedBasketItem> items;
 
     @Data

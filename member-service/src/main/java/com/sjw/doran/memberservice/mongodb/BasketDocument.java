@@ -16,6 +16,7 @@ public class BasketDocument {
 
     @Id
     private Long id;
+    private String userUuid;
     private List<Item> items;
 
     @Data

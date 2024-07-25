@@ -23,6 +23,7 @@ public class BasketTopicMessage {
     public static class Payload {
 
         private Long id;
+        private String userUuid;
         private List<BasketItemData> basketItems;
     }
 

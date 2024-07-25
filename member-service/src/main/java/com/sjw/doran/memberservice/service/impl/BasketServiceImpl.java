@@ -47,7 +47,7 @@ public class BasketServiceImpl implements BasketService {
             return;
         }
         Basket basket = basketRepository.findByMember(member.get());
-        basketItemService.addBasketItem(basket, basketItemCreateRequest);
+        basketItemService.addBasketItem(basket, userUuid, basketItemCreateRequest);
     }
 
     @Override
@@ -58,6 +58,6 @@ public class BasketServiceImpl implements BasketService {
             return;
         }
         Basket basket = basketRepository.findByMember(member.get());
-        basketItemService.deleteBasketItem(basket, itemUuid);
+        basketItemService.deleteBasketItem(basket, userUuid, itemUuid);
     }
 }
