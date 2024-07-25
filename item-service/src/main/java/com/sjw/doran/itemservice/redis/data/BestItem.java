@@ -5,6 +5,7 @@ import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Date;
 
@@ -14,13 +15,12 @@ import java.util.Date;
 @ToString
 @Builder
 @RedisHash(value = "best_item", timeToLive = 7200)
-public class BestItem {
+public class BestItem implements Serializable {
 
     @Id
     private String itemUuid;
     private String itemName;
     private int price;
-    private int stockQuantity;
     private String itemImageUrl;
     private Category category;
 
@@ -33,7 +33,7 @@ public class BestItem {
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class BookInfo {
+    public static class BookInfo implements Serializable {
 
         private String author;
         private String isbn;
@@ -46,7 +46,7 @@ public class BestItem {
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class ArtworkInfo {
+    public static class ArtworkInfo implements Serializable {
 
         private String artist;
         private String explanation;
