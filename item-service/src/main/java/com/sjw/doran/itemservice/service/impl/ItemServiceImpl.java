@@ -13,6 +13,7 @@ import com.sjw.doran.itemservice.mapper.BookMapper;
 import com.sjw.doran.itemservice.mapper.ItemMapper;
 import com.sjw.doran.itemservice.mongodb.item.ItemDocument;
 import com.sjw.doran.itemservice.mongodb.item.ItemDocumentRepository;
+import com.sjw.doran.itemservice.redis.lock.ItemStockLockFacade;
 import com.sjw.doran.itemservice.repository.ItemRepository;
 import com.sjw.doran.itemservice.service.ItemService;
 import com.sjw.doran.itemservice.util.MessageUtil;
@@ -32,6 +33,7 @@ import java.util.*;
 public class ItemServiceImpl implements ItemService {
 
     private final ItemRepository itemRepository;
+    private final ItemStockLockFacade itemStockLockFacade;
     private final ItemDocumentRepository itemDocumentRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final ItemMapper itemMapper;
@@ -116,7 +118,8 @@ public class ItemServiceImpl implements ItemService {
     @Override
     @Transactional
     public void subtractItems(List<String> itemUuidList, List<Integer> countList) {
-        List<Item> items = itemRepository.updateStockQuantity(itemUuidList, countList);
+//        List<Item> items = itemRepository.updateStockQuantity(itemUuidList, countList);
+        List<Item> items = itemStockLockFacade.decreaseStock(itemUuidList, countList);
         /* Publish kafka message */
         for (int i = 0; i < items.size(); i++) {
             if (items.get(i).getCategory() == Category.BOOK) {
@@ -133,7 +136,8 @@ public class ItemServiceImpl implements ItemService {
     @Transactional
     public void restoreItems(List<String> itemUuidList, List<Integer> countList) {
         countList.replaceAll(count -> -count);
-        List<Item> items = itemRepository.updateStockQuantity(itemUuidList, countList);
+//        List<Item> items = itemRepository.updateStockQuantity(itemUuidList, countList);
+        List<Item> items = itemStockLockFacade.decreaseStock(itemUuidList, countList);
         /* Publish kafka message */
         for (int i = 0; i < items.size(); i++) {
             if (items.get(i).getCategory() == Category.BOOK) {
