@@ -2,6 +2,7 @@ package com.sjw.doran.itemservice.controller;
 
 import com.sjw.doran.itemservice.entity.Item;
 import com.sjw.doran.itemservice.redis.data.BestItem;
+import com.sjw.doran.itemservice.redis.lock.ItemStockLockFacade;
 import com.sjw.doran.itemservice.redis.service.BestItemCacheService;
 import com.sjw.doran.itemservice.service.ItemService;
 import com.sjw.doran.itemservice.util.MessageUtil;
@@ -23,6 +24,7 @@ public class ItemController {
 
     private final ItemService itemService;
     private final BestItemCacheService bestItemCacheService;
+    private final ItemStockLockFacade itemStockLockFacade;
     private final MessageUtil messageUtil;
 
     /** 베스트상품 목록 조회하기 **/
@@ -60,14 +62,16 @@ public class ItemController {
     /** 아이템 구매하기 **/
     @PutMapping("/orderitems")
     public ResponseEntity<Void> orderItems(@RequestParam("itemUuidList") List<String> itemUuidList, @RequestParam("countList") List<Integer> countList) {
-        itemService.subtractItems(itemUuidList, countList);
+//        itemService.subtractItems(itemUuidList, countList);
+        itemStockLockFacade.decreaseStock(itemUuidList, countList);
         return ResponseEntity.accepted().build();
     }
 
     /** 아이템 구매 취소하기 **/
     @PutMapping("/orderitems/cancel")
     public ResponseEntity<Void> cancelOrderItems(@RequestParam("itemUuidList") List<String> itemUuidList, @RequestParam("countList") List<Integer> countList) {
-        itemService.restoreItems(itemUuidList, countList);
+//        itemService.restoreItems(itemUuidList, countList);
+        itemStockLockFacade.increaseStock(itemUuidList, countList);
         return ResponseEntity.accepted().build();
     }
 

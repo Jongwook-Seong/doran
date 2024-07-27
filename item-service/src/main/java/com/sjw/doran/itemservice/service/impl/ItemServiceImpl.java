@@ -24,6 +24,7 @@ import com.sjw.doran.itemservice.vo.response.ItemSimpleWithoutPriceResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
@@ -33,7 +34,7 @@ import java.util.*;
 public class ItemServiceImpl implements ItemService {
 
     private final ItemRepository itemRepository;
-    private final ItemStockLockFacade itemStockLockFacade;
+//    private final ItemStockLockFacade itemStockLockFacade;
     private final ItemDocumentRepository itemDocumentRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final ItemMapper itemMapper;
@@ -116,10 +117,9 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    @Transactional
-    public void subtractItems(List<String> itemUuidList, List<Integer> countList) {
-//        List<Item> items = itemRepository.updateStockQuantity(itemUuidList, countList);
-        List<Item> items = itemStockLockFacade.decreaseStock(itemUuidList, countList);
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public List<Item> subtractItems(List<String> itemUuidList, List<Integer> countList) {
+        List<Item> items = itemRepository.updateStockQuantity(itemUuidList, countList);
         /* Publish kafka message */
         for (int i = 0; i < items.size(); i++) {
             if (items.get(i).getCategory() == Category.BOOK) {
@@ -130,14 +130,14 @@ public class ItemServiceImpl implements ItemService {
                 applicationEventPublisher.publishEvent(new ItemEvent(this, message.getId(), message.getPayload(), OperationType.UPDATE));
             }
         }
+        return items;
     }
 
     @Override
-    @Transactional
-    public void restoreItems(List<String> itemUuidList, List<Integer> countList) {
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public List<Item> restoreItems(List<String> itemUuidList, List<Integer> countList) {
         countList.replaceAll(count -> -count);
-//        List<Item> items = itemRepository.updateStockQuantity(itemUuidList, countList);
-        List<Item> items = itemStockLockFacade.decreaseStock(itemUuidList, countList);
+        List<Item> items = itemRepository.updateStockQuantity(itemUuidList, countList);
         /* Publish kafka message */
         for (int i = 0; i < items.size(); i++) {
             if (items.get(i).getCategory() == Category.BOOK) {
@@ -148,5 +148,6 @@ public class ItemServiceImpl implements ItemService {
                 applicationEventPublisher.publishEvent(new ItemEvent(this, message.getId(), message.getPayload(), OperationType.UPDATE));
             }
         }
+        return items;
     }
 }
