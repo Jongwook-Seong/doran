@@ -117,4 +117,10 @@ public class RequestGenerateController {
 
         return itemRepository.findByItemUuidIn(itemUuidList);
     }
+
+    @GetMapping("/member/userUuids")
+    public String generateUserUuidsFile() {
+        memberRequestGenerateService.createHeaderValueJsonFile();
+        return "File created";
+    }
 }

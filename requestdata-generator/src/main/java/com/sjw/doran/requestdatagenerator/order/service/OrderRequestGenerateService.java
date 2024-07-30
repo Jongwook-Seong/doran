@@ -1,8 +1,8 @@
 package com.sjw.doran.requestdatagenerator.order.service;
 
 import com.sjw.doran.requestdatagenerator.common.Generator;
+import com.sjw.doran.requestdatagenerator.item.entity.Book;
 import com.sjw.doran.requestdatagenerator.item.entity.Category;
-import com.sjw.doran.requestdatagenerator.item.entity.Item;
 import com.sjw.doran.requestdatagenerator.item.repository.ItemRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -75,18 +75,18 @@ public class OrderRequestGenerateService {
         List<Integer> countList = new ArrayList<>();
         List<ItemSimpleInfo> itemSimpleInfoList = new ArrayList<>();
         for (int i = 0; i < itemCount; i++) {
-            Item item = itemRepository.findAnyByCategory(Category.BOOK);
-            itemUuidList.add(item.getItemUuid());
+            Book book = itemRepository.findAnyByCategory(Category.BOOK).orElse(null);
+            itemUuidList.add(book.getItemUuid());
             int count = generator.generateRandomInteger(10);
             if (count <= 0) count = 1;
             countList.add(count);
-            itemSimpleInfoList.add(new ItemSimpleInfo(item.getItemUuid(), count, item.getPrice()));
+            itemSimpleInfoList.add(new ItemSimpleInfo(book.getItemUuid(), count, book.getPrice()));
         }
 
-        String orederName = generator.generateRandomString(20);
+        String orderName = generator.generateRandomString(20);
         String receiverName = generator.generateRandomString(20);
         String receiverPhoneNumber = generator.generateRandomString(20);
-        TransceiverInfo transceiverInfo = new TransceiverInfo(orederName, receiverName, receiverPhoneNumber);
+        TransceiverInfo transceiverInfo = new TransceiverInfo(orderName, receiverName, receiverPhoneNumber);
 
         String city = generator.generateRandomString(20);
         String street = generator.generateRandomString(20);
