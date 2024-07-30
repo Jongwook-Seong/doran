@@ -1,23 +1,23 @@
-package com.fastcampus.kafkahandson.requestdatagenerator.service;
+package com.sjw.doran.requestdatagenerator.item.service;
 
-import com.fastcampus.kafkahandson.requestdatagenerator.common.Generator;
-import com.fastcampus.kafkahandson.requestdatagenerator.common.Memory;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.sjw.doran.requestdatagenerator.common.Generator;
+import com.sjw.doran.requestdatagenerator.common.Memory;
+import com.sjw.doran.requestdatagenerator.item.entity.Book;
+import com.sjw.doran.requestdatagenerator.item.repository.ItemRepository;
+import lombok.*;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
-import java.util.List;
 
 @Service
 public class ItemRequestGenerateService {
 
     private final Memory memory = Memory.getInstance();
+    private final ItemRepository itemRepository;
     private final Generator generator;
 
-    public ItemRequestGenerateService(Generator generator) {
+    public ItemRequestGenerateService(ItemRepository itemRepository, Generator generator) {
+        this.itemRepository = itemRepository;
         this.generator = generator;
     }
 
@@ -65,6 +65,36 @@ public class ItemRequestGenerateService {
                     .build();
         }
     }
+
+//    @Data
+//    @NoArgsConstructor
+//    @AllArgsConstructor
+//    @Builder
+//    public static class BookDto {
+//        private String itemName;
+//        private int price;
+//        private int stockQuantity;
+//        private String author;
+//        private String isbn;
+//        private int pages;
+//        private Date publicationDate;
+//        private String contentsTable;
+//        private String bookReview;
+//
+//        public static BookDto getInstance(Book book) {
+//            return BookDto.builder()
+//                    .itemName(book.getItemName())
+//                    .price(book.getPrice())
+//                    .stockQuantity(book.getStockQuantity())
+//                    .author(book.getAuthor())
+//                    .isbn(book.getIsbn())
+//                    .pages(book.getPages())
+//                    .publicationDate(book.getPublicationDate())
+//                    .contentsTable(book.getContentsTable())
+//                    .bookReview(book.getBookReview())
+//                    .build();
+//        }
+//    }
 
     public void setBookItems(long size) {
         for (long i = 1; i <= size; i++) {

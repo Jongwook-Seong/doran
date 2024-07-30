@@ -1,12 +1,13 @@
-package com.fastcampus.kafkahandson.requestdatagenerator.controller;
+package com.sjw.doran.requestdatagenerator.controller;
 
-import com.fastcampus.kafkahandson.requestdatagenerator.common.CustomObjectMapper;
-import com.fastcampus.kafkahandson.requestdatagenerator.common.Memory;
-import com.fastcampus.kafkahandson.requestdatagenerator.service.ItemRequestGenerateService;
+import com.sjw.doran.requestdatagenerator.common.CustomObjectMapper;
+import com.sjw.doran.requestdatagenerator.common.Memory;
+import com.sjw.doran.requestdatagenerator.item.entity.Item;
+import com.sjw.doran.requestdatagenerator.item.repository.ItemRepository;
+import com.sjw.doran.requestdatagenerator.item.service.ItemRequestGenerateService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.data.repository.query.Param;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.net.URI;
@@ -14,6 +15,7 @@ import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,6 +23,7 @@ import java.net.http.HttpResponse;
 public class RequestGenerateController {
 
     private final ItemRequestGenerateService itemRequestGenerateService;
+    private final ItemRepository itemRepository;
     private final Memory memory = Memory.getInstance();
     private final CustomObjectMapper objectMapper = new CustomObjectMapper();
 
@@ -41,5 +44,11 @@ public class RequestGenerateController {
             client.send(request, HttpResponse.BodyHandlers.ofString());
         }
         return "Items created";
+    }
+
+    @GetMapping("/item/booklist")
+    public List<Item> getBookList(@RequestParam("itemUuidList") List<String> itemUuidList) {
+
+        return itemRepository.findByItemUuidIn(itemUuidList);
     }
 }

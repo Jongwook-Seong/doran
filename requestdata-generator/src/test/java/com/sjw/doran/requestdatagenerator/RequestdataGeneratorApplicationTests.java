@@ -1,4 +1,4 @@
-package com.fastcampus.kafkahandson.requestdatagenerator;
+package com.sjw.doran.requestdatagenerator;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

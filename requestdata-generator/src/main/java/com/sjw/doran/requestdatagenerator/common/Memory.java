@@ -1,6 +1,6 @@
-package com.fastcampus.kafkahandson.requestdatagenerator.common;
+package com.sjw.doran.requestdatagenerator.common;
 
-import com.fastcampus.kafkahandson.requestdatagenerator.service.ItemRequestGenerateService;
+import com.sjw.doran.requestdatagenerator.item.service.ItemRequestGenerateService;
 import lombok.Data;
 import org.springframework.stereotype.Component;
 

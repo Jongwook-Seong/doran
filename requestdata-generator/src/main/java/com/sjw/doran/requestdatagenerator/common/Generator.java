@@ -1,4 +1,4 @@
-package com.fastcampus.kafkahandson.requestdatagenerator.common;
+package com.sjw.doran.requestdatagenerator.common;
 
 import org.springframework.stereotype.Component;
 
