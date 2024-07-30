@@ -1,40 +1,20 @@
 package com.sjw.doran.requestdatagenerator.item.service;
 
 import com.sjw.doran.requestdatagenerator.common.Generator;
-import com.sjw.doran.requestdatagenerator.common.Memory;
-import com.sjw.doran.requestdatagenerator.item.entity.Book;
 import com.sjw.doran.requestdatagenerator.item.repository.ItemRepository;
 import lombok.*;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
+@RequiredArgsConstructor
 public class ItemRequestGenerateService {
 
-    private final Memory memory = Memory.getInstance();
     private final ItemRepository itemRepository;
     private final Generator generator;
-
-    public ItemRequestGenerateService(ItemRepository itemRepository, Generator generator) {
-        this.itemRepository = itemRepository;
-        this.generator = generator;
-    }
-
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class BookItem {
-        private String itemName;
-        private int price;
-        private int stockQuantity;
-        private String author;
-        private String isbn;
-        private int pages;
-        private Date publicationDate;
-        private String contentsTable;
-        private String bookReview;
-    }
 
     @Data
     @NoArgsConstructor
@@ -51,19 +31,19 @@ public class ItemRequestGenerateService {
         private String contentsTable;
         private String bookReview;
 
-        public static BookCreateRequest getInstance(BookItem object) {
-            return BookCreateRequest.builder()
-                    .itemName(object.itemName)
-                    .price(object.price)
-                    .stockQuantity(object.stockQuantity)
-                    .author(object.author)
-                    .isbn(object.isbn)
-                    .pages(object.pages)
-                    .publicationDate(object.publicationDate)
-                    .contentsTable(object.contentsTable)
-                    .bookReview(object.bookReview)
-                    .build();
-        }
+//        public static BookCreateRequest getInstance(BookItem object) {
+//            return BookCreateRequest.builder()
+//                    .itemName(object.itemName)
+//                    .price(object.price)
+//                    .stockQuantity(object.stockQuantity)
+//                    .author(object.author)
+//                    .isbn(object.isbn)
+//                    .pages(object.pages)
+//                    .publicationDate(object.publicationDate)
+//                    .contentsTable(object.contentsTable)
+//                    .bookReview(object.bookReview)
+//                    .build();
+//        }
     }
 
 //    @Data
@@ -96,14 +76,15 @@ public class ItemRequestGenerateService {
 //        }
 //    }
 
-    public void setBookItems(long size) {
+    public Map<Long, BookCreateRequest> createBookCreateRequests(long size) {
+        Map<Long, BookCreateRequest> bookCreateRequestMap = new HashMap<>();
         for (long i = 1; i <= size; i++) {
-            BookItem bookItem = generate();
-            memory.getItemDataMap().put(i, bookItem);
+            bookCreateRequestMap.put(i, generateBookCreateRequest());
         }
+        return bookCreateRequestMap;
     }
 
-    private BookItem generate() {
+    private BookCreateRequest generateBookCreateRequest() {
         String itemName = generator.generateRandomString(20);
         int price = generator.generateRandomInteger();
         int stockQuantity = generator.generateRandomInteger();
@@ -116,6 +97,6 @@ public class ItemRequestGenerateService {
                 generator.generateRandomInteger(28));
         String contentsTable = generator.generateRandomString(20);
         String bookReview = generator.generateRandomString(20);
-        return new BookItem(itemName, price, stockQuantity, author, isbn, pages, publicationDate, contentsTable, bookReview);
+        return new BookCreateRequest(itemName, price, stockQuantity, author, isbn, pages, publicationDate, contentsTable, bookReview);
     }
 }

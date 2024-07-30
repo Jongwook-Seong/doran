@@ -2,6 +2,16 @@ spring:
   application:
     name: requestdata-generator
   datasource:
+    member:
+      jdbc-url: jdbc:mysql://localhost:3306/member
+      username: root
+      password: mysql
+      driver-class-name: com.mysql.cj.jdbc.Driver
+    order:
+      jdbc-url: jdbc:mysql://localhost:3306/orders
+      username: root
+      password: mysql
+      driver-class-name: com.mysql.cj.jdbc.Driver
     item:
       jdbc-url: jdbc:mysql://localhost:3306/item
       username: root
@@ -17,4 +27,3 @@ spring:
       hibernate:
         format_sql: true
         show_sql: true
-        dialect: org.hibernate.dialect.MySQL8Dialect
