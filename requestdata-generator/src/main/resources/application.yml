@@ -1,0 +1,29 @@
+spring:
+  application:
+    name: requestdata-generator
+  datasource:
+    member:
+      jdbc-url: jdbc:mysql://localhost:3306/member
+      username: root
+      password: mysql
+      driver-class-name: com.mysql.cj.jdbc.Driver
+    order:
+      jdbc-url: jdbc:mysql://localhost:3306/orders
+      username: root
+      password: mysql
+      driver-class-name: com.mysql.cj.jdbc.Driver
+    item:
+      jdbc-url: jdbc:mysql://localhost:3306/item
+      username: root
+      password: mysql
+      driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+      naming:
+        implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
