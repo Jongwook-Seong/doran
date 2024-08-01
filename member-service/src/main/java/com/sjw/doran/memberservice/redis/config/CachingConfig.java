@@ -1,4 +1,4 @@
-package com.sjw.doran.itemservice.redis.config;
+package com.sjw.doran.memberservice.redis.config;
 
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
@@ -18,8 +18,8 @@ public class CachingConfig {
     @Bean
     public CacheManager cacheManager(RedisConnectionFactory redisConnectionFactory) {
         RedisCacheConfiguration redisCacheConfiguration =
-                RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofHours(2L));
-//                RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofHours(1L));
+                RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofDays(1L));
+//                RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofMinutes(30L));
 
         return RedisCacheManager.builder(
                 RedisCacheWriter.nonLockingRedisCacheWriter(redisConnectionFactory))

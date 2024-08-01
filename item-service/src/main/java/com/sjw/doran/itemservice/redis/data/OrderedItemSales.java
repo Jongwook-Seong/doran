@@ -9,7 +9,8 @@ import org.springframework.data.redis.core.RedisHash;
 @AllArgsConstructor
 @ToString
 @Builder
-@RedisHash(value = "ordered_item_sales", timeToLive = 7200)
+@RedisHash(value = "ordered_item_sales:v1", timeToLive = 7200)
+//@RedisHash(value = "ordered_item_sales:v1", timeToLive = 1800)
 public class OrderedItemSales {
 
     @Id

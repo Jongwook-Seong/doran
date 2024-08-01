@@ -1,6 +1,8 @@
-package com.sjw.doran.memberservice.redis;
+package com.sjw.doran.memberservice.redis.service;
 
-public interface BasketItemListCache {
+import com.sjw.doran.memberservice.redis.data.CachedBasket;
+
+public interface BasketItemListCacheService {
 
     void set(CachedBasket cachedBasket);
     CachedBasket get(String userUuid);

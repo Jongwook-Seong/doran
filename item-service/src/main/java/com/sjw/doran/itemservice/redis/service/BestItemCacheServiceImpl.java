@@ -30,11 +30,13 @@ public class BestItemCacheServiceImpl implements BestItemCacheService {
     private final ItemMapper itemMapper;
 
     @Scheduled(cron = "0 0 0/1 * * *")
+//    @Scheduled(fixedRate = 1800000)
     public void setOrderedItemSalesOnRedis() {
         this.setOrderedItemSales();
     }
 
     @Scheduled(cron = "0 0 0/1 * * *")
+//    @Scheduled(fixedRate = 1800000)
     public void setBestItemsOnRedis() {
         this.setBestItems();
     }

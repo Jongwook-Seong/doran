@@ -87,7 +87,7 @@ public class ItemRequestGenerateService {
     private BookCreateRequest generateBookCreateRequest() {
         String itemName = generator.generateRandomString(20);
         int price = generator.generateRandomInteger();
-        int stockQuantity = generator.generateRandomInteger();
+        int stockQuantity = 100000;
         String author = generator.generateRandomString(20);
         String isbn = generator.generateRandomString(20);
         int pages = generator.generateRandomInteger();

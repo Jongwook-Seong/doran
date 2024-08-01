@@ -12,15 +12,13 @@ import com.sjw.doran.memberservice.mapper.BasketItemMapper;
 import com.sjw.doran.memberservice.mapper.BasketMapper;
 import com.sjw.doran.memberservice.mongodb.BasketDocument;
 import com.sjw.doran.memberservice.mongodb.BasketDocumentRepository;
-import com.sjw.doran.memberservice.redis.BasketItemListCache;
-import com.sjw.doran.memberservice.redis.CachedBasket;
+import com.sjw.doran.memberservice.redis.service.BasketItemListCacheService;
 import com.sjw.doran.memberservice.repository.BasketItemRepository;
 import com.sjw.doran.memberservice.service.BasketItemService;
 import com.sjw.doran.memberservice.vo.request.BasketItemCreateRequest;
 import com.sjw.doran.memberservice.vo.response.item.ItemSimpleResponse;
 import com.sjw.doran.memberservice.vo.response.item.ItemSimpleWithCountResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cloud.client.circuitbreaker.CircuitBreaker;
 import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -37,7 +35,7 @@ public class BasketItemServiceImpl implements BasketItemService {
 
     private final BasketItemRepository basketItemRepository;
     private final BasketDocumentRepository basketDocumentRepository;
-    private final BasketItemListCache basketItemListCache;
+    private final BasketItemListCacheService basketItemListCacheService;
     private final ItemServiceClient itemServiceClient;
     private final ResilientItemServiceClient resilientItemServiceClient;
     private final ApplicationEventPublisher applicationEventPublisher;
@@ -57,7 +55,7 @@ public class BasketItemServiceImpl implements BasketItemService {
         BasketDocument basketDocument = basketDocumentRepository.findById(basket.getId()).get();
         basketDocument.setItems(new ArrayList<>());
         /* Set cache */
-        basketItemListCache.set(basketMapper.toCachedBasket(basketDocument));
+        basketItemListCacheService.set(basketMapper.toCachedBasket(basketDocument));
         basketDocument.getItems().forEach(item -> itemUuidList.add(item.getItemUuid()));
         List<BasketItem> basketItemList = new ArrayList<>();
         basketDocument.getItems().forEach(item -> basketItemList.add(basketItemMapper.toBasketItem(basket, item)));

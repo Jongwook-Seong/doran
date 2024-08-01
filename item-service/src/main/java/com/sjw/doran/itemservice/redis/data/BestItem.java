@@ -14,7 +14,8 @@ import java.util.Date;
 @AllArgsConstructor
 @ToString
 @Builder
-@RedisHash(value = "best_item", timeToLive = 7200)
+@RedisHash(value = "best_item:v1", timeToLive = 7200)
+//@RedisHash(value = "best_item:v1", timeToLive = 1800)
 public class BestItem implements Serializable {
 
     @Id

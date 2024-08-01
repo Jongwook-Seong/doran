@@ -5,7 +5,7 @@ import com.sjw.doran.memberservice.entity.BasketItem;
 import com.sjw.doran.memberservice.kafka.basket.BasketTopicMessage;
 import com.sjw.doran.memberservice.kafka.common.BasketOperationType;
 import com.sjw.doran.memberservice.mongodb.BasketDocument;
-import com.sjw.doran.memberservice.redis.CachedBasket;
+import com.sjw.doran.memberservice.redis.data.CachedBasket;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
