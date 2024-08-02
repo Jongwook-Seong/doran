@@ -79,10 +79,10 @@ public class BasketController {
             throw new NoSuchElementException(messageUtil.getUserUuidEmptyMessage());
         }
 
-//        CachedBasket cachedBasket = basketItemListCacheService.get(userUuid);
-//        if (cachedBasket != null)
-//            return ResponseEntity.status(HttpStatus.OK)
-//                    .body(basketItemMapper.toItemSimpleWCResponseList(cachedBasket.getItems()));
+        CachedBasket cachedBasket = basketItemListCacheService.get(userUuid);
+        if (cachedBasket != null)
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(basketItemMapper.toItemSimpleWCResponseList(cachedBasket.getItems()));
 
         Member member = memberService.findMember(userUuid);
         Basket basket = basketService.findBasket(member);

@@ -123,4 +123,10 @@ public class RequestGenerateController {
         memberRequestGenerateService.createHeaderValueJsonFile();
         return "File created";
     }
+
+    @GetMapping("/item/itemUuids")
+    public String generateItemUuidsFile() {
+        itemRequestGenerateService.createBodyValueJsonFile();
+        return "File created";
+    }
 }

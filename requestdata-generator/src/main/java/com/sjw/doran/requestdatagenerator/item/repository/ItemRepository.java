@@ -22,4 +22,8 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
     @Transactional(value = "itemTransactionManager", readOnly = true)
     @Query(value = "SELECT * FROM Item i WHERE i.category = 'BOOK' ORDER BY RAND() LIMIT 1", nativeQuery = true)
     Optional<Book> findAnyByCategory(@Param("category") Category category);
+
+    @Transactional(value = "itemTransactionManager", readOnly = true)
+    @Query("SELECT i.itemUuid FROM Item i")
+    List<String> findAllItemUuid();
 }

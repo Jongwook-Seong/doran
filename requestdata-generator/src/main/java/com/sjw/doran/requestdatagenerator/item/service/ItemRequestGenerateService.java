@@ -1,12 +1,20 @@
 package com.sjw.doran.requestdatagenerator.item.service;
 
+import com.fasterxml.jackson.core.exc.StreamWriteException;
+import com.fasterxml.jackson.databind.DatabindException;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.sjw.doran.requestdatagenerator.common.CustomObjectMapper;
 import com.sjw.doran.requestdatagenerator.common.Generator;
 import com.sjw.doran.requestdatagenerator.item.repository.ItemRepository;
 import lombok.*;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -15,6 +23,7 @@ public class ItemRequestGenerateService {
 
     private final ItemRepository itemRepository;
     private final Generator generator;
+    private final CustomObjectMapper objectMapper = new CustomObjectMapper();
 
     @Data
     @NoArgsConstructor
@@ -98,5 +107,20 @@ public class ItemRequestGenerateService {
         String contentsTable = generator.generateRandomString(20);
         String bookReview = generator.generateRandomString(20);
         return new BookCreateRequest(itemName, price, stockQuantity, author, isbn, pages, publicationDate, contentsTable, bookReview);
+    }
+
+    public void createBodyValueJsonFile() {
+        ArrayNode arrayNode = objectMapper.createArrayNode();
+        List<String> allItemUuid = itemRepository.findAllItemUuid();
+        for (String itemUuid : allItemUuid) {
+            ObjectNode node = objectMapper.createObjectNode();
+            node.put("itemUuid", itemUuid);
+            arrayNode.add(node);
+        }
+        try {
+            objectMapper.writeValue(new File("itemUuids.json"), arrayNode);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
