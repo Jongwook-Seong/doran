@@ -35,6 +35,15 @@ Velog : https://velog.io/@xav/posts?tag=Doran
 ## Architecture
 <img width="9116" alt="아키텍처" src="https://github.com/user-attachments/assets/d1329fda-b184-4322-be40-5ee61f522ec9">
 
+## Service Details
+
+|     Service       | URL                                                                             | 
+|:-----------------:|:--------------------------------------------------------------------------------|
+|  **API Gateway**  | https://github.com/Jongwook-Seong/doran/blob/main/apigateway-service/READMD.md  |
+|    **Member**     | https://github.com/Jongwook-Seong/doran/blob/main/member-service/READMD.md      |
+|     **Order**     | https://github.com/Jongwook-Seong/doran/blob/main/order-service/READMD.md       |
+|     **Item**      | https://github.com/Jongwook-Seong/doran/blob/main/item-service/READMD.md        |
+
 ## Performance Impovements
 - 매핑 모듈 변경 및 리팩토링을 통해 런타임 부하 해소 및 유지보수성 향상(ModelMapper → Mapstruct)
 - 서킷브레이커 및 리트라이 패턴 적용을 통한 데이터 롤백 및 서비스간 통신 일시 장애 대응 (Resilience4J)
