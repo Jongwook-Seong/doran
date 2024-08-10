@@ -49,16 +49,18 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
 
     @Override
     public Optional<Order> findOrderWithItemsAndDeliveryByUserUuidAndOrderUuid(String userUuid, String orderUuid) {
-        Order findOrder = queryFactory
-                .selectFrom(order)
-                .join(order.orderItems, orderItem)
-                .fetchJoin()
-                .join(order.delivery, delivery)
-                .fetchJoin()
-                .where(order.userUuid.eq(userUuid),
-                        order.orderUuid.eq(orderUuid))
-                .distinct()
-                .fetchOne();
+        EntityGraph<Order> graph = entityManager.createEntityGraph(Order.class);
+        graph.addAttributeNodes("orderItems", "delivery");
+
+        TypedQuery<Order> query = entityManager.createQuery(
+                "SELECT DISTINCT o FROM Order o " +
+                        "WHERE o.userUuid = :userUuid AND o.orderUuid = :orderUuid", Order.class);
+        query.setParameter("userUuid", userUuid);
+        query.setParameter("orderUuid", orderUuid);
+        query.setHint("jakarta.persistence.loadgraph", graph);
+        query.setHint("org.hibernate.readOnly", true);
+
+        Order findOrder = query.getSingleResult();
         return Optional.ofNullable(findOrder);
     }
 
