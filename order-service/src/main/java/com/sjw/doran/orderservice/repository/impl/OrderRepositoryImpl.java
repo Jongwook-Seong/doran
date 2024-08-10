@@ -3,7 +3,10 @@ package com.sjw.doran.orderservice.repository.impl;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sjw.doran.orderservice.entity.*;
 import com.sjw.doran.orderservice.repository.OrderRepositoryCustom;
+import jakarta.persistence.EntityGraph;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TypedQuery;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -16,9 +19,12 @@ import static com.sjw.doran.orderservice.entity.QOrderItem.orderItem;
 
 public class OrderRepositoryImpl implements OrderRepositoryCustom {
 
+    @PersistenceContext
+    private EntityManager entityManager;
     private JPAQueryFactory queryFactory;
 
     public OrderRepositoryImpl(EntityManager entityManager) {
+        this.entityManager = entityManager;
         this.queryFactory = new JPAQueryFactory(entityManager);
     }
 
@@ -70,17 +76,19 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
 
     @Override
     public List<Order> findOrdersWithItemsAndDeliveryByUserUuid(String userUuid) {
-        List<Order> orderList = queryFactory
-                .selectFrom(order)
-                .join(order.orderItems, orderItem)
-                .fetchJoin()
-                .join(order.delivery, delivery)
-                .fetchJoin()
-                .where(order.userUuid.eq(userUuid),
-                        order.orderDate.after(getThreeMonthsAgo()))
-                .orderBy(order.orderDate.desc())
-                .distinct()
-                .fetch();
+        EntityGraph<Order> graph = entityManager.createEntityGraph(Order.class);
+        graph.addAttributeNodes("orderItems", "delivery");
+
+        TypedQuery<Order> query = entityManager.createQuery(
+                "SELECT DISTINCT o FROM Order o " +
+                        "WHERE o.userUuid = :userUuid AND o.orderDate > :date " +
+                        "ORDER BY o.orderDate DESC", Order.class);
+        query.setParameter("userUuid", userUuid);
+        query.setParameter("date", getThreeMonthsAgo());
+        query.setHint("jakarta.persistence.loadgraph", graph);
+        query.setHint("org.hibernate.readOnly", true);
+
+        List<Order> orderList = query.getResultList();
         return orderList;
     }
 
