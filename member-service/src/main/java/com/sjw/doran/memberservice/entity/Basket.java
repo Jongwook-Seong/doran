@@ -9,13 +9,14 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(indexes = @Index(name = "idx_member_id", columnList = "member_id"))
 public class Basket {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "basket_id")
     private Long id;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
 

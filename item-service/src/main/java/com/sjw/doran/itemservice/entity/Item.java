@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "dtype")
+@Table(indexes = @Index(name = "idx_item_uuid", columnList = "item_uuid"))
 public abstract class Item extends AuditingFields {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)

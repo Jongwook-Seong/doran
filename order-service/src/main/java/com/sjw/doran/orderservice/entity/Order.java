@@ -11,8 +11,12 @@ import java.util.List;
 
 @Entity
 @Getter
-@Table(name = "orders")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "orders", indexes = {
+        @Index(name = "idx_order_uuid", columnList = "order_uuid"),
+        @Index(name = "idx_user_uuid", columnList = "user_uuid"),
+        @Index(name = "idx_order_uuid_with_user_uuid", columnList = "order_uuid, user_uuid")
+})
 public class Order extends AuditingFields {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)

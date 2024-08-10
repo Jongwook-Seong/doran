@@ -9,6 +9,7 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(indexes = @Index(name = "idx_user_uuid", columnList = "user_uuid"))
 public class Member extends BaseTimeEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,10 +21,6 @@ public class Member extends BaseTimeEntity {
 
     @Embedded
     private Address address;
-
-    @ElementCollection(fetch = FetchType.LAZY)
-    @CollectionTable(name = "order_uuid_list", joinColumns = @JoinColumn(name = "member_id"))
-    private List<String> orderUuid = new ArrayList<>();
 
     @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private Basket basket;

@@ -10,6 +10,7 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(indexes = @Index(name = "idx_delivery_id", columnList = "delivery_id"))
 public class Delivery {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)

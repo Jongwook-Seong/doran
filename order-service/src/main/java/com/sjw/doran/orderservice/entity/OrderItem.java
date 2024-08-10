@@ -7,6 +7,7 @@ import lombok.*;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(indexes = @Index(name = "idx_oi_order_id", columnList = "order_id"))
 public class OrderItem {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
