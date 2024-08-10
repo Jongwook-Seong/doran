@@ -38,17 +38,17 @@ public class ResilientItemServiceClient {
 
 
     /** getBookBasket fallback methods **/
-    public List<ItemSimpleResponse> getBookBasketFallback(String userUuid, RecordException exception) {
+    public List<ItemSimpleResponse> getBookBasketFallback(List<String> itemUuidList, RecordException exception) {
         log.info("Fallback for getBookBasket: {}", exception.toString());
         return new ArrayList<>();
     }
 
-    public List<ItemSimpleResponse> getBookBasketFallback(String userUuid, IgnoreException exception) {
+    public List<ItemSimpleResponse> getBookBasketFallback(List<String> itemUuidList, IgnoreException exception) {
         log.info("Fallback for getBookBasket: {}", exception.toString());
         return new ArrayList<>();
     }
 
-    private List<ItemSimpleResponse> getBookBasketFallback(String userUuid, CallNotPermittedException exception) {
+    private List<ItemSimpleResponse> getBookBasketFallback(List<String> itemUuidList, CallNotPermittedException exception) {
         log.info("Fallback for getBookBasket: {}", exception.toString());
         return new ArrayList<>();
     }
