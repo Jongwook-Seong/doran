@@ -6,6 +6,7 @@ import lombok.*;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(indexes = @Index(name = "idx_basket_id", columnList = "basket_id"))
 public class BasketItem {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)

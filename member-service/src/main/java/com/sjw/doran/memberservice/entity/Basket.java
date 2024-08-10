@@ -9,6 +9,7 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(indexes = @Index(name = "idx_member_id", columnList = "member_id"))
 public class Basket {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
