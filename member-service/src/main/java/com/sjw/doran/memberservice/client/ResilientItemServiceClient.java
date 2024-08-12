@@ -1,6 +1,5 @@
 package com.sjw.doran.memberservice.client;
 
-import com.sjw.doran.memberservice.exception.FeignException;
 import com.sjw.doran.memberservice.exception.IgnoreException;
 import com.sjw.doran.memberservice.exception.RecordException;
 import com.sjw.doran.memberservice.vo.response.item.ItemSimpleResponse;

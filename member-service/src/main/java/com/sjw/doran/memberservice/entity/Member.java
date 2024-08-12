@@ -3,14 +3,11 @@ package com.sjw.doran.memberservice.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(indexes = @Index(name = "idx_user_uuid", columnList = "user_uuid"))
-public class Member extends BaseTimeEntity {
+public class Member extends AuditingFields {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "member_id")

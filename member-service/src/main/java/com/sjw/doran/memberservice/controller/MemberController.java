@@ -2,7 +2,6 @@ package com.sjw.doran.memberservice.controller;
 
 import com.sjw.doran.memberservice.dto.MemberDto;
 import com.sjw.doran.memberservice.entity.Member;
-import com.sjw.doran.memberservice.service.BasketService;
 import com.sjw.doran.memberservice.service.MemberService;
 import com.sjw.doran.memberservice.util.MessageUtil;
 import com.sjw.doran.memberservice.vo.response.MemberOrderResponse;
@@ -27,7 +26,6 @@ import java.util.List;
 public class MemberController {
 
     private final MemberService memberService;
-    private final BasketService basketService;
     private final MessageUtil messageUtil;
 
     @GetMapping("/members")

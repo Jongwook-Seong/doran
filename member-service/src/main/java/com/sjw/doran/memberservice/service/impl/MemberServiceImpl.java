@@ -1,6 +1,5 @@
 package com.sjw.doran.memberservice.service.impl;
 
-import com.sjw.doran.memberservice.client.OrderServiceClient;
 import com.sjw.doran.memberservice.client.ResilientOrderServiceClient;
 import com.sjw.doran.memberservice.dto.MemberDto;
 import com.sjw.doran.memberservice.entity.Basket;
@@ -22,8 +21,6 @@ import com.sjw.doran.memberservice.vo.response.order.DeliveryTrackingResponse;
 import com.sjw.doran.memberservice.vo.response.order.OrderDetailResponse;
 import com.sjw.doran.memberservice.vo.response.order.OrderListResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cloud.client.circuitbreaker.CircuitBreaker;
-import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,13 +35,11 @@ public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
     private final BasketRepository basketRepository;
-    private final OrderServiceClient orderServiceClient;
     private final ResilientOrderServiceClient resilientOrderServiceClient;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final MemberMapper memberMapper;
     private final BasketMapper basketMapper;
     private final MessageUtil messageUtil;
-    private final CircuitBreakerFactory circuitBreakerFactory;
 
     @Override
     @Transactional(readOnly = true)
@@ -112,9 +107,6 @@ public class MemberServiceImpl implements MemberService {
     public MemberOrderResponse findMemberOrderList(String userUuid) throws InterruptedException {
         Member member = memberRepository.findByUserUuid(userUuid).orElseThrow(() -> {
             throw new NoSuchElementException("Invalid Member"); });
-//        CircuitBreaker circuitBreaker = circuitBreakerFactory.create("MS-findMemberOrderList-circuitebreaker");
-//        OrderListResponse orderListResponse = circuitBreaker.run(() ->
-//                orderServiceClient.inquireOrderList(userUuid), throwable -> null);
         OrderListResponse orderListResponse = resilientOrderServiceClient.inquireOrderList(userUuid);
         return MemberOrderResponse.getInstance(member.getUserUuid(), member.getNickname(), member.getProfileImageUrl(), orderListResponse);
     }
@@ -124,9 +116,6 @@ public class MemberServiceImpl implements MemberService {
     public MemberOrderResponse findMemberOrderDetail(String userUuid, String orderUuid) throws InterruptedException {
         Member member = memberRepository.findByUserUuid(userUuid).orElseThrow(() -> {
             throw new NoSuchElementException("Invalid Member"); });
-//        CircuitBreaker circuitBreaker = circuitBreakerFactory.create("MS-findMemberOrderDetail-circuitbreaker");
-//        OrderDetailResponse orderDetailResponse = circuitBreaker.run(() ->
-//                orderServiceClient.inquireOrderDetail(userUuid, orderUuid), throwable -> null);
         OrderDetailResponse orderDetailResponse = resilientOrderServiceClient.inquireOrderDetail(userUuid, orderUuid);
         return MemberOrderResponse.getInstance(member.getUserUuid(), member.getNickname(), member.getProfileImageUrl(), orderDetailResponse);
     }
@@ -136,9 +125,6 @@ public class MemberServiceImpl implements MemberService {
     public MemberOrderResponse findMemberOrderDeliveryTracking(String userUuid, String orderUuid) throws InterruptedException {
         Member member = memberRepository.findByUserUuid(userUuid).orElseThrow(() -> {
             throw new NoSuchElementException("Invalid Member"); });
-//        CircuitBreaker circuitBreaker = circuitBreakerFactory.create("MS-findMemberOrderDeliveryTracking-circuitbreaker");
-//        DeliveryTrackingResponse deliveryTrackingResponse = circuitBreaker.run(() ->
-//                orderServiceClient.inquireDeliveryTracking(userUuid, orderUuid), throwable -> null);
         DeliveryTrackingResponse deliveryTrackingResponse = resilientOrderServiceClient.inquireDeliveryTracking(userUuid, orderUuid);
         return MemberOrderResponse.getInstance(member.getUserUuid(), member.getNickname(), member.getProfileImageUrl(), deliveryTrackingResponse);
     }
