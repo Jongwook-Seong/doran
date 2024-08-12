@@ -8,6 +8,7 @@ import com.sjw.doran.orderservice.vo.response.ItemSimpleWithoutPriceResponse;
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,12 +19,10 @@ import java.util.List;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class ResilientItemServiceClient {
 
-    @Autowired
     private ItemServiceClient itemServiceClient;
-
-    @Autowired
     private SlackService slackService;
 
     private static final String BASE_CIRCUIT_BREAKER_CONFIG = "baseCircuitBreakerConfig";

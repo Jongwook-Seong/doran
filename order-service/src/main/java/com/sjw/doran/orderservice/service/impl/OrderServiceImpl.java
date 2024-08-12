@@ -50,7 +50,6 @@ public class OrderServiceImpl implements OrderService {
     private final OrderItemRepository orderItemRepository;
     private final DeliveryTrackingRepository deliveryTrackingRepository;
     private final DeliveryDocumentRepository deliveryDocumentRepository;
-//    private final ItemServiceClient itemServiceClient;
     private final ResilientItemServiceClient resilientItemServiceClient;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final OrderMapper orderMapper;
@@ -85,7 +84,6 @@ public class OrderServiceImpl implements OrderService {
             List<OrderItem> savedOrderItems = orderItemRepository.saveAll(orderItemList);
             DeliveryTracking savedDeliveryTracking = deliveryTrackingRepository.save(deliveryTracking);
             Delivery savedDelivery = savedOrder.getDelivery();
-//            itemServiceClient.orderItems(itemUuidList, itemCountList);
             resilientItemServiceClient.orderItems(itemUuidList, itemCountList);
             /* Publish kafka message */
             OrderTopicMessage orderTopicMessage = orderMapper.toOrderTopicMessage(savedOrder, savedOrderItems, savedDelivery.getId(), null);
@@ -121,7 +119,6 @@ public class OrderServiceImpl implements OrderService {
                 itemCountList.add(info.getCount());
             });
 
-//            itemServiceClient.cancelOrderItems(itemUuidList, itemCountList);
             resilientItemServiceClient.cancelOrderItems(itemUuidList, itemCountList);
             /* Kafka produce */
             applicationEventPublisher.publishEvent(new OrderEvent(this, order.getId(), null, OperationType.DELETE));

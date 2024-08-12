@@ -1,7 +1,6 @@
 package com.sjw.doran.orderservice.kafka.order;
 
 import com.sjw.doran.orderservice.kafka.common.OperationType;
-import com.sjw.doran.orderservice.kafka.order.OrderTopicMessage;
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 

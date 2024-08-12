@@ -7,7 +7,6 @@ import com.sjw.doran.orderservice.kafka.delivery.DeliveryTopicMessage;
 import com.sjw.doran.orderservice.kafka.order.OrderTopicMessage;
 import com.sjw.doran.orderservice.mapper.CustomObjectMapper;
 import com.sjw.doran.orderservice.mapper.DeliveryMapper;
-import com.sjw.doran.orderservice.mongodb.DeliveryDocument;
 import com.sjw.doran.orderservice.mongodb.DeliveryDocumentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

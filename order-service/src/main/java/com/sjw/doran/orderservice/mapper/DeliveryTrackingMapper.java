@@ -1,12 +1,10 @@
 package com.sjw.doran.orderservice.mapper;
 
-import com.sjw.doran.orderservice.entity.Delivery;
 import com.sjw.doran.orderservice.entity.DeliveryTracking;
 import com.sjw.doran.orderservice.kafka.delivery.DeliveryTopicMessage;
 import com.sjw.doran.orderservice.mongodb.DeliveryDocument;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 

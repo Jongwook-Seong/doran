@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 
 @Data
 @Builder
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @AllArgsConstructor
 public class DeliveryTrackingInfo {
 
