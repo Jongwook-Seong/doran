@@ -4,7 +4,6 @@ import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import lombok.*;
 
-import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity

@@ -7,7 +7,6 @@ import com.sjw.doran.itemservice.mongodb.item.ItemDocument;
 import com.sjw.doran.itemservice.redis.data.BestItem;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
 
 import java.util.UUID;

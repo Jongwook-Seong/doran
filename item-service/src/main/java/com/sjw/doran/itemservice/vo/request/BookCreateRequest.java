@@ -1,6 +1,5 @@
 package com.sjw.doran.itemservice.vo.request;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;

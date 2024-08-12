@@ -13,7 +13,6 @@ import com.sjw.doran.itemservice.mapper.BookMapper;
 import com.sjw.doran.itemservice.mapper.ItemMapper;
 import com.sjw.doran.itemservice.mongodb.item.ItemDocument;
 import com.sjw.doran.itemservice.mongodb.item.ItemDocumentRepository;
-import com.sjw.doran.itemservice.redis.lock.ItemStockLockFacade;
 import com.sjw.doran.itemservice.repository.ItemRepository;
 import com.sjw.doran.itemservice.service.ItemService;
 import com.sjw.doran.itemservice.util.MessageUtil;
@@ -34,7 +33,6 @@ import java.util.*;
 public class ItemServiceImpl implements ItemService {
 
     private final ItemRepository itemRepository;
-//    private final ItemStockLockFacade itemStockLockFacade;
     private final ItemDocumentRepository itemDocumentRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final ItemMapper itemMapper;
