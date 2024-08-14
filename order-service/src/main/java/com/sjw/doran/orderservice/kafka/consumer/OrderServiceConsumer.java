@@ -23,7 +23,7 @@ public class OrderServiceConsumer {
     private final DeliveryMapper deliveryMapper;
     private final DeliveryDocumentRepository deliveryDocumentRepository;
 
-    @KafkaListener(topics = { Topic.ORDER_TOPIC }, groupId = "order-consumer-group", concurrency = "3")
+    @KafkaListener(topics = { Topic.ORDER_TOPIC }, groupId = "order-consumer-group", concurrency = "2")
     public void listenOrderTopic(ConsumerRecord<String, String> record) throws JsonProcessingException {
         OrderTopicMessage message = objectMapper.readValue(record.value(), OrderTopicMessage.class);
         if (message.getOperationType() == OperationType.CREATE) {
@@ -35,7 +35,7 @@ public class OrderServiceConsumer {
         }
     }
 
-    @KafkaListener(topics = { Topic.DELIVERY_TOPIC }, groupId = "order-consumer-group", concurrency = "3")
+    @KafkaListener(topics = { Topic.DELIVERY_TOPIC }, groupId = "order-consumer-group", concurrency = "2")
     public void listenDeliveryTopic(ConsumerRecord<String, String> record) throws JsonProcessingException {
         DeliveryTopicMessage message = objectMapper.readValue(record.value(), DeliveryTopicMessage.class);
         if (message.getOperationType() == OperationType.CREATE) {
