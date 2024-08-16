@@ -142,6 +142,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public OrderListResponse getOrderList(String userUuid) throws InterruptedException {
         List<OrderSimple> orderSimpleList;
         List<String> itemUuidList;
@@ -214,6 +215,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public OrderDetailResponse getOrderDetail(String userUuid, String orderUuid) {
         OrderDocument orderDocument = orderDocumentRepository.findByUserUuidAndOrderUuid(userUuid, orderUuid).get();
         if (orderDocument != null) { // first : find from MongoDB
@@ -264,6 +266,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public DeliveryTrackingResponse getDeliveryTrackingInfo(String userUuid, String orderUuid) {
         List<DeliveryTracking> deliveryTrackings = new ArrayList<>();
         Delivery delivery = null;
