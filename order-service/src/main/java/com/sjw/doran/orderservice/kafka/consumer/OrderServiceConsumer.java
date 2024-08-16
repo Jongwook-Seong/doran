@@ -7,7 +7,9 @@ import com.sjw.doran.orderservice.kafka.delivery.DeliveryTopicMessage;
 import com.sjw.doran.orderservice.kafka.order.OrderTopicMessage;
 import com.sjw.doran.orderservice.mapper.CustomObjectMapper;
 import com.sjw.doran.orderservice.mapper.DeliveryMapper;
-import com.sjw.doran.orderservice.mongodb.DeliveryDocumentRepository;
+import com.sjw.doran.orderservice.mapper.OrderMapper;
+import com.sjw.doran.orderservice.mongodb.delivery.DeliveryDocumentRepository;
+import com.sjw.doran.orderservice.mongodb.order.OrderDocumentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -20,7 +22,9 @@ import org.springframework.stereotype.Service;
 public class OrderServiceConsumer {
 
     private final CustomObjectMapper objectMapper = new CustomObjectMapper();
+    private final OrderMapper orderMapper;
     private final DeliveryMapper deliveryMapper;
+    private final OrderDocumentRepository orderDocumentRepository;
     private final DeliveryDocumentRepository deliveryDocumentRepository;
 
     @KafkaListener(topics = { Topic.ORDER_TOPIC }, groupId = "order-consumer-group", concurrency = "2")
@@ -49,8 +53,10 @@ public class OrderServiceConsumer {
 
     private void handleOrderCreate(OrderTopicMessage message) {
         try {
+            OrderTopicMessage.Payload payload = message.getPayload();
             log.info("[{}] Consumed OrderTopicMessage: {}",
-                    message.getOperationType(), objectMapper.writeValueAsString(message.getPayload()));
+                    message.getOperationType(), objectMapper.writeValueAsString(payload));
+            orderDocumentRepository.save(orderMapper.toOrderDocument(payload));
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
@@ -69,7 +75,7 @@ public class OrderServiceConsumer {
         try {
             log.info("[{}] Consumed OrderTopicMessage: {}",
                     message.getOperationType(), objectMapper.writeValueAsString(message.getPayload()));
-            deliveryDocumentRepository.deleteById(message.getId());
+            orderDocumentRepository.deleteById(message.getId());
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
@@ -101,6 +107,7 @@ public class OrderServiceConsumer {
         try {
             log.info("[{}] Consumed DeliveryTopicMessage: {}",
                     message.getOperationType(), objectMapper.writeValueAsString(message.getPayload()));
+            deliveryDocumentRepository.deleteById(message.getId());
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }

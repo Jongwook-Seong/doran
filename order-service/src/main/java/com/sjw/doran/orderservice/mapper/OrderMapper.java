@@ -6,6 +6,7 @@ import com.sjw.doran.orderservice.entity.Order;
 import com.sjw.doran.orderservice.entity.OrderItem;
 import com.sjw.doran.orderservice.kafka.common.OperationType;
 import com.sjw.doran.orderservice.kafka.order.OrderTopicMessage;
+import com.sjw.doran.orderservice.mongodb.order.OrderDocument;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
@@ -33,4 +34,15 @@ public interface OrderMapper {
             @Mapping(target = "payload.orderDate", source = "order.orderDate")
     })
     OrderTopicMessage toOrderTopicMessage(Order order, List<OrderItem> orderItems, Long deliveryId, OperationType operationType);
+
+    @Mappings({
+            @Mapping(target = "id", source = "payload.id"),
+            @Mapping(target = "orderUuid", source = "payload.orderUuid"),
+            @Mapping(target = "userUuid", source = "payload.userUuid"),
+            @Mapping(target = "orderItems", source = "payload.items"),
+            @Mapping(target = "deliveryId", source = "payload.deliveryId"),
+            @Mapping(target = "orderStatus", source = "payload.orderStatus"),
+            @Mapping(target = "orderDate", source = "payload.orderDate")
+    })
+    OrderDocument toOrderDocument(OrderTopicMessage.Payload payload);
 }

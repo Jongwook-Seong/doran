@@ -2,7 +2,7 @@ package com.sjw.doran.orderservice.mapper;
 
 import com.sjw.doran.orderservice.entity.TransceiverInfo;
 import com.sjw.doran.orderservice.kafka.delivery.DeliveryTopicMessage;
-import com.sjw.doran.orderservice.mongodb.DeliveryDocument;
+import com.sjw.doran.orderservice.mongodb.delivery.DeliveryDocument;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

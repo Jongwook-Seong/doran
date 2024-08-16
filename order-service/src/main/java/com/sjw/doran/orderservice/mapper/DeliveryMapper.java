@@ -6,7 +6,7 @@ import com.sjw.doran.orderservice.entity.Delivery;
 import com.sjw.doran.orderservice.entity.DeliveryTracking;
 import com.sjw.doran.orderservice.kafka.common.OperationType;
 import com.sjw.doran.orderservice.kafka.delivery.DeliveryTopicMessage;
-import com.sjw.doran.orderservice.mongodb.DeliveryDocument;
+import com.sjw.doran.orderservice.mongodb.delivery.DeliveryDocument;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;

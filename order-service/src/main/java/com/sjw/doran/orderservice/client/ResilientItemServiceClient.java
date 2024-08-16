@@ -10,7 +10,6 @@ import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -22,8 +21,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ResilientItemServiceClient {
 
-    private ItemServiceClient itemServiceClient;
-    private SlackService slackService;
+    private final ItemServiceClient itemServiceClient;
+    private final SlackService slackService;
 
     private static final String BASE_CIRCUIT_BREAKER_CONFIG = "baseCircuitBreakerConfig";
     private static final String BASE_RETRY_CONFIG = "baseRetryConfig";

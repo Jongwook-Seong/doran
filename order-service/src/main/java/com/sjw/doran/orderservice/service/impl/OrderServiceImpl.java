@@ -16,8 +16,10 @@ import com.sjw.doran.orderservice.kafka.order.OrderTopicMessage;
 import com.sjw.doran.orderservice.mapper.DeliveryMapper;
 import com.sjw.doran.orderservice.mapper.DeliveryTrackingMapper;
 import com.sjw.doran.orderservice.mapper.OrderMapper;
-import com.sjw.doran.orderservice.mongodb.DeliveryDocument;
-import com.sjw.doran.orderservice.mongodb.DeliveryDocumentRepository;
+import com.sjw.doran.orderservice.mongodb.delivery.DeliveryDocument;
+import com.sjw.doran.orderservice.mongodb.delivery.DeliveryDocumentRepository;
+import com.sjw.doran.orderservice.mongodb.order.OrderDocument;
+import com.sjw.doran.orderservice.mongodb.order.OrderDocumentRepository;
 import com.sjw.doran.orderservice.repository.DeliveryTrackingRepository;
 import com.sjw.doran.orderservice.repository.OrderItemRepository;
 import com.sjw.doran.orderservice.repository.OrderRepository;
@@ -49,6 +51,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
     private final DeliveryTrackingRepository deliveryTrackingRepository;
+    private final OrderDocumentRepository orderDocumentRepository;
     private final DeliveryDocumentRepository deliveryDocumentRepository;
     private final ResilientItemServiceClient resilientItemServiceClient;
     private final ApplicationEventPublisher applicationEventPublisher;
@@ -85,11 +88,14 @@ public class OrderServiceImpl implements OrderService {
             DeliveryTracking savedDeliveryTracking = deliveryTrackingRepository.save(deliveryTracking);
             Delivery savedDelivery = savedOrder.getDelivery();
             resilientItemServiceClient.orderItems(itemUuidList, itemCountList);
+            System.out.println("resilientItemServiceClient.orderItems");
             /* Publish kafka message */
             OrderTopicMessage orderTopicMessage = orderMapper.toOrderTopicMessage(savedOrder, savedOrderItems, savedDelivery.getId(), null);
             applicationEventPublisher.publishEvent(new OrderEvent(this, savedOrder.getId(), orderTopicMessage.getPayload(), OperationType.CREATE));
+            System.out.println("publishEvent - OrderEvent");
             DeliveryTopicMessage deliveryTopicMessage = deliveryMapper.toDeliveryTopicMessage(savedDelivery, List.of(savedDeliveryTracking), null);
             applicationEventPublisher.publishEvent(new DeliveryEvent(this, savedDelivery.getId(), deliveryTopicMessage.getPayload(), OperationType.CREATE));
+            System.out.println("publishEvent - DeliveryEvent");
         } catch (RetryException e) {
             throw e;
         } catch (RecordException e) {
@@ -137,17 +143,15 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderListResponse getOrderList(String userUuid) throws InterruptedException {
-        List<OrderSimple> orderSimpleList = new ArrayList<>();
+        List<OrderSimple> orderSimpleList;
         List<String> itemUuidList;
         try {
-            List<Order> orderList = orderRepository.findOrdersWithItemsAndDeliveryByUserUuid(userUuid);
-            for (Order order : orderList) {
-                List<OrderItemSimple> oisList = new ArrayList<>();
-                List<OrderItem> orderItems = order.getOrderItems();
-                for (OrderItem orderItem : orderItems) {
-                    oisList.add(OrderItemSimple.getInstance(orderItem.getItemUuid(), orderItem.getCount(), orderItem.getOrderPrice()));
-                }
-                orderSimpleList.add(OrderSimple.getInstance(oisList, order.getDelivery().getDeliveryStatus(), order.getOrderDate()));
+            List<OrderDocument> orderDocumentList = orderDocumentRepository.findAllByUserUuid(userUuid);
+            if (orderDocumentList != null) { // first : find from MongoDB
+                orderSimpleList = createOrderSimpleListByOrderDocumentList(orderDocumentList);
+            } else { // second : if not exist in MongoDB, then find from MySQL DB
+                List<Order> orderList = orderRepository.findOrdersWithItemsAndDeliveryByUserUuid(userUuid);
+                orderSimpleList = createOrderSimpleList(orderList);
             }
             // itemUuidList 추출 및 itemServiceClient.getItemSimpleWithoutPrice() 호출
             itemUuidList = extractItemUuidList(orderSimpleList);
@@ -158,6 +162,35 @@ public class OrderServiceImpl implements OrderService {
         // itemName, itemImageUrl 추출 및 삽입
         insertItemNameAndImageUrlIntoOrderSimpleList(itemSimpleWxPList, orderSimpleList);
         return OrderListResponse.getInstance(orderSimpleList);
+    }
+
+    private List<OrderSimple> createOrderSimpleList(List<Order> orderList) {
+        List<OrderSimple> orderSimpleList = new ArrayList<>();
+        for (Order order : orderList) {
+            List<OrderItemSimple> oisList = new ArrayList<>();
+            List<OrderItem> orderItems = order.getOrderItems();
+            for (OrderItem orderItem : orderItems) {
+                oisList.add(OrderItemSimple.getInstance(orderItem.getItemUuid(), orderItem.getCount(), orderItem.getOrderPrice()));
+            }
+            orderSimpleList.add(OrderSimple.getInstance(oisList, order.getDelivery().getDeliveryStatus(), order.getOrderDate()));
+        }
+        return orderSimpleList;
+    }
+
+    private List<OrderSimple> createOrderSimpleListByOrderDocumentList(List<OrderDocument> orderDocumentList) {
+        List<OrderSimple> orderSimpleList = new ArrayList<>();
+        List<Long> deliveryIdList = new ArrayList<>();
+        orderDocumentList.forEach(doc -> deliveryIdList.add(doc.getDeliveryId()));
+        List<DeliveryDocument> deliveryDocumentList = deliveryDocumentRepository.findAllByIds(deliveryIdList);
+        for (int i = 0; i < orderDocumentList.size(); i++) {
+            List<OrderItemSimple> oisList = new ArrayList<>();
+            List<OrderDocument.OrderItem> orderItems = orderDocumentList.get(i).getOrderItems();
+            for (OrderDocument.OrderItem orderItem : orderItems) {
+                oisList.add(OrderItemSimple.getInstance(orderItem.getItemUuid(), orderItem.getCount(), orderItem.getOrderPrice()));
+            }
+            orderSimpleList.add(OrderSimple.getInstance(oisList, deliveryDocumentList.get(i).getDeliveryStatus(), orderDocumentList.get(i).getOrderDate()));
+        }
+        return orderSimpleList;
     }
 
     private static List<String> extractItemUuidList(List<OrderSimple> orderSimpleList) {

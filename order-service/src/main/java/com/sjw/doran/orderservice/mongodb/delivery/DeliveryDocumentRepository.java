@@ -1,4 +1,4 @@
-package com.sjw.doran.orderservice.mongodb;
+package com.sjw.doran.orderservice.mongodb.delivery;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 
