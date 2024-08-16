@@ -18,4 +18,9 @@ public interface TransceiverInfoMapper {
     @Mapping(target = "receiverName", source = "transceiverInfoData.receiverName")
     @Mapping(target = "receiverPhoneNumber", source = "transceiverInfoData.receiverPhoneNumber")
     DeliveryDocument.TransceiverInfo toDeliveryDocumentTransceiverInfo(DeliveryTopicMessage.TransceiverInfoData transceiverInfoData);
+
+    @Mapping(target = "ordererName", source = "transceiverInfo.ordererName")
+    @Mapping(target = "receiverName", source = "transceiverInfo.receiverName")
+    @Mapping(target = "receiverPhoneNumber", source = "transceiverInfo.receiverPhoneNumber")
+    TransceiverInfo toTransceiverInfo(DeliveryDocument.TransceiverInfo transceiverInfo);
 }

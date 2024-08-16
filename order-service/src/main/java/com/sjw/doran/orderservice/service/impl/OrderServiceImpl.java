@@ -13,9 +13,7 @@ import com.sjw.doran.orderservice.kafka.delivery.DeliveryEvent;
 import com.sjw.doran.orderservice.kafka.delivery.DeliveryTopicMessage;
 import com.sjw.doran.orderservice.kafka.order.OrderEvent;
 import com.sjw.doran.orderservice.kafka.order.OrderTopicMessage;
-import com.sjw.doran.orderservice.mapper.DeliveryMapper;
-import com.sjw.doran.orderservice.mapper.DeliveryTrackingMapper;
-import com.sjw.doran.orderservice.mapper.OrderMapper;
+import com.sjw.doran.orderservice.mapper.*;
 import com.sjw.doran.orderservice.mongodb.delivery.DeliveryDocument;
 import com.sjw.doran.orderservice.mongodb.delivery.DeliveryDocumentRepository;
 import com.sjw.doran.orderservice.mongodb.order.OrderDocument;
@@ -58,6 +56,8 @@ public class OrderServiceImpl implements OrderService {
     private final OrderMapper orderMapper;
     private final DeliveryMapper deliveryMapper;
     private final DeliveryTrackingMapper deliveryTrackingMapper;
+    private final TransceiverInfoMapper transceiverInfoMapper;
+    private final AddressMapper addressMapper;
     private final MessageUtil messageUtil;
 
     @Override
@@ -215,18 +215,31 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderDetailResponse getOrderDetail(String userUuid, String orderUuid) {
-        Order order = orderRepository.findOrderWithItemsAndDeliveryByUserUuidAndOrderUuid(userUuid, orderUuid).orElseThrow(() -> {
-            throw new NoSuchElementException("Invalid Order"); });
-
-        List<OrderItemSimple> orderItemSimpleList = new ArrayList<>();
-        List<OrderItem> orderItems = order.getOrderItems();
-        for (OrderItem orderItem : orderItems) {
-            orderItemSimpleList.add(OrderItemSimple.getInstance(orderItem.getItemUuid(), orderItem.getCount(), orderItem.getOrderPrice()));
+        OrderDocument orderDocument = orderDocumentRepository.findByUserUuidAndOrderUuid(userUuid, orderUuid).get();
+        if (orderDocument != null) { // first : find from MongoDB
+            DeliveryDocument deliveryDocument = deliveryDocumentRepository.findById(orderDocument.getDeliveryId()).get();
+            List<OrderItemSimple> orderItemSimpleList = new ArrayList<>();
+            List<OrderDocument.OrderItem> orderItems = orderDocument.getOrderItems();
+            for (OrderDocument.OrderItem orderItem : orderItems) {
+                orderItemSimpleList.add(OrderItemSimple.getInstance(orderItem.getItemUuid(), orderItem.getCount(), orderItem.getOrderPrice()));
+            }
+            return OrderDetailResponse.getInstance(orderItemSimpleList, orderDocument.getOrderDate(),
+                    deliveryDocument.getDeliveryStatus(),
+                    transceiverInfoMapper.toTransceiverInfo(deliveryDocument.getTransceiverInfo()),
+                    addressMapper.toAddress(deliveryDocument.getAddress()));
+        } else { // second : if not exist in MongoDB, then find from MySQL DB
+            Order order = orderRepository.findOrderWithItemsAndDeliveryByUserUuidAndOrderUuid(userUuid, orderUuid).orElseThrow(() -> {
+                throw new NoSuchElementException("Invalid Order");
+            });
+            List<OrderItemSimple> orderItemSimpleList = new ArrayList<>();
+            List<OrderItem> orderItems = order.getOrderItems();
+            for (OrderItem orderItem : orderItems) {
+                orderItemSimpleList.add(OrderItemSimple.getInstance(orderItem.getItemUuid(), orderItem.getCount(), orderItem.getOrderPrice()));
+            }
+            Delivery delivery = order.getDelivery();
+            return OrderDetailResponse.getInstance(orderItemSimpleList, order.getOrderDate(),
+                    delivery.getDeliveryStatus(), delivery.getTransceiverInfo(), delivery.getAddress());
         }
-        Delivery delivery = order.getDelivery();
-
-        return OrderDetailResponse.getInstance(orderItemSimpleList, order.getOrderDate(),
-                delivery.getDeliveryStatus(), delivery.getTransceiverInfo(), delivery.getAddress());
     }
 
     /** getOrderDetail - @Async, CompletableFuture 테스트 적용 **/
@@ -252,13 +265,29 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public DeliveryTrackingResponse getDeliveryTrackingInfo(String userUuid, String orderUuid) {
-        Order order = orderRepository.findOrderWithDeliveryByUserUuidAndOrderUuid(userUuid, orderUuid).orElseThrow(() -> {
-            throw new NoSuchElementException("Invalid Order"); });
+        List<DeliveryTracking> deliveryTrackings = new ArrayList<>();
+        Delivery delivery = null;
+        Long deliveryId = null;
+        DeliveryStatus deliveryStatus = null;
 
-        Delivery delivery = order.getDelivery();
-//        List<DeliveryTracking> deliveryTrackings = deliveryTrackingRepository.findAllByDelivery(delivery);
-        DeliveryDocument deliveryDocument = deliveryDocumentRepository.findById(delivery.getId()).get();
-        List<DeliveryTracking> deliveryTrackings = deliveryTrackingMapper.toDeliveryTrackingList(deliveryDocument.getDeliveryTrackings());
+        Optional<OrderDocument> optionalOrderDocument = orderDocumentRepository.findByUserUuidAndOrderUuid(userUuid, orderUuid);
+        if (optionalOrderDocument.isPresent()) { // first : find from MongoDB
+            deliveryId = optionalOrderDocument.get().getDeliveryId();
+        } else { // second : if not exist in MongoDB, then find from MySQL DB
+            delivery = orderRepository.findOrderWithDeliveryByUserUuidAndOrderUuid(userUuid, orderUuid).orElseThrow(() -> {
+                throw new NoSuchElementException("Invalid Order"); }).getDelivery();
+            deliveryId = delivery.getId();
+            deliveryStatus = delivery.getDeliveryStatus();
+        }
+
+        Optional<DeliveryDocument> optionalDeliveryDocument = deliveryDocumentRepository.findById(deliveryId);
+        if (optionalDeliveryDocument.isPresent()) { // first : find from MongoDB
+            deliveryTrackings = deliveryTrackingMapper.toDeliveryTrackingList(optionalDeliveryDocument.get().getDeliveryTrackings());
+        } else { // second : if not exist in MongoDB, then find from MySQL DB
+            deliveryTrackings = deliveryTrackingRepository.findAllByDelivery(delivery);
+        }
+        if (deliveryStatus == null)
+            deliveryStatus = optionalDeliveryDocument.get().getDeliveryStatus();
 
         List<DeliveryTrackingInfo> deliveryTrackingInfoList = new ArrayList<>();
         for (DeliveryTracking tracking : deliveryTrackings) {
@@ -266,7 +295,7 @@ public class OrderServiceImpl implements OrderService {
                     .getInstance(tracking.getCourier(), tracking.getContactNumber(), tracking.getPostLocation(), tracking.getPostDateTime()));
         }
 
-        return DeliveryTrackingResponse.getInstance(deliveryTrackingInfoList, delivery.getDeliveryStatus());
+        return DeliveryTrackingResponse.getInstance(deliveryTrackingInfoList, deliveryStatus);
     }
 
     @Override

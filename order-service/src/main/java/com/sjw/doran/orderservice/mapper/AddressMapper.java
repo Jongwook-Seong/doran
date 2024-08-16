@@ -20,4 +20,10 @@ public interface AddressMapper {
     @Mapping(target = "details", source = "addressData.details")
     @Mapping(target = "zipcode", source = "addressData.zipcode")
     DeliveryDocument.Address toDeliveryDocumentAddress(DeliveryTopicMessage.AddressData addressData);
+
+    @Mapping(target = "city", source = "address.city")
+    @Mapping(target = "street", source = "address.street")
+    @Mapping(target = "details", source = "address.details")
+    @Mapping(target = "zipcode", source = "address.zipcode")
+    Address toAddress(DeliveryDocument.Address address);
 }
