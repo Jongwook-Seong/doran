@@ -4,7 +4,7 @@ import com.sjw.doran.memberservice.dto.BasketItemDto;
 import com.sjw.doran.memberservice.entity.Basket;
 import com.sjw.doran.memberservice.entity.BasketItem;
 import com.sjw.doran.memberservice.kafka.basket.BasketTopicMessage;
-import com.sjw.doran.memberservice.mongodb.BasketDocument;
+import com.sjw.doran.memberservice.mongodb.basket.BasketDocument;
 import com.sjw.doran.memberservice.redis.data.CachedBasket;
 import com.sjw.doran.memberservice.vo.request.BasketItemCreateRequest;
 import com.sjw.doran.memberservice.vo.response.item.ItemSimpleResponse;

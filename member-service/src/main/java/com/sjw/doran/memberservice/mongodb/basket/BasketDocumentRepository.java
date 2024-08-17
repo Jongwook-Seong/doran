@@ -1,4 +1,4 @@
-package com.sjw.doran.memberservice.mongodb;
+package com.sjw.doran.memberservice.mongodb.basket;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 

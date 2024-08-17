@@ -1,4 +1,4 @@
-package com.sjw.doran.memberservice.mongodb;
+package com.sjw.doran.memberservice.mongodb.basket;
 
 import com.sjw.doran.memberservice.entity.Category;
 import org.springframework.data.annotation.Id;

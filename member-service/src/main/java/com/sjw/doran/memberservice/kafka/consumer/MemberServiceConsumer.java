@@ -9,8 +9,11 @@ import com.sjw.doran.memberservice.kafka.member.MemberTopicMessage;
 import com.sjw.doran.memberservice.mapper.BasketItemMapper;
 import com.sjw.doran.memberservice.mapper.BasketMapper;
 import com.sjw.doran.memberservice.mapper.CustomObjectMapper;
-import com.sjw.doran.memberservice.mongodb.BasketDocument;
-import com.sjw.doran.memberservice.mongodb.BasketDocumentRepository;
+import com.sjw.doran.memberservice.mapper.MemberMapper;
+import com.sjw.doran.memberservice.mongodb.basket.BasketDocument;
+import com.sjw.doran.memberservice.mongodb.basket.BasketDocumentRepository;
+import com.sjw.doran.memberservice.mongodb.member.MemberDocument;
+import com.sjw.doran.memberservice.mongodb.member.MemberDocumentRepository;
 import com.sjw.doran.memberservice.redis.service.BasketItemListCacheService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,8 +27,10 @@ import org.springframework.stereotype.Service;
 public class MemberServiceConsumer {
 
     private final CustomObjectMapper objectMapper = new CustomObjectMapper();
+    private final MemberMapper memberMapper;
     private final BasketMapper basketMapper;
     private final BasketItemMapper basketItemMapper;
+    private final MemberDocumentRepository memberDocumentRepository;
     private final BasketDocumentRepository basketDocumentRepository;
     private final BasketItemListCacheService basketItemListCacheService;
 
@@ -57,8 +62,10 @@ public class MemberServiceConsumer {
 
     private void handleMemberCreate(MemberTopicMessage message) {
         try {
+            MemberTopicMessage.Payload payload = message.getPayload();
             log.info("[{}] Consumed MemberTopicMessage: {}",
-                    message.getOperationType(), objectMapper.writeValueAsString(message.getPayload()));
+                    message.getOperationType(), objectMapper.writeValueAsString(payload));
+            memberDocumentRepository.save(memberMapper.toMemberDocument(payload));
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
@@ -66,8 +73,10 @@ public class MemberServiceConsumer {
 
     private void handleMemberUpdate(MemberTopicMessage message) {
         try {
+            MemberTopicMessage.Payload payload = message.getPayload();
             log.info("[{}] Consumed MemberTopicMessage: {}",
-                    message.getOperationType(), objectMapper.writeValueAsString(message.getPayload()));
+                    message.getOperationType(), objectMapper.writeValueAsString(payload));
+            memberDocumentRepository.updateMemberDocument(message.getId(), payload);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
@@ -77,6 +86,7 @@ public class MemberServiceConsumer {
         try {
             log.info("[{}] Consumed MemberTopicMessage: {}",
                     message.getOperationType(), objectMapper.writeValueAsString(message.getPayload()));
+            memberDocumentRepository.deleteById(message.getId());
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
@@ -124,7 +134,7 @@ public class MemberServiceConsumer {
             BasketTopicMessage.Payload payload = message.getPayload();
             log.info("[{}] Consumed BasketTopicMessage: {}",
                     message.getOperationType(), objectMapper.writeValueAsString(payload));
-            basketDocumentRepository.delete(basketMapper.toBasketDocument(payload));
+            basketDocumentRepository.deleteById(message.getId());
             basketItemListCacheService.delete(payload.getUserUuid());
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);

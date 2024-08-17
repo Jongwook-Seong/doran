@@ -12,6 +12,8 @@ import com.sjw.doran.memberservice.kafka.member.MemberEvent;
 import com.sjw.doran.memberservice.kafka.member.MemberTopicMessage;
 import com.sjw.doran.memberservice.mapper.BasketMapper;
 import com.sjw.doran.memberservice.mapper.MemberMapper;
+import com.sjw.doran.memberservice.mongodb.member.MemberDocument;
+import com.sjw.doran.memberservice.mongodb.member.MemberDocumentRepository;
 import com.sjw.doran.memberservice.repository.BasketRepository;
 import com.sjw.doran.memberservice.repository.MemberRepository;
 import com.sjw.doran.memberservice.service.MemberService;
@@ -35,6 +37,7 @@ public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
     private final BasketRepository basketRepository;
+    private final MemberDocumentRepository memberDocumentRepository;
     private final ResilientOrderServiceClient resilientOrderServiceClient;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final MemberMapper memberMapper;
@@ -59,8 +62,10 @@ public class MemberServiceImpl implements MemberService {
     @Override
     @Transactional(readOnly = true)
     public List<MemberDto> findMembers() {
-        List<Member> members = memberRepository.findAll();
-        List<MemberDto> memberDtos = memberMapper.toMemberDtoList(members);
+//        List<Member> members = memberRepository.findAll();
+//        List<MemberDto> memberDtos = memberMapper.toMemberDtoList(members);
+        List<MemberDocument> memberDocuments = memberDocumentRepository.findAll();
+        List<MemberDto> memberDtos = memberMapper.toMemberDtoListFromMemberDocumentList(memberDocuments);
         return memberDtos;
     }
 
@@ -96,7 +101,8 @@ public class MemberServiceImpl implements MemberService {
             memberRepository.delete(member);
             /* Publish kafka message */
             applicationEventPublisher.publishEvent(new MemberEvent(this, member.getId(), null, OperationType.DELETE));
-            applicationEventPublisher.publishEvent(new BasketEvent(this, basket.getId(), null, BasketOperationType.DELETE));
+            applicationEventPublisher.publishEvent(new BasketEvent(this, basket.getId(),
+                    new BasketTopicMessage.Payload(basket.getId(), userUuid, null), BasketOperationType.DELETE));
         } catch (Exception e) {
             throw new RuntimeException(messageUtil.getMemberDeleteErrorMessage());
         }
