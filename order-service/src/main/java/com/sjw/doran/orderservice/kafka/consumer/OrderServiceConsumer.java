@@ -39,7 +39,7 @@ public class OrderServiceConsumer {
         }
     }
 
-    @KafkaListener(topics = { Topic.DELIVERY_TOPIC }, groupId = "order-consumer-group", concurrency = "2")
+    @KafkaListener(topics = { Topic.DELIVERY_TOPIC }, groupId = "delivery-consumer-group", concurrency = "2")
     public void listenDeliveryTopic(ConsumerRecord<String, String> record) throws JsonProcessingException {
         DeliveryTopicMessage message = objectMapper.readValue(record.value(), DeliveryTopicMessage.class);
         if (message.getOperationType() == OperationType.CREATE) {
