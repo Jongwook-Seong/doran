@@ -26,10 +26,6 @@ public class Member extends BaseTimeEntity {
     @Embedded
     private Address address;
 
-    @ElementCollection(fetch = FetchType.LAZY)
-    @CollectionTable(name = "order_uuid_list", joinColumns = @JoinColumn(name = "member_id"))
-    private List<String> orderUuid = new ArrayList<>();
-
     @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private Basket basket;
 

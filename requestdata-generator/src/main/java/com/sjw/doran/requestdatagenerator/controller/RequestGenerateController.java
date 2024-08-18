@@ -50,6 +50,9 @@ public class RequestGenerateController {
                     .setHeader("Content-Type", "application/json")
                     .build();
             client.send(request, HttpResponse.BodyHandlers.ofString());
+            if (i % 500 == 0)
+                System.out.println("RequestGenerateController.generateMemberRequests" +
+                        " - processed " + i + " requests.");
         }
         return "Members created";
     }
@@ -70,6 +73,9 @@ public class RequestGenerateController {
                     .setHeader("userUuid", userUuid)
                     .build();
             client.send(request, HttpResponse.BodyHandlers.ofString());
+            if (i % 50 == 0)
+                System.out.println("RequestGenerateController.generateBasketItemRequests" +
+                        " - processed " + i + " requests.");
         }
         return "Basket Items created";
     }
@@ -90,6 +96,9 @@ public class RequestGenerateController {
                     .setHeader("userUuid", userUuid)
                     .build();
             client.send(request, HttpResponse.BodyHandlers.ofString());
+            if (i % 500 == 0)
+                System.out.println("RequestGenerateController.generateOrderRequests" +
+                        " - processed " + i + " requests.");
         }
         return "Orders created";
     }
@@ -108,6 +117,9 @@ public class RequestGenerateController {
                     .setHeader("Content-Type", "application/json")
                     .build();
             client.send(request, HttpResponse.BodyHandlers.ofString());
+            if (i % 500 == 0)
+                System.out.println("RequestGenerateController.generateItemRequests" +
+                        " - processed " + i + " requests.");
         }
         return "Items created";
     }

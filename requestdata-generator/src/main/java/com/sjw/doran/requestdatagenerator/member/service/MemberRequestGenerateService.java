@@ -62,6 +62,8 @@ public class MemberRequestGenerateService {
         Map<Long, BasketItemAddRequest> requestMap = new HashMap<>();
         for (long i = 1; i <= size; i++) {
             requestMap.put(i, generateBasketItemAddRequest());
+            if (i % 50 == 0)
+                System.out.println("MemberRequestGenerateService.createBasketItemAddRequests - " + i);
         }
         return requestMap;
     }
