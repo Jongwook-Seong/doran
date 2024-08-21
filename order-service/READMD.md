@@ -15,6 +15,8 @@
 ## Architecture
 <img width="9116" alt="주문서비스아키텍처" src="https://github.com/user-attachments/assets/fea186dd-526d-4c31-8534-9eb5dc650322">
 
+<img width="9116" alt="주문서비스아키텍처" src="https://github.com/user-attachments/assets/0d0e5549-6494-4c92-a713-691270f40712">
+
 <br>
 <br>
 
