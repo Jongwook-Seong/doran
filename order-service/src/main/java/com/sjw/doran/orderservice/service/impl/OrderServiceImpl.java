@@ -165,9 +165,9 @@ public class OrderServiceImpl implements OrderService {
         }
         // Get Item-Service data by Kafka Asynchronous Communication, instead of FeignClient
         List<ItemDocument> itemDocuments = itemDocumentRepository.findAllByItemUuidIn(itemUuidList);
-//        List<ItemSimpleWithoutPriceResponse> itemSimpleWxPList = resilientItemServiceClient.getItemSimpleWithoutPrice(itemUuidList);
-        // itemName, itemImageUrl 추출 및 삽입
         insertItemNameAndImageUrlIntoOrderSimpleList(itemMapper.toItemSimpleWxPResponseList(itemDocuments), orderSimpleList);
+//        List<ItemSimpleWithoutPriceResponse> itemSimpleWxPList = resilientItemServiceClient.getItemSimpleWithoutPrice(itemUuidList);
+//        // itemName, itemImageUrl 추출 및 삽입
 //        insertItemNameAndImageUrlIntoOrderSimpleList(itemSimpleWxPList, orderSimpleList);
         return OrderListResponse.getInstance(orderSimpleList);
     }

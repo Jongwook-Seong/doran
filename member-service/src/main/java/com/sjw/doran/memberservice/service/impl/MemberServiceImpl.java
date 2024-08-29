@@ -12,24 +12,30 @@ import com.sjw.doran.memberservice.kafka.member.MemberEvent;
 import com.sjw.doran.memberservice.kafka.member.MemberTopicMessage;
 import com.sjw.doran.memberservice.mapper.BasketMapper;
 import com.sjw.doran.memberservice.mapper.MemberMapper;
+import com.sjw.doran.memberservice.mapper.order.DeliveryMapper;
+import com.sjw.doran.memberservice.mapper.order.OrderMapper;
+import com.sjw.doran.memberservice.mongodb.delivery.DeliveryDocument;
+import com.sjw.doran.memberservice.mongodb.delivery.DeliveryDocumentRepository;
+import com.sjw.doran.memberservice.mongodb.item.ItemDocument;
+import com.sjw.doran.memberservice.mongodb.item.ItemDocumentRepository;
 import com.sjw.doran.memberservice.mongodb.member.MemberDocument;
 import com.sjw.doran.memberservice.mongodb.member.MemberDocumentRepository;
+import com.sjw.doran.memberservice.mongodb.order.OrderDocument;
+import com.sjw.doran.memberservice.mongodb.order.OrderDocumentRepository;
 import com.sjw.doran.memberservice.repository.BasketRepository;
 import com.sjw.doran.memberservice.repository.MemberRepository;
 import com.sjw.doran.memberservice.service.MemberService;
 import com.sjw.doran.memberservice.util.MessageUtil;
 import com.sjw.doran.memberservice.vo.response.MemberOrderResponse;
-import com.sjw.doran.memberservice.vo.response.order.DeliveryTrackingResponse;
-import com.sjw.doran.memberservice.vo.response.order.OrderDetailResponse;
-import com.sjw.doran.memberservice.vo.response.order.OrderListResponse;
+import com.sjw.doran.memberservice.vo.response.order.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -38,10 +44,15 @@ public class MemberServiceImpl implements MemberService {
     private final MemberRepository memberRepository;
     private final BasketRepository basketRepository;
     private final MemberDocumentRepository memberDocumentRepository;
+    private final OrderDocumentRepository orderDocumentRepository;
+    private final DeliveryDocumentRepository deliveryDocumentRepository;
+    private final ItemDocumentRepository itemDocumentRepository;
     private final ResilientOrderServiceClient resilientOrderServiceClient;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final MemberMapper memberMapper;
     private final BasketMapper basketMapper;
+    private final OrderMapper orderMapper;
+    private final DeliveryMapper deliveryMapper;
     private final MessageUtil messageUtil;
 
     @Override
@@ -113,8 +124,35 @@ public class MemberServiceImpl implements MemberService {
     public MemberOrderResponse findMemberOrderList(String userUuid) throws InterruptedException {
         Member member = memberRepository.findByUserUuid(userUuid).orElseThrow(() -> {
             throw new NoSuchElementException("Invalid Member"); });
-        OrderListResponse orderListResponse = resilientOrderServiceClient.inquireOrderList(userUuid);
+        // Get Order-Service data by using Kafka Asynchronous Communication, instead of FeignClient
+        List<OrderDocument> orderDocuments = orderDocumentRepository.findAllByUserUuid(userUuid);
+        List<Long> deliveryIds = orderDocuments.stream().map(OrderDocument::getDeliveryId).collect(Collectors.toList());
+        // extract deliveryStatus list for mapping
+        List<DeliveryDocument> deliveryDocuments = deliveryDocumentRepository.findAllByIds(deliveryIds);
+        List<DeliveryStatus> deliveryStatuses = deliveryDocuments.stream()
+                .map(DeliveryDocument::getDeliveryStatus).collect(Collectors.toList());
+        // extract itemDocuments list for mapping
+        List<List<OrderDocument.OrderItem>> orderItems = orderDocuments.stream().map(OrderDocument::getOrderItems).collect(Collectors.toList());
+        List<List<String>> ordersItemUuids = new ArrayList<>();
+        orderItems.stream().forEach(list -> ordersItemUuids.add(list.stream()
+                .map(OrderDocument.OrderItem::getItemUuid).collect(Collectors.toList())));
+        List<String> itemUuidList = new ArrayList<>();
+        ordersItemUuids.forEach(list -> list.forEach(itemUuid -> itemUuidList.add(itemUuid)));
+        List<ItemDocument> itemDocuments = itemDocumentRepository.findAllByItemUuidIn(itemUuidList);
+        List<List<ItemDocument>> itemDocumentsList = extractItemDocumentsList(itemDocuments, ordersItemUuids);
+        // create orderListResponse by mapping orderSimpleList
+        List<OrderSimple> orderSimpleList = orderMapper.toOrderSimpleList(orderDocuments, itemDocumentsList, deliveryStatuses);
+        OrderListResponse orderListResponse = OrderListResponse.getInstance(orderSimpleList);
+//        OrderListResponse orderListResponse = resilientOrderServiceClient.inquireOrderList(userUuid);
         return MemberOrderResponse.getInstance(member.getUserUuid(), member.getNickname(), member.getProfileImageUrl(), orderListResponse);
+    }
+
+    private List<List<ItemDocument>> extractItemDocumentsList(List<ItemDocument> itemDocuments, List<List<String>> ordersItemUuids) {
+        Map<String, ItemDocument> itemDocumentMap = itemDocuments.stream().collect(Collectors.toMap(ItemDocument::getItemUuid, Function.identity()));
+        List<List<ItemDocument>> itemDocumentsList = new ArrayList<>();
+        ordersItemUuids.forEach(orderItemUuids -> itemDocumentsList.add(orderItemUuids.stream()
+                .map(itemDocumentMap::get).collect(Collectors.toList())));
+        return itemDocumentsList;
     }
 
     @Override
@@ -122,7 +160,11 @@ public class MemberServiceImpl implements MemberService {
     public MemberOrderResponse findMemberOrderDetail(String userUuid, String orderUuid) throws InterruptedException {
         Member member = memberRepository.findByUserUuid(userUuid).orElseThrow(() -> {
             throw new NoSuchElementException("Invalid Member"); });
-        OrderDetailResponse orderDetailResponse = resilientOrderServiceClient.inquireOrderDetail(userUuid, orderUuid);
+        // Get Order-Service data by using Kafka Asynchronous Communication, instead of FeignClient
+        OrderDocument orderDocument = orderDocumentRepository.findByUserUuidAndOrderUuid(userUuid, orderUuid).orElseThrow();
+        DeliveryDocument deliveryDocument = deliveryDocumentRepository.findByUserUuidAndOrderUuid(userUuid, orderUuid).orElseThrow();
+        OrderDetailResponse orderDetailResponse = orderMapper.toOrderDetailResponse(orderDocument, deliveryDocument);
+//        OrderDetailResponse orderDetailResponse = resilientOrderServiceClient.inquireOrderDetail(userUuid, orderUuid);
         return MemberOrderResponse.getInstance(member.getUserUuid(), member.getNickname(), member.getProfileImageUrl(), orderDetailResponse);
     }
 
@@ -131,7 +173,10 @@ public class MemberServiceImpl implements MemberService {
     public MemberOrderResponse findMemberOrderDeliveryTracking(String userUuid, String orderUuid) throws InterruptedException {
         Member member = memberRepository.findByUserUuid(userUuid).orElseThrow(() -> {
             throw new NoSuchElementException("Invalid Member"); });
-        DeliveryTrackingResponse deliveryTrackingResponse = resilientOrderServiceClient.inquireDeliveryTracking(userUuid, orderUuid);
+        // Get Order-Service data by using Kafka Asynchronous Communication, instead of FeignClient
+        DeliveryDocument deliveryDocument = deliveryDocumentRepository.findByUserUuidAndOrderUuid(userUuid, orderUuid).orElseThrow();
+        DeliveryTrackingResponse deliveryTrackingResponse = deliveryMapper.toDeliveryTrackingResponse(deliveryDocument);
+//        DeliveryTrackingResponse deliveryTrackingResponse = resilientOrderServiceClient.inquireDeliveryTracking(userUuid, orderUuid);
         return MemberOrderResponse.getInstance(member.getUserUuid(), member.getNickname(), member.getProfileImageUrl(), deliveryTrackingResponse);
     }
 }

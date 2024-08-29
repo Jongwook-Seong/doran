@@ -1,4 +1,4 @@
-package com.sjw.doran.memberservice.mapper;
+package com.sjw.doran.memberservice.mapper.item;
 
 import com.sjw.doran.memberservice.kafka.item.ItemTopicMessage;
 import com.sjw.doran.memberservice.mongodb.item.ItemDocument;

@@ -9,7 +9,7 @@ import com.sjw.doran.memberservice.kafka.basket.BasketTopicMessage;
 import com.sjw.doran.memberservice.kafka.common.BasketOperationType;
 import com.sjw.doran.memberservice.mapper.BasketItemMapper;
 import com.sjw.doran.memberservice.mapper.BasketMapper;
-import com.sjw.doran.memberservice.mapper.ItemMapper;
+import com.sjw.doran.memberservice.mapper.item.ItemMapper;
 import com.sjw.doran.memberservice.mongodb.basket.BasketDocument;
 import com.sjw.doran.memberservice.mongodb.basket.BasketDocumentRepository;
 import com.sjw.doran.memberservice.mongodb.item.ItemDocument;
