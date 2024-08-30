@@ -1,18 +1,21 @@
 package com.sjw.doran.memberservice.vo.response.order;
 
 import jakarta.persistence.Embeddable;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Embeddable
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
 public class TransceiverInfo {
 
     private String ordererName;
     private String receiverName;
     private String receiverPhoneNumber;
+
+    @Builder
+    public TransceiverInfo(String ordererName, String receiverName, String receiverPhoneNumber) {
+        this.ordererName = ordererName;
+        this.receiverName = receiverName;
+        this.receiverPhoneNumber = receiverPhoneNumber;
+    }
 }

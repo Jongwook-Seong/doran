@@ -16,6 +16,8 @@ import com.sjw.doran.orderservice.kafka.order.OrderTopicMessage;
 import com.sjw.doran.orderservice.mapper.*;
 import com.sjw.doran.orderservice.mongodb.delivery.DeliveryDocument;
 import com.sjw.doran.orderservice.mongodb.delivery.DeliveryDocumentRepository;
+import com.sjw.doran.orderservice.mongodb.item.ItemDocument;
+import com.sjw.doran.orderservice.mongodb.item.ItemDocumentRepository;
 import com.sjw.doran.orderservice.mongodb.order.OrderDocument;
 import com.sjw.doran.orderservice.mongodb.order.OrderDocumentRepository;
 import com.sjw.doran.orderservice.repository.DeliveryTrackingRepository;
@@ -51,6 +53,7 @@ public class OrderServiceImpl implements OrderService {
     private final DeliveryTrackingRepository deliveryTrackingRepository;
     private final OrderDocumentRepository orderDocumentRepository;
     private final DeliveryDocumentRepository deliveryDocumentRepository;
+    private final ItemDocumentRepository itemDocumentRepository;
     private final ResilientItemServiceClient resilientItemServiceClient;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final OrderMapper orderMapper;
@@ -58,6 +61,7 @@ public class OrderServiceImpl implements OrderService {
     private final DeliveryTrackingMapper deliveryTrackingMapper;
     private final TransceiverInfoMapper transceiverInfoMapper;
     private final AddressMapper addressMapper;
+    private final ItemMapper itemMapper;
     private final MessageUtil messageUtil;
 
     @Override
@@ -159,9 +163,12 @@ public class OrderServiceImpl implements OrderService {
         } catch (Exception e) {
             throw new NoSuchElementException(messageUtil.getNoSuchUserUuidErrorMessage(userUuid));
         }
-        List<ItemSimpleWithoutPriceResponse> itemSimpleWxPList = resilientItemServiceClient.getItemSimpleWithoutPrice(itemUuidList);
-        // itemName, itemImageUrl 추출 및 삽입
-        insertItemNameAndImageUrlIntoOrderSimpleList(itemSimpleWxPList, orderSimpleList);
+        // Get Item-Service data by Kafka Asynchronous Communication, instead of FeignClient
+        List<ItemDocument> itemDocuments = itemDocumentRepository.findAllByItemUuidIn(itemUuidList);
+        insertItemNameAndImageUrlIntoOrderSimpleList(itemMapper.toItemSimpleWxPResponseList(itemDocuments), orderSimpleList);
+//        List<ItemSimpleWithoutPriceResponse> itemSimpleWxPList = resilientItemServiceClient.getItemSimpleWithoutPrice(itemUuidList);
+//        // itemName, itemImageUrl 추출 및 삽입
+//        insertItemNameAndImageUrlIntoOrderSimpleList(itemSimpleWxPList, orderSimpleList);
         return OrderListResponse.getInstance(orderSimpleList);
     }
 

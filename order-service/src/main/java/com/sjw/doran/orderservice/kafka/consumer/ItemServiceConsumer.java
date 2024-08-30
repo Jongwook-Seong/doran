@@ -1,15 +1,12 @@
-package com.sjw.doran.itemservice.kafka.consumer;
+package com.sjw.doran.orderservice.kafka.consumer;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.sjw.doran.itemservice.entity.Category;
-import com.sjw.doran.itemservice.kafka.common.OperationType;
-import com.sjw.doran.itemservice.kafka.common.Topic;
-import com.sjw.doran.itemservice.kafka.item.ItemTopicMessage;
-import com.sjw.doran.itemservice.mapper.ArtworkMapper;
-import com.sjw.doran.itemservice.mapper.BookMapper;
-import com.sjw.doran.itemservice.mapper.CustomObjectMapper;
-import com.sjw.doran.itemservice.mongodb.incidental.IncidentalDocumentRepository;
-import com.sjw.doran.itemservice.mongodb.item.ItemDocumentRepository;
+import com.sjw.doran.orderservice.kafka.common.OperationType;
+import com.sjw.doran.orderservice.kafka.common.Topic;
+import com.sjw.doran.orderservice.kafka.item.ItemTopicMessage;
+import com.sjw.doran.orderservice.mapper.CustomObjectMapper;
+import com.sjw.doran.orderservice.mapper.ItemMapper;
+import com.sjw.doran.orderservice.mongodb.item.ItemDocumentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -22,12 +19,10 @@ import org.springframework.stereotype.Service;
 public class ItemServiceConsumer {
 
     private final CustomObjectMapper objectMapper = new CustomObjectMapper();
-    private final BookMapper bookMapper;
-    private final ArtworkMapper artworkMapper;
+    private final ItemMapper itemMapper;
     private final ItemDocumentRepository itemDocumentRepository;
-    private final IncidentalDocumentRepository incidentalDocumentRepository;
 
-    @KafkaListener(topics = { Topic.ITEM_TOPIC }, groupId = "item-svc-item-consumer-group", concurrency = "2")
+    @KafkaListener(topics = { Topic.ITEM_TOPIC }, groupId = "order-svc-item-consumer-group", concurrency = "2")
     public void listenItemTopic(ConsumerRecord<String, String> record) throws JsonProcessingException {
         ItemTopicMessage message = objectMapper.readValue(record.value(), ItemTopicMessage.class);
         if (message.getOperationType() == OperationType.CREATE) {
@@ -44,11 +39,7 @@ public class ItemServiceConsumer {
             ItemTopicMessage.Payload payload = message.getPayload();
             log.info("[{}] Consumed ItemTopicMessage: {}",
                     message.getOperationType(), objectMapper.writeValueAsString(payload));
-            if (payload.getCategory() == Category.BOOK) {
-                itemDocumentRepository.save(bookMapper.toItemDocument(payload));
-            } else if (payload.getCategory() == Category.ARTWORK) {
-                itemDocumentRepository.save(artworkMapper.toItemDocument(payload));
-            }
+            itemDocumentRepository.save(itemMapper.toItemDocument(payload));
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
@@ -60,7 +51,6 @@ public class ItemServiceConsumer {
             log.info("[{}] Consumed ItemTopicMessage: {}",
                     message.getOperationType(), objectMapper.writeValueAsString(payload));
             itemDocumentRepository.updateItemDocument(message.getId(), payload);
-            incidentalDocumentRepository.saveAnIncidentalData(payload.getItemUuid(), payload.getLatestOrderQuantity());
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }

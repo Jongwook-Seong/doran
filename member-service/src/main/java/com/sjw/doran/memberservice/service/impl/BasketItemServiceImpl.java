@@ -9,8 +9,11 @@ import com.sjw.doran.memberservice.kafka.basket.BasketTopicMessage;
 import com.sjw.doran.memberservice.kafka.common.BasketOperationType;
 import com.sjw.doran.memberservice.mapper.BasketItemMapper;
 import com.sjw.doran.memberservice.mapper.BasketMapper;
+import com.sjw.doran.memberservice.mapper.item.ItemMapper;
 import com.sjw.doran.memberservice.mongodb.basket.BasketDocument;
 import com.sjw.doran.memberservice.mongodb.basket.BasketDocumentRepository;
+import com.sjw.doran.memberservice.mongodb.item.ItemDocument;
+import com.sjw.doran.memberservice.mongodb.item.ItemDocumentRepository;
 import com.sjw.doran.memberservice.redis.service.BasketItemListCacheService;
 import com.sjw.doran.memberservice.repository.BasketItemRepository;
 import com.sjw.doran.memberservice.service.BasketItemService;
@@ -34,10 +37,12 @@ public class BasketItemServiceImpl implements BasketItemService {
     private final BasketItemRepository basketItemRepository;
     private final BasketDocumentRepository basketDocumentRepository;
     private final BasketItemListCacheService basketItemListCacheService;
+    private final ItemDocumentRepository itemDocumentRepository;
     private final ResilientItemServiceClient resilientItemServiceClient;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final BasketMapper basketMapper;
     private final BasketItemMapper basketItemMapper;
+    private final ItemMapper itemMapper;
 
     @Override
     @Transactional(readOnly = true)
@@ -52,8 +57,11 @@ public class BasketItemServiceImpl implements BasketItemService {
         basketDocument.getItems().forEach(item -> itemUuidList.add(item.getItemUuid()));
         List<BasketItem> basketItemList = new ArrayList<>();
         basketDocument.getItems().forEach(item -> basketItemList.add(basketItemMapper.toBasketItem(basket, item)));
-        List<ItemSimpleResponse> itemSimpleResponseList = resilientItemServiceClient.getBookBasket(itemUuidList);
-        return getItemSimpleWithCountResponseList(basketItemList, itemSimpleResponseList);
+        // Get Item-Service data by Kafka Asynchronous Communication, instead of FeignClient
+        List<ItemDocument> itemDocuments = itemDocumentRepository.findAllByItemUuidIn(itemUuidList);
+        return getItemSimpleWithCountResponseList(basketItemList, itemMapper.toItemSimpleResponseList(itemDocuments));
+//        List<ItemSimpleResponse> itemSimpleResponseList = resilientItemServiceClient.getBookBasket(itemUuidList);
+//        return getItemSimpleWithCountResponseList(basketItemList, itemSimpleResponseList);
     }
 
     private static List<ItemSimpleWithCountResponse> getItemSimpleWithCountResponseList(List<BasketItem> basketItemList, List<ItemSimpleResponse> itemSimpleResponseList) {
@@ -73,11 +81,17 @@ public class BasketItemServiceImpl implements BasketItemService {
         BasketItemDto basketItemDto = basketItemMapper.toBasketItemDto(request);
         BasketItem basketItem = basketItemMapper.toBasketItem(basketItemDto, basket);
         basketItemRepository.save(basketItem);
-        /* Get additional fields of BasketItem from FeignClient */
-        ItemSimpleResponse itemSimpleResponse = resilientItemServiceClient.getBookBasket(List.of(basketItem.getItemUuid())).get(0);
+        // Get Item-Service data by Kafka Asynchronous Communication, instead of FeignClient
+        ItemDocument itemDocument = itemDocumentRepository.findAllByItemUuidIn(List.of(basketItem.getItemUuid())).get(0);
         /* Mapping */
         BasketTopicMessage.BasketItemData basketItemData =
-                basketItemMapper.toBasketTopicMessageBasketItemDataFromItemSimpleResponse(itemSimpleResponse, basketItem.getCount());
+                basketItemMapper.toBasketTopicMessageBasketItemDataFromItemSimpleResponse(
+                        itemMapper.toItemSimpleResponse(itemDocument), basketItem.getCount());
+//        /* Get additional fields of BasketItem from FeignClient */
+//        ItemSimpleResponse itemSimpleResponse = resilientItemServiceClient.getBookBasket(List.of(basketItem.getItemUuid())).get(0);
+//        /* Mapping */
+//        BasketTopicMessage.BasketItemData basketItemData =
+//                basketItemMapper.toBasketTopicMessageBasketItemDataFromItemSimpleResponse(itemSimpleResponse, basketItem.getCount());
         BasketTopicMessage basketTopicMessage = basketMapper.toBasketTopicMessage(basket, new ArrayList<>(), userUuid, null);
         basketTopicMessage.getPayload().getBasketItems().add(basketItemData);
         /* Publish kafka message */

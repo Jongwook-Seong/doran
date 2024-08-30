@@ -1,0 +1,47 @@
+package com.sjw.doran.memberservice.kafka.order;
+
+import com.sjw.doran.memberservice.kafka.common.OperationType;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class OrderTopicMessage {
+
+    private Long id;
+    private Payload payload;
+    private OperationType operationType;
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Payload {
+
+        private Long id;
+        private String orderUuid;
+        private String userUuid;
+        private List<ItemData> items;
+        private Long deliveryId;
+        private OrderStatus orderStatus;
+        private LocalDateTime orderDate;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ItemData {
+
+        private String itemUuid;
+        private int price;
+        private int count;
+    }
+
+    public enum OrderStatus {
+        ORDER, CANCEL
+    }
+}

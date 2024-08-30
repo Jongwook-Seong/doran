@@ -34,7 +34,7 @@ public class MemberServiceConsumer {
     private final BasketDocumentRepository basketDocumentRepository;
     private final BasketItemListCacheService basketItemListCacheService;
 
-    @KafkaListener(topics = {Topic.MEMBER_TOPIC }, groupId = "member-consumer-group", concurrency = "2")
+    @KafkaListener(topics = {Topic.MEMBER_TOPIC }, groupId = "member-svc-member-consumer-group", concurrency = "2")
     public void listenMemberTopic(ConsumerRecord<String, String> record) throws JsonProcessingException {
         MemberTopicMessage message = objectMapper.readValue(record.value(), MemberTopicMessage.class);
         if (message.getOperationType() == OperationType.CREATE) {
@@ -46,7 +46,7 @@ public class MemberServiceConsumer {
         }
     }
 
-    @KafkaListener(topics = { Topic.BASKET_TOPIC }, groupId = "basket-consumer-group", concurrency = "2")
+    @KafkaListener(topics = { Topic.BASKET_TOPIC }, groupId = "member-svc-basket-consumer-group", concurrency = "2")
     public void listenBasketTopic(ConsumerRecord<String, String> record) throws JsonProcessingException {
         BasketTopicMessage message = objectMapper.readValue(record.value(), BasketTopicMessage.class);
         if (message.getOperationType() == BasketOperationType.CREATE) {
