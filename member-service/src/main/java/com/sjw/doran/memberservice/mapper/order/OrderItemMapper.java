@@ -8,6 +8,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Mapper(componentModel = "spring")
@@ -29,5 +30,10 @@ public interface OrderItemMapper {
     @Mapping(target = "count", source = "orderItem.count")
     OrderItemSimple toOrderItemSimple(OrderDocument.OrderItem orderItem, ItemDocument itemDocument);
 
-    List<OrderItemSimple> toOrderItemSimpleList(List<OrderDocument.OrderItem> orderItems, List<ItemDocument> itemDocuments);
+    default List<OrderItemSimple> toOrderItemSimpleList(List<OrderDocument.OrderItem> orderItems, List<ItemDocument> itemDocuments) {
+        List<OrderItemSimple> orderItemSimpleList = new ArrayList<>();
+        for (int i = 0; i < orderItems.size(); i++)
+            orderItemSimpleList.add(toOrderItemSimple(orderItems.get(i), itemDocuments.get(i)));
+        return orderItemSimpleList;
+    }
 }

@@ -12,6 +12,7 @@ import java.util.List;
 
 @Document(collection = "deliveryInfoForMemberService")
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 public class DeliveryDocument {
 

@@ -40,11 +40,4 @@ public class DeliveryDocumentRepositoryImpl implements DeliveryDocumentCustomRep
                 .map(deliveryDocMap::get)
                 .collect(Collectors.toList());
     }
-
-    @Override
-    public Optional<DeliveryDocument> findByUserUuidAndOrderUuid(String userUuid, String orderUuid) {
-        Query query = new Query(Criteria.where("userUuid").is(userUuid).and("orderUuid").is(orderUuid));
-        DeliveryDocument deliveryDocument = mongoTemplate.findOne(query, DeliveryDocument.class);
-        return Optional.ofNullable(deliveryDocument);
-    }
 }

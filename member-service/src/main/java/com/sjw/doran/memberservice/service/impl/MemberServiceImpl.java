@@ -162,7 +162,7 @@ public class MemberServiceImpl implements MemberService {
             throw new NoSuchElementException("Invalid Member"); });
         // Get Order-Service data by using Kafka Asynchronous Communication, instead of FeignClient
         OrderDocument orderDocument = orderDocumentRepository.findByUserUuidAndOrderUuid(userUuid, orderUuid).orElseThrow();
-        DeliveryDocument deliveryDocument = deliveryDocumentRepository.findByUserUuidAndOrderUuid(userUuid, orderUuid).orElseThrow();
+        DeliveryDocument deliveryDocument = deliveryDocumentRepository.findById(orderDocument.getDeliveryId()).orElseThrow();
         OrderDetailResponse orderDetailResponse = orderMapper.toOrderDetailResponse(orderDocument, deliveryDocument);
 //        OrderDetailResponse orderDetailResponse = resilientOrderServiceClient.inquireOrderDetail(userUuid, orderUuid);
         return MemberOrderResponse.getInstance(member.getUserUuid(), member.getNickname(), member.getProfileImageUrl(), orderDetailResponse);
@@ -174,7 +174,8 @@ public class MemberServiceImpl implements MemberService {
         Member member = memberRepository.findByUserUuid(userUuid).orElseThrow(() -> {
             throw new NoSuchElementException("Invalid Member"); });
         // Get Order-Service data by using Kafka Asynchronous Communication, instead of FeignClient
-        DeliveryDocument deliveryDocument = deliveryDocumentRepository.findByUserUuidAndOrderUuid(userUuid, orderUuid).orElseThrow();
+        OrderDocument orderDocument = orderDocumentRepository.findByUserUuidAndOrderUuid(userUuid, orderUuid).orElseThrow();
+        DeliveryDocument deliveryDocument = deliveryDocumentRepository.findById(orderDocument.getDeliveryId()).orElseThrow();
         DeliveryTrackingResponse deliveryTrackingResponse = deliveryMapper.toDeliveryTrackingResponse(deliveryDocument);
 //        DeliveryTrackingResponse deliveryTrackingResponse = resilientOrderServiceClient.inquireDeliveryTracking(userUuid, orderUuid);
         return MemberOrderResponse.getInstance(member.getUserUuid(), member.getNickname(), member.getProfileImageUrl(), deliveryTrackingResponse);

@@ -11,6 +11,4 @@ public interface DeliveryDocumentCustomRepository {
     void addDeliveryTracking(Long deliveryId, DeliveryTopicMessage.DeliveryTrackingData deliveryTrackingData, DeliveryStatus deliveryStatus);
 
     List<DeliveryDocument> findAllByIds(List<Long> deliveryIds);
-
-    Optional<DeliveryDocument> findByUserUuidAndOrderUuid(String userUuid, String orderUuid);
 }

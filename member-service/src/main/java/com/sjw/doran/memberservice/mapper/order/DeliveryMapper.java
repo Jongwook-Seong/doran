@@ -17,7 +17,7 @@ public interface DeliveryMapper {
     @Mappings({
             @Mapping(target = "id", source = "payload.id"),
             @Mapping(target = "deliveryTrackingInfoList", source = "payload.deliveryTrackings"),
-            @Mapping(target = "transceiverInfoData", source = "payload.transceiverInfoData"),
+            @Mapping(target = "transceiverInfoData", source = "payload.transceiverInfo"),
             @Mapping(target = "address", source = "payload.address"),
             @Mapping(target = "deliveryStatus", source = "payload.deliveryStatus")
     })
