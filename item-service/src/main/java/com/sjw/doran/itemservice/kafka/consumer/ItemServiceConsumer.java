@@ -27,7 +27,7 @@ public class ItemServiceConsumer {
     private final ItemDocumentRepository itemDocumentRepository;
     private final IncidentalDocumentRepository incidentalDocumentRepository;
 
-    @KafkaListener(topics = { Topic.ITEM_TOPIC }, groupId = "item-consumer-group", concurrency = "2")
+    @KafkaListener(topics = { Topic.ITEM_TOPIC }, groupId = "item-svc-item-consumer-group", concurrency = "2")
     public void listenItemTopic(ConsumerRecord<String, String> record) throws JsonProcessingException {
         ItemTopicMessage message = objectMapper.readValue(record.value(), ItemTopicMessage.class);
         if (message.getOperationType() == OperationType.CREATE) {
