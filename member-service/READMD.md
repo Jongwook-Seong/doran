@@ -13,9 +13,9 @@
 <br>
 
 ## Architecture
-<img width="9116" alt="회원서비스아키텍처" src="https://github.com/user-attachments/assets/b965bf74-b911-4ebe-a327-e1392d5fd191">
+<img width="9116" alt="회원서비스아키텍처" src="https://github.com/user-attachments/assets/52e82d67-8a21-4050-beeb-786d355611f3">
 
-<img width="9116" alt="회원서비스아키텍처" src="https://github.com/user-attachments/assets/f4c0006d-1f74-4f8f-b87f-ddd21f739b29">
+<img width="9116" alt="회원서비스아키텍처" src="https://github.com/user-attachments/assets/4b6ed962-e9b9-4615-a91d-d29f6b1edf1f">
 
 <br>
 <br>

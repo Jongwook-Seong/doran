@@ -33,9 +33,9 @@ Velog : https://velog.io/@xav/posts?tag=Doran
 - **Messaging System** : ![Static Badge](https://img.shields.io/badge/kafka-3.6.0-231F20?logo=ApacheKafka&label=Apache%20Kafka&color=231F20)
 
 ## Architecture
-<img width="9116" alt="아키텍처" src="https://github.com/user-attachments/assets/d1329fda-b184-4322-be40-5ee61f522ec9">
+<img width="9116" alt="아키텍처" src="https://github.com/user-attachments/assets/6f1c9993-47d4-4afb-b566-c77e5d34e22e">
 
-<img width="9116" alt="카프카 아키텍처" src="https://github.com/user-attachments/assets/325a27e2-800d-4497-82ac-0d178898457f">
+<img width="9116" alt="카프카 아키텍처" src="https://github.com/user-attachments/assets/f2f999ac-b9ce-46c5-953f-f96ac2abebe4">
 
 ❗마이크로서비스별 아키텍처는 각 서비스의 README를 통해 확인할 수 있습니다.
 
@@ -49,10 +49,10 @@ Velog : https://velog.io/@xav/posts?tag=Doran
 |     **Item**      | https://github.com/Jongwook-Seong/doran/blob/main/item-service/READMD.md        |
 
 ## Performance Impovements
-- DB 접근 시 비동기 처리 및 CDC 적용을 통한 서비스 안정성 및 성능 향상 / 데이터 정합성 이슈 해소 (Apache Kafka 적용)
+- DB 접근 시 비동기 처리와 CDC 및 비동기 통신 적용을 통한 서비스 안정성 및 성능 향상 / 데이터 정합성 이슈 해소 (Apache Kafka 적용)
 - 서킷브레이커 및 리트라이 패턴 적용을 통한 데이터 롤백 및 서비스간 통신 장애 대응 및 데이터 롤백 (Resilience4J)
 - 자주 조회되는 데이터에 대한 캐시 적용으로 조회 속도 향상 및 부하 분산 (Redis 캐시 서버 적용)
 - 상품 재고수량 증감 시 동시성 이슈로 인한 데이터 불일치 가능성 해소 (Redisson 분산 락 적용)
 - JPA N+1 문제 해결로 로딩 속도 및 메모리 성능 최적화
-- MySQL과 JPA 인덱스 설정을 통한 쿼리 속도 향상
+- MySQL 인덱스 설정을 통한 쿼리 속도 향상
 - 객체 매핑에 대한 리팩토링을 통해 런타임 부하 해소 및 유지보수성 향상(ModelMapper → Mapstruct)

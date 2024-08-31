@@ -13,9 +13,9 @@
 <br>
 
 ## Architecture
-<img width="9116" alt="상품서비스아키텍처" src="https://github.com/user-attachments/assets/5537f418-0d66-445e-a105-5658ed88adf4">
+<img width="9116" alt="상품서비스아키텍처" src="https://github.com/user-attachments/assets/2968949b-0b67-490d-8814-c4f945cc35ea">
 
-<img width="9116" alt="상품서비스아키텍처" src="https://github.com/user-attachments/assets/5f4d428e-b82d-4364-a9a6-2b6afe5e51cd">
+<img width="9116" alt="상품서비스아키텍처" src="https://github.com/user-attachments/assets/b8ebab5a-23bf-4647-8fb4-a6f038f1dcd8">
 
 <br>
 <br>
