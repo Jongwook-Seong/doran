@@ -25,7 +25,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("/basket")
@@ -48,9 +47,6 @@ public class BasketController {
             @ApiResponse(responseCode = "500", description = "Fail")
     })
     public ResponseEntity<BasketItemResponse> setBasketItem(@RequestHeader String userUuid, @Valid @RequestBody BasketItemCreateRequest basketItemCreateRequest) throws InterruptedException {
-        if (userUuid.isEmpty()) {
-            throw new NoSuchElementException(messageUtil.getUserUuidEmptyMessage());
-        }
         basketService.addBasketItem(userUuid, basketItemCreateRequest);
         return ResponseEntity.ok(BasketItemResponse.getInstance(basketItemCreateRequest.getItemUuid(), messageUtil.getBasketItemCreateMessage()));
     }
@@ -75,10 +71,6 @@ public class BasketController {
             @ApiResponse(responseCode = "500", description = "Fail")
     })
     public ResponseEntity<List<ItemSimpleWithCountResponse>> getBasketItemList(@RequestHeader String userUuid) throws InterruptedException {
-        if (userUuid.isEmpty()) {
-            throw new NoSuchElementException(messageUtil.getUserUuidEmptyMessage());
-        }
-
         CachedBasket cachedBasket = basketItemListCacheService.get(userUuid);
         if (cachedBasket != null)
             return ResponseEntity.status(HttpStatus.OK)

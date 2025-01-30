@@ -34,6 +34,14 @@ public class MessageUtil {
         return getMessage("request.empty.userUuid");
     }
 
+    public String getOrderUuidEmptyMessage() {
+        return getMessage("request.empty.orderUuid");
+    }
+
+    public String getItemUuidEmptyMessage() {
+        return getMessage("request.empty.itemUuid");
+    }
+
     public String getBasketItemCreateAlreadyMessage() {
         return getMessage("request.already.basketItem.create");
     }
