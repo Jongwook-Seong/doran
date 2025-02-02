@@ -93,9 +93,6 @@ public class ItemController {
     /** 책 삭제하기 **/
     @DeleteMapping("/delete")
     public ResponseEntity<Void> deleteItem(@RequestParam String itemUuid) {
-        if (itemUuid.isEmpty()) {
-            throw new NoSuchElementException(messageUtil.getItemUuidEmptyErrorMessage());
-        }
         itemService.deleteItem(itemUuid);
         return ResponseEntity.accepted().build();
     }
@@ -103,9 +100,6 @@ public class ItemController {
     /** 아이템 단순정보(itemUuid, itemName, itemImageUrl) 조회(서비스간 통신 호출) **/
     @GetMapping("/items/simple")
     public ResponseEntity<List<ItemSimpleWithoutPriceResponse>> getItemSimpleWithoutPrice(@RequestParam("itemUuidList") List<String> itemUuidList) {
-        if (itemUuidList.isEmpty()) {
-            throw new NoSuchElementException(messageUtil.getItemUuidEmptyErrorMessage());
-        }
         List<ItemSimpleWithoutPriceResponse> itemSimpleWithoutPriceList = itemService.getItemSimpleWithoutPriceList(itemUuidList);
         return new ResponseEntity<>(itemSimpleWithoutPriceList, HttpStatus.OK);
     }
