@@ -1,6 +1,8 @@
 package com.sjw.doran.apigatewayservice.filter;
 
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
@@ -12,6 +14,8 @@ import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
+
+import javax.crypto.SecretKey;
 
 @Component
 @Slf4j
@@ -51,10 +55,11 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
     private boolean isJwtValid(String jwt) {
         boolean returnValue = true;
         String subject = null;
+        SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(env.getProperty("token.secret")));
+
         try {
-            subject = Jwts.parser().setSigningKey(env.getProperty("token.secret"))
-                    .parseClaimsJws(jwt).getBody()
-                    .getSubject();
+            subject = Jwts.parser().verifyWith(key).build()
+                    .parseSignedClaims(jwt).getPayload().getSubject();
         } catch (Exception ex) {
             returnValue = false;
         }
