@@ -39,14 +39,20 @@ public class IntegrationTest {
             .withPassword("doranms1234!");
     private static final RedisContainer REDIS_CONTAINER = new RedisContainer(RedisContainer.DEFAULT_IMAGE_NAME.withTag("7.4.2"));
     private static final MongoDBContainer MONGO_DB_CONTAINER = new MongoDBContainer(DockerImageName.parse("mongo:8.0"));
-    private static final KafkaContainer KAFKA_CONTAINER = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:7.8.1"));
+    private static final KafkaContainer KAFKA_CONTAINER = new KafkaContainer(DockerImageName.parse("apache/kafka:3.7.2"));
 
     @BeforeAll
     public static void setupContainers() {
-        MYSQL_CONTAINER.start();
-        REDIS_CONTAINER.start();
-        MONGO_DB_CONTAINER.start();
-        KAFKA_CONTAINER.start();
+        try {
+            MYSQL_CONTAINER.start();
+            REDIS_CONTAINER.start();
+            MONGO_DB_CONTAINER.start();
+            KAFKA_CONTAINER.start();
+        } catch (Exception e) {
+            System.err.println("Container setup failed: " + e.getMessage());
+            System.err.println(KAFKA_CONTAINER.getLogs());
+            throw e;
+        }
     }
 
     @AfterAll
