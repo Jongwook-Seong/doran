@@ -22,7 +22,7 @@ public class OrderDocumentRepositoryImpl implements OrderDocumentCustomRepositor
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime threeMonthsAgo = now.minusMonths(3L);
 
-        org.springframework.data.mongodb.core.query.Query query = new Query();
+        Query query = new Query();
         query.addCriteria(Criteria.where("userUuid").is(userUuid)
                 .and("orderDate").gte(threeMonthsAgo).lte(now));
         query.with(Sort.by(Sort.Direction.DESC, "orderDate"));

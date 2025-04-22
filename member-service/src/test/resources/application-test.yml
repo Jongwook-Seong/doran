@@ -1,0 +1,99 @@
+server:
+  port: 0
+
+spring:
+  config:
+    activate:
+      on-profile: test
+  application:
+    name: member-service
+  messages:
+    basename: errors, messages
+  datasource:
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+    url: jdbc:tc:mysql://localhost:23306/test-member
+    username: doranms
+    password: doranms1234!
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        format_sql: true
+        show-sql: true
+  main:
+    allow-bean-definition-overriding: true
+  cloud:
+    openfeign:
+      circuitbreaker:
+        enabled: true
+        group:
+          enabled: true
+  kafka:
+    bootstrap-servers: localhost:9092
+  data:
+    mongodb:
+      uri: mongodb://testmember:1234@localhost:27217/doranms?authSource=admin
+      authentication-database: admin
+    redis:
+      host: localhost
+      port: 26379
+
+eureka:
+  instance:
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://127.0.0.1:8761/eureka
+
+logging:
+  level:
+    org.hibernate.SQL: debug
+
+management:
+  health:
+    circuitbreakers:
+      enabled: true
+
+resilience4j.retry:
+  configs:
+    default:
+      maxAttempts: 3
+      waitDuration: 1000
+      retryExceptions:
+        - com.sjw.doran.memberservice.exception.RetryException
+      ignoreExceptions:
+        - com.sjw.doran.memberservice.exception.IgnoreException
+  instances:
+    baseRetryConfig:
+      baseConfig: default
+
+resilience4j.circuitbreaker:
+  configs:
+    default:
+      slidingWindowType: COUNT_BASED
+      registerHealthIndicator: true
+      slidingWindowSize: 10
+      failureRateThreshold: 40
+      minimumNumberOfCalls: 7
+      waitDurationInOpenState: 10s
+
+      slowCallDurationThreshold: 3000
+      slowCallRateThreshold: 60
+
+      permittedNumberOfCallsInHalfOpenState: 5
+      automaticTransitionFromOpenToHalfOpenEnabled: true
+
+      recordExceptions:
+        #        - com.sjw.doran.memberservice.exception.FeignException.FeignOrderServerException
+        #        - com.sjw.doran.memberservice.exception.FeignException.FeignItemServerException
+        - com.sjw.doran.memberservice.exception.RecordException
+      ignoreExceptions:
+        #        - com.sjw.doran.memberservice.exception.FeignException.FeignOrderClientException
+        #        - com.sjw.doran.memberservice.exception.FeignException.FeignItemClientException
+        - com.sjw.doran.memberservice.exception.IgnoreException
+  instances:
+    baseCircuitBreakerConfig:
+      baseConfig: default
