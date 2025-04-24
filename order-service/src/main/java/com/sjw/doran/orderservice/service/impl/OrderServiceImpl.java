@@ -92,14 +92,11 @@ public class OrderServiceImpl implements OrderService {
             DeliveryTracking savedDeliveryTracking = deliveryTrackingRepository.save(deliveryTracking);
             Delivery savedDelivery = savedOrder.getDelivery();
             resilientItemServiceClient.orderItems(itemUuidList, itemCountList);
-            System.out.println("resilientItemServiceClient.orderItems");
             /* Publish kafka message */
             OrderTopicMessage orderTopicMessage = orderMapper.toOrderTopicMessage(savedOrder, savedOrderItems, savedDelivery.getId(), null);
             applicationEventPublisher.publishEvent(new OrderEvent(this, savedOrder.getId(), orderTopicMessage.getPayload(), OperationType.CREATE));
-            System.out.println("publishEvent - OrderEvent");
             DeliveryTopicMessage deliveryTopicMessage = deliveryMapper.toDeliveryTopicMessage(savedDelivery, List.of(savedDeliveryTracking), null);
             applicationEventPublisher.publishEvent(new DeliveryEvent(this, savedDelivery.getId(), deliveryTopicMessage.getPayload(), OperationType.CREATE));
-            System.out.println("publishEvent - DeliveryEvent");
         } catch (RetryException e) {
             throw e;
         } catch (RecordException e) {
@@ -166,9 +163,6 @@ public class OrderServiceImpl implements OrderService {
         // Get Item-Service data by Kafka Asynchronous Communication, instead of FeignClient
         List<ItemDocument> itemDocuments = itemDocumentRepository.findAllByItemUuidIn(itemUuidList);
         insertItemNameAndImageUrlIntoOrderSimpleList(itemMapper.toItemSimpleWxPResponseList(itemDocuments), orderSimpleList);
-//        List<ItemSimpleWithoutPriceResponse> itemSimpleWxPList = resilientItemServiceClient.getItemSimpleWithoutPrice(itemUuidList);
-//        // itemName, itemImageUrl 추출 및 삽입
-//        insertItemNameAndImageUrlIntoOrderSimpleList(itemSimpleWxPList, orderSimpleList);
         return OrderListResponse.getInstance(orderSimpleList);
     }
 
