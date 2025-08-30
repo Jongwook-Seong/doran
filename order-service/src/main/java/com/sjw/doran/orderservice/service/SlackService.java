@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 import static com.slack.api.webhook.WebhookPayloads.payload;
 
-@Service
+//@Service
 public class SlackService {
 
     @Value("${webhook.slack.url}")
