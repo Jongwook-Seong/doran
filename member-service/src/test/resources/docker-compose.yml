@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:9.2.0
+    environment:
+      MYSQL_DATABASE: test-member
+      MYSQL_USER: doranms
+      MYSQL_PASSWORD: doranms1234!
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "23306:3306"
+
+  mongodb:
+    image: mongo:4.4.6
+    ports:
+      - "27217:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=testmember
+      - MONGO_INITDB_ROOT_PASSWORD=1234
+      - MONGO_INITDB_DATABASE=doranms
+
+  redis:
+    image: redis:7.4.2
+    ports:
+      - "26379:6379"

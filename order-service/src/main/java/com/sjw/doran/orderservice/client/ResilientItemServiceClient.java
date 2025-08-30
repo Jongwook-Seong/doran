@@ -22,7 +22,7 @@ import java.util.List;
 public class ResilientItemServiceClient {
 
     private final ItemServiceClient itemServiceClient;
-    private final SlackService slackService;
+//    private final SlackService slackService;
 
     private static final String BASE_CIRCUIT_BREAKER_CONFIG = "baseCircuitBreakerConfig";
     private static final String BASE_RETRY_CONFIG = "baseRetryConfig";
@@ -90,7 +90,7 @@ public class ResilientItemServiceClient {
         log.info("Fallback for getOrderItems: {}", exception.toString());
         HashMap<String, String> data = new HashMap<>();
         data.put(exception.toString(), exception.getMessage());
-        slackService.sendMessage("[ORDER-SERVICE] o.s.c.l.core.RoundRobinLoadBalancer: No servers available for service: item-service", data);
+//        slackService.sendMessage("[ORDER-SERVICE] o.s.c.l.core.RoundRobinLoadBalancer: No servers available for service: item-service", data);
         throw exception;
 //        return new ArrayList<>();
     }
@@ -109,7 +109,7 @@ public class ResilientItemServiceClient {
         log.info("Fallback for orderItems: {}", exception.toString());
         HashMap<String, String> data = new HashMap<>();
         data.put(exception.toString(), exception.getMessage());
-        slackService.sendMessage("[ORDER-SERVICE] o.s.c.l.core.RoundRobinLoadBalancer: No servers available for service: item-service", data);
+//        slackService.sendMessage("[ORDER-SERVICE] o.s.c.l.core.RoundRobinLoadBalancer: No servers available for service: item-service", data);
         throw exception;
     }
 
@@ -127,7 +127,7 @@ public class ResilientItemServiceClient {
         log.info("Fallback for cancelOrderItems: {}", exception.toString());
         HashMap<String, String> data = new HashMap<>();
         data.put(exception.toString(), exception.getMessage());
-        slackService.sendMessage("[ORDER-SERVICE] o.s.c.l.core.RoundRobinLoadBalancer: No servers available for service: item-service", data);
+//        slackService.sendMessage("[ORDER-SERVICE] o.s.c.l.core.RoundRobinLoadBalancer: No servers available for service: item-service", data);
         throw exception;
     }
 
@@ -146,7 +146,7 @@ public class ResilientItemServiceClient {
         log.info("Fallback for getItemSimpleWithoutPrice: {}", exception.toString());
         HashMap<String, String> data = new HashMap<>();
         data.put(exception.toString(), exception.getMessage());
-        slackService.sendMessage("[ORDER-SERVICE] o.s.c.l.core.RoundRobinLoadBalancer: No servers available for service: item-service", data);
+//        slackService.sendMessage("[ORDER-SERVICE] o.s.c.l.core.RoundRobinLoadBalancer: No servers available for service: item-service", data);
         throw exception;
 //        return new ArrayList<>();
     }

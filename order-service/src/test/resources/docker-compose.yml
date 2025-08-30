@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:9.2.0
+    environment:
+      MYSQL_DATABASE: test-order
+      MYSQL_USER: doranos
+      MYSQL_PASSWORD: doranos1234!
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "23306:3306"
+
+  mongodb:
+    image: mongo:4.4.6
+    ports:
+      - "27217:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=testorder
+      - MONGO_INITDB_ROOT_PASSWORD=1234
+      - MONGO_INITDB_DATABASE=doranos

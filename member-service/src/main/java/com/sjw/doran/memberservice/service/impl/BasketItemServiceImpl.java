@@ -51,7 +51,9 @@ public class BasketItemServiceImpl implements BasketItemService {
 //        List<BasketItem> basketItemList = basketItemRepository.findAllByBasket(basket);
 //        basketItemList.forEach(basketItem -> itemUuidList.add(basketItem.getItemUuid()));
         BasketDocument basketDocument = basketDocumentRepository.findById(basket.getId()).get();
-        basketDocument.setItems(new ArrayList<>());
+        if (basketDocument.getItems() == null) {
+            basketDocument.setItems(new ArrayList<>());
+        }
         /* Set cache */
         basketItemListCacheService.set(basketMapper.toCachedBasket(basketDocument));
         basketDocument.getItems().forEach(item -> itemUuidList.add(item.getItemUuid()));
