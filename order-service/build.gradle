@@ -42,7 +42,7 @@ dependencies {
     implementation 'io.github.resilience4j:resilience4j-spring-boot3'
     implementation 'io.github.resilience4j:resilience4j-all'
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0'
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+//    developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
     implementation 'com.mysql:mysql-connector-j'
     implementation 'org.springframework.kafka:spring-kafka'

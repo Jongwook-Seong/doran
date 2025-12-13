@@ -1,91 +1,124 @@
 package com.sjw.doran.authservice.jwt;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.interfaces.DecodedJWT;
 import com.sjw.doran.authservice.dto.TokenDto;
-import com.sjw.doran.authservice.entity.User;
+import com.sjw.doran.authservice.entity.UserEntity;
 import com.sjw.doran.authservice.exception.AuthServiceException;
 import com.sjw.doran.authservice.exception.ErrorCode;
-import com.sjw.doran.authservice.redis.RedisUtil;
+import com.sjw.doran.authservice.redis.service.KeyRedisService;
 import com.sjw.doran.authservice.repository.UserRepository;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.UnsupportedJwtException;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SecurityException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
+import javax.crypto.SecretKey;
 import java.security.Key;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Component
-public class TokenProvider {
+public class TokenProvider implements InitializingBean {
 
     private static final String AUTHORITIES_KEY = "auth";
+    private final String secret;
+    private final long accessTokenValidityInMilliseconds;
+    private final long refreshTokenValidityInMilliseconds;
+    private final KeyRedisService keyRedisService;
+    private Key key;
     private final UserRepository userRepository;
-    private final RedisUtil redisUtil;
 
-    public TokenProvider(UserRepository userRepository, RedisUtil redisUtil) {
+    public TokenProvider(
+            @Value("${jwt.secret}") String secret,
+            @Value("${jwt.access-token-validity-in-millis}") long accessTokenValidityInMilliseconds,
+            @Value("${jwt.refresh-token-validity-in-millis}") long refreshTokenValidityInMilliseconds,
+            KeyRedisService keyRedisService,
+            UserRepository userRepository) {
+        this.secret = secret;
+        this.accessTokenValidityInMilliseconds = accessTokenValidityInMilliseconds;
+        this.refreshTokenValidityInMilliseconds = refreshTokenValidityInMilliseconds;
+        this.keyRedisService = keyRedisService;
         this.userRepository = userRepository;
-        this.redisUtil = redisUtil;
     }
 
-    public TokenDto createToken(String identity, String authorities) {
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        byte[] keyBytes = Decoders.BASE64.decode(secret);
+        this.key = Keys.hmacShaKeyFor(keyBytes);
+    }
 
-        User user = userRepository.findByIdentity(identity).get();
+    // Authorization 객체의 권한 정보를 이용해서 토큰을 생성하는 메소드
 
-        String accessToken = JWT.create()
-                .withSubject(user.getEmail())
-                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.ACCESS_TOKEN_EXPIRATION_TIME))
-                .withClaim("id", user.getId())
-                .withClaim("identity", user.getIdentity())
-                .withClaim(AUTHORITIES_KEY, authorities)
-                .sign(Algorithm.HMAC512(JwtProperties.SECRET));
+    /**
+     * Authorization 객체의 권한 정보를 이용해서 토큰을 생성하는 메소드
+     * @param userId
+     * @return
+     */
+    public TokenDto createToken(String userId, String authorities) {
+        long now = (new java.util.Date()).getTime();
+        UserEntity userEntity = userRepository.findByUserId(userId).orElseThrow(() -> new AuthServiceException(ErrorCode.USER_NOT_FOUND));
 
-        String refreshToken = JWT.create()
-                .withSubject(user.getEmail())
-                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.REFRESH_TOKEN_EXPIRATION_TIME))
-                .withClaim("id", user.getId())
-                .withClaim("identity", user.getIdentity())
-                .withClaim(AUTHORITIES_KEY, authorities)
-                .sign(Algorithm.HMAC512(JwtProperties.SECRET));
+        String accessToken = Jwts.builder()
+                .claim("userId", userEntity.getUserId())
+                .claim("email", userEntity.getEmail())
+                .claim(AUTHORITIES_KEY, authorities)
+                .subject(userEntity.getUserUuid())
+                .expiration(new Date(now + this.accessTokenValidityInMilliseconds))
+                .signWith(key)
+                .compact();
+
+        String refreshToken = Jwts.builder()
+                .claim("userId", userEntity.getUserId())
+                .claim("email", userEntity.getEmail())
+                .claim(AUTHORITIES_KEY, authorities)
+                .subject(userEntity.getUserUuid())
+                .expiration(new Date(now + this.refreshTokenValidityInMilliseconds))
+                .signWith(key)
+                .compact();
 
         return new TokenDto(accessToken, refreshToken);
     }
 
+    /**
+     * 토큰을 파라미터로 받아 토큰에 담겨있는 정보로 Authentication 객체를 리턴하는 메소드
+     * @param token
+     * @return
+     */
     public Authentication getAuthentication(String token) {
+        Claims claims = getClaims(token);
 
-        DecodedJWT decodedToken = getDecodedJWT(token);
-
-        List<SimpleGrantedAuthority> authorities =
-                Arrays.stream(
-                        decodedToken.getClaim(AUTHORITIES_KEY).toString().split(","))
+        Collection<? extends GrantedAuthority> authorities =
+                Arrays.stream(claims.get(AUTHORITIES_KEY).toString().split(","))
                         .map(SimpleGrantedAuthority::new)
-                        .collect(Collectors.toList());
-
-        UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(
-                        decodedToken.getClaim("identity"), null, authorities);
-
-        return authenticationToken;
+                        .toList();
+        return new UsernamePasswordAuthenticationToken(claims.get("userId"), null, authorities);
     }
 
+    /**
+     * 토큰의 유효성 검증 메소드
+     * @param token
+     * @return
+     */
     public boolean validateToken(String token) {
         try {
-            if (redisUtil.hasKeyBlackList(token))
+            Jwts.parser()
+                    .verifyWith((SecretKey) key)
+                    .build()
+                    .parseSignedClaims(token);
+            if (keyRedisService.hasKeyBlackList(token)) {
                 throw new AuthServiceException(ErrorCode.INVALID_ACCESS_TOKEN, "로그아웃 또는 탈퇴한 회원입니다.");
+            }
             return true;
-        } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
+        } catch (SecurityException | MalformedJwtException e) {
             log.info("잘못된 JWT 서명입니다.");
         } catch (ExpiredJwtException e) {
             log.info("만료된 JWT 토큰입니다.");
@@ -97,8 +130,20 @@ public class TokenProvider {
         return false;
     }
 
-    public DecodedJWT getDecodedJWT(String token) {
-        return JWT.require(Algorithm.HMAC512(JwtProperties.SECRET))
-                .build().verify(token);
+    /**
+     * 토큰을 파라미터로 받아 토큰에 담겨있는 정보를 꺼내는 메소드
+     * @param token
+     * @return Claims
+     */
+    public Claims getClaims(String token) {
+        try {
+            return Jwts.parser()
+                    .verifyWith((SecretKey) key)
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
+        } catch (ExpiredJwtException e) {
+            return e.getClaims();
+        }
     }
 }

@@ -13,14 +13,12 @@ public class GlobalControllerAdvice {
     @ExceptionHandler(AuthServiceException.class)
     public ResponseEntity<?> applicationHandler(AuthServiceException e) {
         log.error("Error occurs {}", e.toString());
-        return ResponseEntity.status(e.getErrorCode().getStatus())
-                .body(e.getErrorCode().name());
+        return ResponseEntity.status(e.getErrorCode().getStatus()).body(e.getErrorCode().name());
     }
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<?> applicationHandler(RuntimeException e) {
         log.error("Error occurs {}", e.toString());
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ErrorCode.INTERNAL_SERVER_ERROR.name());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ErrorCode.INTERNAL_SERVER_ERROR.name());
     }
 }

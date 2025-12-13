@@ -37,7 +37,7 @@ public class ItemController {
     // 임시
     /** 책 상세 보기 **/
     @GetMapping("/book/detail")
-    public ResponseEntity<Item> bookDetail(@RequestParam String itemUuid) {
+    public ResponseEntity<Item> bookDetail(@RequestParam("itemUuid") String itemUuid) {
         if (itemUuid.isEmpty()) {
             throw new NoSuchElementException(messageUtil.getItemUuidEmptyErrorMessage());
         }
@@ -77,7 +77,7 @@ public class ItemController {
 
     // 임시
     @GetMapping("/book/search")
-    public ResponseEntity<List<ItemSimpleResponse>> bookSearch(@RequestParam String keywords) {
+    public ResponseEntity<List<ItemSimpleResponse>> bookSearch(@RequestParam("keywords") String keywords) {
         List<ItemSimpleResponse> itemSimpleResponseList = itemService.getBooksByKeyword(keywords);
 //        List<ItemSimpleResponse> itemSimpleResponseList = itemService.getItemsByKeyword(keywords);
         return new ResponseEntity<>(itemSimpleResponseList, HttpStatus.OK);
@@ -92,7 +92,7 @@ public class ItemController {
 
     /** 책 삭제하기 **/
     @DeleteMapping("/delete")
-    public ResponseEntity<Void> deleteItem(@RequestParam String itemUuid) {
+    public ResponseEntity<Void> deleteItem(@RequestParam("itemUuid") String itemUuid) {
         itemService.deleteItem(itemUuid);
         return ResponseEntity.accepted().build();
     }

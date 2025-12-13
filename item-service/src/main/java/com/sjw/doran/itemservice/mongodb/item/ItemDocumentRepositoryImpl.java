@@ -68,10 +68,14 @@ public class ItemDocumentRepositoryImpl implements ItemDocumentCustomRepository 
 
     @Override
     public List<ItemDocument> findBooksByKeyword(String keyword) {
-        Query query = new Query(Criteria.where("itemName")
-                .orOperator(Criteria.where("bookInfo.author"))
-                .andOperator(Criteria.where("category").is(Category.BOOK))
-                .regex(keyword, "i"));
+        Criteria criteria = new Criteria().andOperator(
+                Criteria.where("category").is(Category.BOOK),
+                new Criteria().orOperator(
+                        Criteria.where("itemName").regex(keyword, "i"),
+                        Criteria.where("bookInfo.author").regex(keyword, "i")
+                )
+        );
+        Query query = new Query(criteria);
         return mongoTemplate.find(query, ItemDocument.class);
     }
 

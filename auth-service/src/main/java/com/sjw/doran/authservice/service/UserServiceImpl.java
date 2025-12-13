@@ -1,17 +1,19 @@
 package com.sjw.doran.authservice.service;
 
+import com.sjw.doran.authservice.client.MemberServiceClient;
 import com.sjw.doran.authservice.dto.UserDto;
-import com.sjw.doran.authservice.entity.User;
-import com.sjw.doran.authservice.entity.constant.UserRole;
+import com.sjw.doran.authservice.entity.UserEntity;
+import com.sjw.doran.authservice.entity.UserRole;
 import com.sjw.doran.authservice.exception.AuthServiceException;
 import com.sjw.doran.authservice.exception.ErrorCode;
+import com.sjw.doran.authservice.mapper.UserMapper;
 import com.sjw.doran.authservice.repository.UserRepository;
-import com.sjw.doran.authservice.util.ModelMapperUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -20,83 +22,97 @@ import java.util.UUID;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final ModelMapperUtil modelMapperUtil;
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final BCryptPasswordEncoder passwordEncoder;
+    private final UserMapper userMapper;
+    private final MemberServiceClient memberServiceClient;
 
     @Override
-    @Transactional
     public void join(UserDto userDto) {
-        User user = User.builder()
-                .userUuid(UUID.randomUUID().toString())
-                .identity(userDto.getIdentity())
-                .password(bCryptPasswordEncoder.encode(userDto.getPassword()))
-                .email(userDto.getEmail())
-                .username(userDto.getUsername())
-                .birthDate(userDto.getBirthDate())
-                .gender(userDto.getGender())
-                .role(UserRole.USER)
-                .build();
-        userRepository.save(user);
+        UserEntity findUserEntity = userRepository.findByUserId(userDto.getUserId()).orElse(null);
+        if (findUserEntity != null) {
+            throw new AuthServiceException(ErrorCode.DUPLICATED_USER_ID);
+        }
+
+        userDto.setUserUuid(UUID.randomUUID().toString());
+        userDto.setPassword(passwordEncoder.encode(userDto.getPassword()));
+        userDto.setActivated(true);
+        userDto.setRole(UserRole.USER);
+        UserEntity userEntity = userMapper.toUserEntity(userDto);
+
+        try {
+            memberServiceClient.joinMember(userDto.getUserUuid(), userDto.getUsername());
+            userRepository.save(userEntity);
+        } catch (Exception e) {
+            throw new AuthServiceException(ErrorCode.MEMBER_CREATION_ERROR);
+        }
     }
 
     @Override
     @Transactional(readOnly = true)
     public UserDto getUserByUserUuid(String userUuid) {
-        User user = userRepository.findByUserUuid(userUuid)
-                .orElseThrow(() -> new AuthServiceException(ErrorCode.USER_NOT_FOUND));
-        return modelMapperUtil.convertToUserDto(user);
+        UserEntity userEntity = userRepository.findByUserUuid(userUuid).orElseThrow(() ->
+                new AuthServiceException(ErrorCode.INVALID_USER_UUID));
+        return userMapper.toUserDto(userEntity);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public UserDto getUserByIdentity(String identity) {
-        User user = userRepository.findByIdentity(identity)
-                .orElseThrow(() -> new AuthServiceException(ErrorCode.USER_NOT_FOUND));
-        return modelMapperUtil.convertToUserDto(user);
+    public UserDto getUserByUserId(String userId) {
+        UserEntity userEntity = userRepository.findByUserId(userId).orElseThrow(() ->
+                new AuthServiceException(ErrorCode.USER_NOT_FOUND));
+        return userMapper.toUserDto(userEntity);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<UserDto> getUsers() {
-        List<User> users = userRepository.findAll();
-        return modelMapperUtil.mapToUserDtoList(users);
+        List<UserEntity> userEntityList = userRepository.findAll();
+        List<UserDto> userDtoList = new ArrayList<>();
+        userEntityList.forEach(userEntity -> userDtoList.add(userMapper.toUserDto(userEntity)));
+        return userDtoList;
     }
 
     @Override
     @Transactional
-    public void modifyUserInfo(String userUuid, String identity, String email, String password) {
-        User user = userRepository.findByIdentity(identity).orElseThrow(() ->
+    public void modifyUserInfo(String userId, String userUuid, String password) {
+        UserEntity userEntity = userRepository.findByUserId(userId).orElseThrow(() ->
                 new AuthServiceException(ErrorCode.USER_NOT_FOUND));
 
-        if (!user.getUserUuid().equals(userUuid)) {
+        if (!userEntity.getUserUuid().equals(userUuid)) {
             throw new AuthServiceException(ErrorCode.INVALID_USER_UUID);
         }
 
-        user.modifyUserInfo(email, bCryptPasswordEncoder.encode(password));
-        userRepository.save(user);
+        userEntity.modifyPassword(passwordEncoder.encode(password));
+        userRepository.save(userEntity);
     }
 
     @Override
     @Transactional
-    public void deleteUser(String identity, String userUuid) {
-        User user = userRepository.findByIdentity(identity).orElseThrow(() ->
+    public void deleteUser(String userId, String userUuid) {
+        UserEntity userEntity = userRepository.findByUserUuid(userUuid).orElseThrow(() ->
                 new AuthServiceException(ErrorCode.USER_NOT_FOUND));
-
-        if (!user.getUserUuid().equals(userUuid)) {
+        if (!userEntity.getUserId().equals(userId)) {
             throw new AuthServiceException(ErrorCode.INVALID_USER_UUID);
+        }
+        if (userEntity.isDeleted()) {
+            throw new AuthServiceException(ErrorCode.USER_NOT_FOUND);
         }
 
         try {
-            // memberServiceClient.deleteMember()
-            userRepository.delete(user);
+            memberServiceClient.deleteMember(userEntity.getUserUuid());
+
+            userEntity.changeDeleted(true);
+            userRepository.save(userEntity);
         } catch (Exception e) {
-            throw new AuthServiceException(ErrorCode.USER_DELETE_ERROR);
+            throw new AuthServiceException(ErrorCode.MEMBER_DELETE_ERROR);
         }
     }
 
     @Override
     @Transactional
-    public User userUpdate(User user) {
-        return userRepository.save(user);
+    public UserDto userUpdate(UserDto userDto) {
+        UserEntity userEntity = userMapper.toUserEntity(userDto);
+        UserEntity savedUserEntity = userRepository.save(userEntity);
+        return userMapper.toUserDto(savedUserEntity);
     }
 }

@@ -7,7 +7,8 @@
 ## Period / Personnel
 - 설계 및 개발 : 24.03. ~ 24.07. / 5개월
 - 성능테스트 및 리팩토링 : 24.06. ~ 24.07. / 2개월
-- BE 1인 개인프로젝트
+- 프론트엔드 개발 : 25.01. / 1개월
+- BE 1인 개인프로젝트 (프론트엔드 포함)
 
 ## Blog
 Velog : https://velog.io/@xav/posts?tag=Doran
@@ -24,6 +25,8 @@ Velog : https://velog.io/@xav/posts?tag=Doran
 - 베스트 상품 리스트 조회
 
 ## Technologies
+
+### Backend
 - **Language** : ![Static Badge](https://img.shields.io/badge/java-17-ED8B00?logo=Java&label=Java&color=ED8B00)
 - **Build** : ![Static Badge](https://img.shields.io/badge/maven-4.0.0-ED1B4B?logo=Maven&label=Maven&color=ED1B4B)
 - **Framework** : ![Static Badge](https://img.shields.io/badge/springboot-3.2.5-6DB33F?logo=springboot&label=Spring%20Boot&color=6DB33F) ![Static Badge](https://img.shields.io/badge/springcloud-2023.0.1-6DB33F?logo=Spring&label=Spring%20Cloud&color=6DB33F)
@@ -31,6 +34,13 @@ Velog : https://velog.io/@xav/posts?tag=Doran
 - **Database/Cache** : ![Static Badge](https://img.shields.io/badge/mysql-8.0-4479A1?logo=MySQL&label=MySQL&color=4479A1) ![Static Badge](https://img.shields.io/badge/mongodb-7.0.3-47A248?logo=MongoDB&label=MongoDB&color=47A248) ![Static Badge](https://img.shields.io/badge/redis-6.0.20-FF4438?logo=Redis&label=Redis&color=FF4438)
 - **Configuration Management** : ![Static Badge](https://img.shields.io/badge/github-2.44.0-231F20?logo=Github&label=Github&color=231F20)
 - **Messaging System** : ![Static Badge](https://img.shields.io/badge/kafka-3.6.0-231F20?logo=ApacheKafka&label=Apache%20Kafka&color=231F20)
+
+### Frontend
+- **Language** : ![Static Badge](https://img.shields.io/badge/typescript-5-3178C6?logo=TypeScript&label=TypeScript&color=3178C6)
+- **Framework** : ![Static Badge](https://img.shields.io/badge/nextjs-15.5.2-000000?logo=Next.js&label=Next.js&color=000000) ![Static Badge](https://img.shields.io/badge/react-19.1.0-61DAFB?logo=React&label=React&color=61DAFB)
+- **Styling** : ![Static Badge](https://img.shields.io/badge/tailwindcss-4-38B2AC?logo=Tailwind%20CSS&label=Tailwind%20CSS&color=38B2AC)
+- **State Management** : ![Static Badge](https://img.shields.io/badge/reactquery-5.87.4-FF4154?logo=React%20Query&label=React%20Query&color=FF4154)
+- **Form Handling** : ![Static Badge](https://img.shields.io/badge/reacthookform-7.62.0-EC5990?logo=React%20Hook%20Form&label=React%20Hook%20Form&color=EC5990) ![Static Badge](https://img.shields.io/badge/zod-4.1.8-3E67B1?logo=Zod&label=Zod&color=3E67B1)
 
 ## Architecture
 <img width="9116" alt="아키텍처" src="https://github.com/user-attachments/assets/6f1c9993-47d4-4afb-b566-c77e5d34e22e">
@@ -56,3 +66,85 @@ Velog : https://velog.io/@xav/posts?tag=Doran
 - JPA N+1 문제 해결로 로딩 속도 및 메모리 성능 최적화
 - MySQL 인덱스 설정을 통한 쿼리 속도 향상
 - 객체 매핑에 대한 리팩토링을 통해 런타임 부하 해소 및 유지보수성 향상(ModelMapper → Mapstruct)
+
+## Getting Started
+
+### Backend
+
+각 서비스를 실행하려면 다음 순서를 따르세요:
+
+1. **Discovery Service** (포트 8761)
+```bash
+cd discovery-service
+./gradlew bootRun
+```
+
+2. **API Gateway** (포트 8000)
+```bash
+cd apigateway-service
+./gradlew bootRun
+```
+
+3. **마이크로서비스들** (순서 무관)
+```bash
+# Auth Service
+cd auth-service
+./gradlew bootRun
+
+# Member Service
+cd member-service
+./gradlew bootRun
+
+# Item Service
+cd item-service
+./gradlew bootRun
+
+# Order Service
+cd order-service
+./gradlew bootRun
+```
+
+### Frontend
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+브라우저에서 http://localhost:3000 접속
+
+## Project Structure
+
+```
+doran/
+├── apigateway-service/     # API Gateway (Spring Cloud Gateway)
+├── discovery-service/      # Service Discovery (Eureka Server)
+├── auth-service/          # 인증/인가 서비스
+├── member-service/        # 회원 및 장바구니 관리 서비스
+├── item-service/          # 상품 관리 서비스
+├── order-service/         # 주문 및 배송 관리 서비스
+├── frontend/              # Next.js 프론트엔드
+│   ├── src/
+│   │   ├── app/          # Next.js 페이지
+│   │   ├── components/   # 재사용 컴포넌트
+│   │   ├── contexts/     # React Context
+│   │   ├── lib/          # 라이브러리 설정
+│   │   └── utils/        # 유틸리티 함수
+│   ├── README.md         # 프론트엔드 상세 문서
+│   ├── IMPLEMENTATION_GUIDE.md  # 구현 가이드
+│   ├── TESTING_GUIDE.md  # 테스트 가이드
+│   └── DEPLOYMENT.md     # 배포 가이드
+└── README.md             # 이 파일
+```
+
+## Frontend Features
+
+- **BFF (Backend for Frontend) 패턴**: API Gateway를 통한 마이크로서비스 통신
+- **반응형 디자인**: 모바일, 태블릿, 데스크톱 지원
+- **상태 관리**: React Query를 사용한 서버 상태 관리
+- **인증**: JWT 토큰 기반 인증
+- **타입 안정성**: TypeScript를 통한 타입 체크
+- **자세한 주석**: React/Next.js 초보자를 위한 상세한 코드 주석
+
+더 자세한 내용은 [Frontend README](./frontend/README.md)를 참조하세요.
