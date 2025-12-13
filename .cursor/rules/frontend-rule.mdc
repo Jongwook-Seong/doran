@@ -1,0 +1,11 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+
+이 폴더 하위의 폴더들은 각각 스프링 클라우드를 활용한 마이크로서비스들이야. discovery-service는 디스커버리 서비스, apigateway-service는 api 게이트웨이 서비스, auth-service는 스프링 시큐리티를 활용하여 회원가입 및 로그인 등 인증/인가 기능을 구현한 인증인가서비스, member-service는 회원관리 및 장바구니 관리 기능을 가진 멤버서비스, order-service는 주문 및 배송관리 기능을 가진 오더서비스, item-service는 상품관리 기능을 가진 아이템서비스야.
+
+이때 이들은 모두 이커머스 애플리케이션을 구성하는 백엔드 마이크로서비스들이고, 이제 이들에 대한 프론트엔드 서버를 구현할거야. 그래서 frontend 폴더를 별도로 만들어서 그곳에서 bff 방식으로 각 마이크로서비스들의 api에 대한 호출이 가능한 화면들을 구성하도록 할건데, 이때 프론트엔드 프레임워크로 next.js를 사용하도록 할거야. 이때 난 참고로 react는 물론 next.js는 처음 사용해보는 거라서 너가 이 프론트엔드를 구성해줄 때에는 반드시 주석으로 코드들에 대한 설명을 같이 적어주면 좋겠어.
+
+그리고 추가로 참고해야 할 게, 프론트엔드에서 각 마이크로서비스의 API를 호출하고자 할 때에는 컨트롤러도 참고해야 하지만, API 게이트웨이 서비스의 application.yml에 명시된 주소변환 방식에 따라야 해. 예를 들어, auth-service의 POST /api/users API의 경우에는 API 게이트웨이 서비스의 주소변환 방식에 따라 http://localhost:8000/auth-service/api/users 경로로 POST 요청을 해야 돼.

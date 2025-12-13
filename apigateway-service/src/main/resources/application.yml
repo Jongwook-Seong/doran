@@ -13,37 +13,57 @@ spring:
     name: apigateway-service
   cloud:
     gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "http://localhost:3001"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders: "*"
+            allowCredentials: true
       routes:
-        - id: auth-simple-service
-          uri: lb://AUTH-SIMPLE-SERVICE
+        - id: auth-service
+          uri: lb://AUTH-SERVICE
           predicates:
-            - Path=/auth-simple-service/login
-            - Method=POST
+            - Path=/auth-service/api/join
+            - Method=POST,OPTIONS
           filters:
             - RemoveRequestHeader=Cookie
-            - RewritePath=/auth-simple-service/(?<segment>/*), /$\{segment}
-        - id: auth-simple-service
-          uri: lb://AUTH-SIMPLE-SERVICE
+            - RewritePath=/auth-service/(?<segment>/*), /$\{segment}
+        - id: auth-service
+          uri: lb://AUTH-SERVICE
           predicates:
-            - Path=/auth-simple-service/users
-            - Method=GET,POST,PUT,DELETE
+            - Path=/auth-service/api/login
+            - Method=POST,OPTIONS
           filters:
             - RemoveRequestHeader=Cookie
-            - RewritePath=/auth-simple-service/(?<segment>/*), /$\{segment}
-        - id: auth-simple-service
-          uri: lb://AUTH-SIMPLE-SERVICE
+            - RewritePath=/auth-service/(?<segment>/*), /$\{segment}
+        - id: auth-service
+          uri: lb://AUTH-SERVICE
           predicates:
-            - Path=/auth-simple-service/**
-            - Method=GET
+            - Path=/auth-service/api/reissue
+            - Method=POST,OPTIONS
           filters:
             - RemoveRequestHeader=Cookie
-            - RewritePath=/auth-simple-service/(?<segment>/*), /$\{segment}
+            - RewritePath=/auth-service/(?<segment>/*), /$\{segment}
+        - id: auth-service
+          uri: lb://AUTH-SERVICE
+          predicates:
+            - Path=/auth-service/**
+            - Method=GET,POST,PUT,DELETE,OPTIONS
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/auth-service/(?<segment>/*), /$\{segment}
             - AuthorizationHeaderFilter
         - id: member-service
           uri: lb://MEMBER-SERVICE
           predicates:
             - Path=/member-service/**
-            - Method=GET,POST,PUT,DELETE
+            - Method=GET,POST,PUT,DELETE,OPTIONS
           filters:
 #            - RemoveRequestHeader=Cookie
             - RewritePath=/member-service/(?<segment>/*), /$\{segment}
@@ -65,14 +85,14 @@ spring:
           uri: lb://ITEM-SERVICE
           predicates:
             - Path=/item-service/**
-            - Method=GET,POST,PUT,DELETE
+            - Method=GET,POST,PUT,DELETE,OPTIONS
           filters:
             - RewritePath=/item-service/(?<segment>/*), /$\{segment}
         - id: order-service
           uri: lb://ORDER-SERVICE
           predicates:
             - Path=/order-service/**
-            - Method=GET,POST,PUT,DELETE
+            - Method=GET,POST,PUT,DELETE,OPTIONS
           filters:
             - RewritePath=/order-service/(?<segment>/*), /$\{segment}
             - name: CircuitBreaker
@@ -125,3 +145,9 @@ resilience4j.circuitbreaker:
   instances:
     baseCircuitBreakerConfig:
       baseConfig: default
+
+token:
+#  access-expiration-time: 3600000 # 1시간
+  access-expiration-time: 1800000
+  refresh-expiration-time: 604800000 # 7일
+  secret: Z29vcm10aG9uLWRvY2tlci1wcm9qZWN0LWF1dGgtc2VydmljZS1qd3QtYXV0aG9yaXphdGlvbi1rZXktZ29vcm10aG9kLWRvY2tlci1wcm9qZWN0LWF1dGgtc2VydmljZQo=

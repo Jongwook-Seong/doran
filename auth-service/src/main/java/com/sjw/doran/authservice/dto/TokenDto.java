@@ -1,15 +1,19 @@
 package com.sjw.doran.authservice.dto;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Data
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
+@Getter
+@NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 public class TokenDto {
 
     private String accessToken;
     private String refreshToken;
+
+    @Builder
+    public TokenDto(String accessToken, String refreshToken) {
+        this.accessToken = accessToken;
+        this.refreshToken = refreshToken;
+    }
 }

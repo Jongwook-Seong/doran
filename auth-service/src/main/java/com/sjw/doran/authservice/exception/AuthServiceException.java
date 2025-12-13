@@ -17,9 +17,9 @@ public class AuthServiceException extends RuntimeException {
 
     @Override
     public String getMessage() {
-        if (message == null) {
+        if (this.message == null) {
             return errorCode.getMessage();
         }
-        return String.format("%s, %s", errorCode.getMessage(), message);
+        return String.format("%s, %s", errorCode.getMessage(), this.message);
     }
 }

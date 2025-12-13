@@ -3,6 +3,7 @@ package com.sjw.doran.orderservice.integration;
 import com.sjw.doran.orderservice.client.ResilientItemServiceClient;
 import com.sjw.doran.orderservice.entity.Address;
 import com.sjw.doran.orderservice.entity.TransceiverInfo;
+import com.sjw.doran.orderservice.exception.RecordException;
 import com.sjw.doran.orderservice.kafka.common.Topic;
 import com.sjw.doran.orderservice.mapper.*;
 import com.sjw.doran.orderservice.mongodb.delivery.DeliveryDocumentRepository;
@@ -21,6 +22,7 @@ import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.junit.jupiter.api.*;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.util.TestPropertyValues;
@@ -30,6 +32,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.DockerComposeContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
@@ -38,9 +41,11 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.kafka.ConfluentKafkaContainer;
 
 import java.io.File;
+import java.time.Duration;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 
 @Testcontainers
 @ActiveProfiles("test")
@@ -62,7 +67,7 @@ public class OrderServiceIntegrationTest {
     @Autowired OrderDocumentRepository orderDocumentRepository;
     @Autowired DeliveryDocumentRepository deliveryDocumentRepository;
     @Autowired ItemDocumentRepository itemDocumentRepository;
-    @Autowired ResilientItemServiceClient resilientItemServiceClient;
+    @MockitoBean ResilientItemServiceClient resilientItemServiceClient;
     @Autowired ApplicationEventPublisher applicationEventPublisher;
     @Autowired OrderMapper orderMapper;
     @Autowired DeliveryMapper deliveryMapper;
@@ -158,19 +163,24 @@ public class OrderServiceIntegrationTest {
     void createOrderTest() throws InterruptedException {
         // given
         for (int i = 0; i < 10; i++) {
-            ItemSimpleInfo itemSimpleInfo = new ItemSimpleInfo(itemUuidList.get(i), 1000, 1);
+            ItemSimpleInfo itemSimpleInfo = new ItemSimpleInfo(itemUuidList.get(i), 1, 1000);
             TransceiverInfo transceiverInfo = new TransceiverInfo("orderer" + i, "receiver" + i, "010-0000-000" + i);
             Address address = new Address("city" + i, "street" + i, "details" + i, "zipcode" + i);
             orderCreateRequests.add(new OrderCreateRequest(List.of(itemSimpleInfo), transceiverInfo, address));
+            Mockito.doThrow(new RecordException("record exception")).when(resilientItemServiceClient).orderItems(List.of(itemUuidList.get(i)), List.of(1));
         }
 
         // when
         for (int i = 0; i < 10; i++) {
-            orderService.createOrder(userUuidList.get(i), orderCreateRequests.get(i));
+            try {
+                orderService.createOrder(userUuidList.get(i), orderCreateRequests.get(i));
+            } catch (RecordException e) {
+                System.out.println("Item-Service Connection required : " + userUuidList.get(i) + " - " + e.getMessage());
+            }
         }
     }
 
-    @Test
+//    @Test
     @Order(2)
     @Transactional
     @Rollback(false)

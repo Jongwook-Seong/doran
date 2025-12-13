@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { login } from '@/utils/api';
+import { login, getUserByUuid } from '@/utils/api';
+import { useAuth } from '@/contexts/AuthContext';
 
 // 로그인 폼의 데이터 타입 정의
 interface LoginFormData {
@@ -14,6 +15,7 @@ interface LoginFormData {
 export default function LoginPage() {
   // Next.js의 라우터 훅 사용
   const router = useRouter();
+  const { login: authLogin } = useAuth();
   
   // 폼 데이터를 관리하는 상태
   const [formData, setFormData] = useState<LoginFormData>({
@@ -46,17 +48,36 @@ export default function LoginPage() {
       // API 유틸리티 함수를 사용하여 로그인 요청
       const result = await login(formData);
 
-      if (result.success) {
-        // 로그인 성공 시 토큰을 로컬 스토리지에 저장
+      if (result.success && result.data) {
+        // 로그인 성공 시 AuthContext를 통해 인증 상태 업데이트
         const loginData = result.data;
-        localStorage.setItem('token', loginData.token);
-        localStorage.setItem('userUuid', loginData.userUuid);
-        localStorage.setItem('userId', loginData.userId);
-        localStorage.setItem('username', loginData.username);
+        console.log('loginData', loginData);
         
-        // 성공 메시지 표시 후 메인 페이지로 이동
-        alert('로그인이 완료되었습니다!');
-        router.push('/');
+        // 로그인 성공 후 받은 토큰으로 사용자 정보를 조회
+        const userResult = await getUserByUuid(
+          loginData.userUuid, 
+          loginData.accessToken, 
+          loginData.refreshToken
+        );
+        console.log('userResult', userResult);
+        
+        if (userResult.success && userResult.data) {
+          const userData = userResult.data;
+          
+          // AuthContext의 login 함수 호출 (refreshToken도 함께 저장)
+          authLogin({
+            userUuid: loginData.userUuid,
+            userId: userData.userId,
+            username: userData.username,
+            email: userData.email
+          }, loginData.accessToken, loginData.refreshToken);
+          
+          // 성공 메시지 표시 후 메인 페이지로 이동
+          alert('로그인이 완료되었습니다!');
+          router.push('/');
+        } else {
+          setErrorMessage('사용자 정보를 가져오는데 실패했습니다.');
+        }
       } else {
         // 에러 응답 처리
         setErrorMessage(result.error || '로그인에 실패했습니다.');
@@ -77,7 +98,7 @@ export default function LoginPage() {
           로그인
         </h2>
         <p className="mt-2 text-center text-sm text-gray-600">
-          도란 쇼핑몰에 오신 것을 환영합니다
+          도란 온라인 서가에 오신 것을 환영합니다
         </p>
       </div>
 

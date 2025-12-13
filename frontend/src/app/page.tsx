@@ -1,75 +1,40 @@
-import Link from "next/link";
+'use client';
 
-// 도란 쇼핑몰 메인 페이지 컴포넌트
+import Link from "next/link";
+import { useAuth } from "@/contexts/AuthContext";
+import { useQuery } from '@tanstack/react-query';
+import { getBestItems } from "@/utils/api";
+import { ShoppingCart, Star } from 'lucide-react';
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+
+// 도란 온라인 서가 메인 페이지 컴포넌트
 export default function Home() {
+  const { user, isAuthenticated, logout } = useAuth();
+  
+  // 베스트 아이템 목록을 가져오는 쿼리
+  // React Query를 사용하여 API 호출을 관리합니다
+  const { data: bestItems, isLoading, error } = useQuery({
+    queryKey: ['bestItems'], // 쿼리 키 - 캐싱과 무효화에 사용됩니다
+    queryFn: getBestItems, // API 호출 함수
+    staleTime: 5 * 60 * 1000, // 5분간 캐시 유지
+  });
+  
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* 헤더 영역 */}
-      <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            {/* 로고 */}
-            <div className="flex items-center">
-              <h1 className="text-2xl font-bold text-indigo-600">도란 쇼핑몰</h1>
-            </div>
-            
-            {/* 네비게이션 메뉴 */}
-            <nav className="flex space-x-8">
-              <Link 
-                href="/" 
-                className="text-gray-900 hover:text-indigo-600 px-3 py-2 text-sm font-medium"
-              >
-                홈
-              </Link>
-              <Link 
-                href="/products" 
-                className="text-gray-500 hover:text-indigo-600 px-3 py-2 text-sm font-medium"
-              >
-                상품
-              </Link>
-              <Link 
-                href="/cart" 
-                className="text-gray-500 hover:text-indigo-600 px-3 py-2 text-sm font-medium"
-              >
-                장바구니
-              </Link>
-              <Link 
-                href="/orders" 
-                className="text-gray-500 hover:text-indigo-600 px-3 py-2 text-sm font-medium"
-              >
-                주문내역
-              </Link>
-            </nav>
-
-            {/* 로그인/회원가입 버튼 */}
-            <div className="flex items-center space-x-4">
-              <Link
-                href="/login"
-                className="text-gray-500 hover:text-indigo-600 px-3 py-2 text-sm font-medium"
-              >
-                로그인
-              </Link>
-              <Link
-                href="/signup"
-                className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium"
-              >
-                회원가입
-              </Link>
-            </div>
-          </div>
-        </div>
-      </header>
+      {/* 헤더 컴포넌트 사용 */}
+      <Header />
 
       {/* 메인 콘텐츠 영역 */}
       <main className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
         {/* 히어로 섹션 */}
         <div className="text-center">
           <h2 className="text-4xl font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
-            <span className="block">도란 쇼핑몰에</span>
+            <span className="block">도란 온라인 서가에</span>
             <span className="block text-indigo-600">오신 것을 환영합니다</span>
           </h2>
           <p className="mt-3 max-w-md mx-auto text-base text-gray-500 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
-            최고의 상품과 서비스로 여러분의 쇼핑을 더욱 즐겁게 만들어드립니다.
+            다양한 책과 예술에 대해 도란도란 여러분을 더욱 즐겁게 만들어드립니다.
           </p>
           <div className="mt-5 max-w-md mx-auto sm:flex sm:justify-center md:mt-8">
             <div className="rounded-md shadow">
@@ -89,6 +54,64 @@ export default function Home() {
               </Link>
             </div>
           </div>
+        </div>
+
+        {/* 베스트 아이템 섹션 */}
+        <div className="mt-24">
+          <div className="text-center">
+            <h3 className="text-3xl font-bold text-gray-900">베스트 아이템</h3>
+            <p className="mt-2 text-lg text-gray-600">인기 있는 상품들을 만나보세요</p>
+          </div>
+          
+          {isLoading ? (
+            <div className="mt-8 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+              {[...Array(4)].map((_, i) => (
+                <div key={i} className="bg-white rounded-lg shadow-md p-6 animate-pulse">
+                  <div className="w-full h-48 bg-gray-200 rounded-md mb-4"></div>
+                  <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                  <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                </div>
+              ))}
+            </div>
+          ) : error ? (
+            <div className="mt-8 text-center">
+              <p className="text-red-600">상품을 불러오는데 실패했습니다.</p>
+            </div>
+          ) : bestItems?.success && bestItems.data && bestItems.data.length > 0 ? (
+            <div className="mt-8 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+              {bestItems.data.slice(0, 4).map((item: any) => (
+                <div key={item.itemUuid} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                  <div className="w-full h-48 bg-gray-200 flex items-center justify-center">
+                    {item.itemImageUrl ? (
+                      <img 
+                        src={item.itemImageUrl} 
+                        alt={item.itemName}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <ShoppingCart className="w-12 h-12 text-gray-400" />
+                    )}
+                  </div>
+                  <div className="p-4">
+                    <h4 className="text-lg font-semibold text-gray-900 mb-2">{item.itemName}</h4>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xl font-bold text-indigo-600">
+                        {item.itemPrice?.toLocaleString()}원
+                      </span>
+                      <div className="flex items-center">
+                        <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                        <span className="text-sm text-gray-600 ml-1">{item.salesCount || 0}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="mt-8 text-center">
+              <p className="text-gray-600">베스트 아이템이 없습니다.</p>
+            </div>
+          )}
         </div>
 
         {/* 서비스 소개 섹션 */}
@@ -178,16 +201,8 @@ export default function Home() {
         </div>
       </main>
 
-      {/* 푸터 영역 */}
-      <footer className="bg-white border-t border-gray-200 mt-24">
-        <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <p className="text-base text-gray-400">
-              &copy; 2024 도란 쇼핑몰. All rights reserved.
-            </p>
-          </div>
-        </div>
-      </footer>
+      {/* 푸터 컴포넌트 사용 */}
+      <Footer />
     </div>
   );
 }

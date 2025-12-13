@@ -1,23 +1,23 @@
 package com.sjw.doran.authservice.dto;
 
-import com.sjw.doran.authservice.entity.constant.Gender;
-import com.sjw.doran.authservice.entity.constant.UserRole;
-import lombok.*;
+import com.sjw.doran.authservice.entity.UserRole;
+import lombok.Data;
 
-import java.time.LocalDate;
+import java.util.Date;
 
 @Data
-@Builder
-@RequiredArgsConstructor
-@AllArgsConstructor
 public class UserDto {
 
     private String userUuid;
-    private String identity;
-    private String password;
-    private String email;
     private String username;
-    private LocalDate birthDate;
-    private Gender gender;
+    private Date birthDate;
+    private String email;
+    private String phoneNumber;
+
     private UserRole role;
+    private String userId;
+    private String password;
+
+    private boolean activated;
+    private boolean isDeleted;
 }

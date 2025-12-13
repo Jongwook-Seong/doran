@@ -52,11 +52,8 @@ export default function SignupPage() {
 
     try {
       // API 유틸리티 함수를 사용하여 회원가입 요청
-      const result = await signUp({
-        ...formData,
-        // birthDate를 Date 객체로 변환
-        birthDate: new Date(formData.birthDate)
-      });
+      // birthDate는 문자열로 전송합니다 (백엔드에서 처리)
+      const result = await signUp(formData);
 
       if (result.success) {
         // 회원가입 성공 시 메인 페이지로 이동
@@ -82,7 +79,7 @@ export default function SignupPage() {
           회원가입
         </h2>
         <p className="mt-2 text-center text-sm text-gray-600">
-          도란 쇼핑몰에 오신 것을 환영합니다
+          도란 온라인 서가에 오신 것을 환영합니다
         </p>
       </div>
 
