@@ -12,7 +12,7 @@ services:
       - ./.data/zookeeper/datalog:/bitnami/zookeeper/datalog
       - ./.data/zookeeper/logs:/bitnami/zookeeper/logs
   kafka1:
-    image: 'bitnami/kafka:3.6.0'
+    image: 'soldevelo/kafka:3.6.2'
     container_name: kafka1
     ports:
       - 19092
@@ -30,7 +30,7 @@ services:
     volumes:
       - ./.data/kafka1:/bitnami/kafka/data
   kafka2:
-    image: 'bitnami/kafka:3.6.0'
+    image: 'soldevelo/kafka:3.6.2'
     container_name: kafka2
     ports:
       - 19092
@@ -48,7 +48,7 @@ services:
     volumes:
       - ./.data/kafka2:/bitnami/kafka/data
   kafka3:
-    image: 'bitnami/kafka:3.6.0'
+    image: 'soldevelo/kafka:3.6.2'
     container_name: kafka3
     ports:
       - 19092
